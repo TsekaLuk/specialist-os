@@ -173,6 +173,11 @@ class YOLOProvider(OptionalProvider):
 
 
 class UltralyticsSegmentProvider(OptionalProvider):
+    # SAM2 keeps a large parameter graph and temporary feature maps in the
+    # worker address space even for tiny inputs. Give the isolated worker a
+    # realistic virtual-memory budget instead of the generic 4 GiB ceiling.
+    memory_requirement_mb = 4096
+
     def __init__(self, model="sam2_s.pt"):
         super().__init__("sam", "vision.segment", model)
 
@@ -219,6 +224,11 @@ class PaddleOCRProvider(OptionalProvider):
 
     def _load_model(self):
         self._check_dependency()
+        # PaddlePaddle 3.3.1 can select oneDNN by default on Linux. The
+        # PP-OCRv5 PIR graph contains attributes that the bundled oneDNN
+        # executor does not implement, so disable that optional engine for a
+        # deterministic CPU path.
+        os.environ["FLAGS_use_mkldnn"] = "0"
         from paddleocr import PaddleOCR
 
         root = self.artifact_root()

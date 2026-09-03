@@ -122,7 +122,13 @@ class SpecialistRuntime:
             worker_env["PATH"] = bin_dir + os.pathsep + os.environ.get("PATH", "")
         artifact_required = bool(getattr(provider, "requires_verified_artifact", False) if requires_verified_artifact is None else requires_verified_artifact)
         worker_backend = "real" if self.backend == "auto" and artifact_required else self.backend
-        worker = JsonlProcessProvider(provider.name, name, provider.model, [str(python), "-m", "specialist", "_worker", "--capability", name, "--backend", worker_backend], timeout_seconds=timeout, cpu_limit_seconds=timeout + 10, env=worker_env, log_path=self.cache.logs / f"{name.replace('.', '__')}.worker.log")
+        # Model providers can reserve substantially more virtual address space
+        # than their steady-state RSS. Keep the generic ceiling for small
+        # providers but let heavyweight providers such as SAM2 start without
+        # being killed by RLIMIT_AS before inference begins.
+        provider_memory_mb = int(getattr(provider, "memory_requirement_mb", 0) or 0)
+        memory_limit_bytes = max(4 * 1024**3, (provider_memory_mb + 2048) * 1024**2)
+        worker = JsonlProcessProvider(provider.name, name, provider.model, [str(python), "-m", "specialist", "_worker", "--capability", name, "--backend", worker_backend], timeout_seconds=timeout, cpu_limit_seconds=timeout + 10, memory_limit_bytes=memory_limit_bytes, env=worker_env, log_path=self.cache.logs / f"{name.replace('.', '__')}.worker.log")
         worker.requires_verified_artifact = artifact_required
         worker.requires_local_model_directory = bool(getattr(provider, "requires_local_model_directory", False))
         return worker

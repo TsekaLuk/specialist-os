@@ -7,6 +7,12 @@
   handling, PaddleOCR PP-OCRv5 compatibility, and process-group cleanup on
   timeout.
 
+## 1.0.2
+
+- Disable the unsupported PaddlePaddle oneDNN path for PP-OCRv5 CPU bundles.
+- Raise the isolated SAM2 virtual-memory budget and propagate operator provider
+  configuration through worker process boundaries.
+
 ## 1.0.1
 
 - Production hardening release for real-provider environments and acceptance

@@ -185,6 +185,13 @@ class ProductionBoundaryTests(unittest.TestCase):
             self.assertEqual(worker.env["MINERU_TOOLS_CONFIG_JSON"], "/opt/mineru.json")
             runtime.close()
 
+    def test_sam_worker_has_heavy_model_address_space_budget(self):
+        with tempfile.TemporaryDirectory() as temp:
+            runtime = SpecialistRuntime(home=Path(temp) / "home", backend="real", isolate=True)
+            worker = runtime.providers["vision.segment"]
+            self.assertGreaterEqual(worker.memory_limit_bytes, 6 * 1024**3)
+            runtime.close()
+
     def test_wheel_provider_requires_an_isolated_environment(self):
         with tempfile.TemporaryDirectory() as temp:
             runtime = SpecialistRuntime(
