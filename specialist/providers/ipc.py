@@ -8,6 +8,8 @@ timeout. A crashed or timed-out worker is terminated before the next request.
 from __future__ import annotations
 
 import json
+import contextlib
+import io
 import os
 import queue
 import signal
@@ -229,7 +231,11 @@ def run_worker(request: dict[str, Any], backend="fallback") -> dict[str, Any]:
         installation = worker_cache.installation(capability)
         if installation and installation.get("artifact_path"):
             provider.model = installation["artifact_path"]
-        result, warnings = provider.infer(Path(request["input_path"]), request.get("options") or {}, worker_cache)
+        # Provider libraries commonly print progress bars and diagnostics to
+        # stdout. The JSONL protocol owns stdout, so capture both streams at
+        # the process boundary to prevent log bytes corrupting a response.
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            result, warnings = provider.infer(Path(request["input_path"]), request.get("options") or {}, worker_cache)
         return {"result": result, "warnings": warnings}
     except WorkerError as exc:
         return {"error": {"code": exc.code, "message": str(exc), "retryable": exc.retryable}}
