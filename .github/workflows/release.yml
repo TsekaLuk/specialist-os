@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 jobs:
   release:
@@ -16,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - run: python -m pip install uv
+      - run: uv lock --check --no-config --default-index https://pypi.org/simple
       - run: python -m pip install build setuptools
       - run: python -m unittest discover -s tests -v
       - run: python -m unittest discover -s tests/e2e -v
@@ -24,6 +28,11 @@ jobs:
           SPECIALIST_RUN_PACKAGE_E2E: "1"
       - run: python scripts/release_check.py --require-artifacts --tag "$GITHUB_REF_NAME"
       - run: python -m build --wheel --sdist
+      - run: python scripts/generate_sbom.py --output dist/sbom.cdx.json
+      - run: sha256sum dist/* > dist/SHA256SUMS
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "dist/*"
       - run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

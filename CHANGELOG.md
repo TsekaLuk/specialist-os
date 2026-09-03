@@ -8,6 +8,14 @@
 - Added release metadata validation and systemd/launchd service templates.
 - MCP SIGTERM now exits cleanly without emitting a traceback or non-JSON
   stdout.
+- Added pinned upstream model artifacts, atomic multi-file bundle manifests,
+  integrity re-checks before provider load, uv dependency locking, SBOM
+  generation and build provenance attestations.
+
+## 1.0.0
+
+- Production release with audited registry artifacts for all eight capability
+  providers and opt-in real-provider integration coverage.
 
 ## 0.2.0
 

@@ -14,6 +14,7 @@ from pathlib import Path
 
 from specialist.cache import Cache
 from specialist.environments import ProviderEnvironmentManager
+from specialist.models import ModelArtifactError, ModelManager
 from specialist.registry import CAPABILITIES, REGISTRY_DOCUMENT
 from specialist.runtime import SpecialistRuntime
 from specialist.server import RuntimeRequestHandler
@@ -44,6 +45,37 @@ class ProductionBoundaryTests(unittest.TestCase):
             with self.assertRaises(Exception) as caught:
                 provider.infer(Path(temp) / "input", {}, cache)
             self.assertEqual(caught.exception.code, "model_artifact_required")
+
+    def test_optional_provider_rechecks_artifact_integrity_before_load(self):
+        class FakeProvider(OptionalProvider):
+            def __init__(self):
+                super().__init__("fake", "vision.ocr", "fake-model")
+
+            def _check_dependency(self):
+                return None
+
+            def _load_model(self):
+                return None
+
+            def infer(self, input_path, options, cache):
+                self.load()
+                return {"blocks": []}, []
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "model.bin"
+            source.write_bytes(b"verified")
+            digest = hashlib.sha256(source.read_bytes()).hexdigest()
+            cache = Cache(root / "home")
+            cache.mark_installed("vision.ocr", "fake", "fake-model", artifact_path=source, sha256=digest)
+            provider = FakeProvider()
+            provider._cache = cache
+            provider.infer(source, {}, cache)
+            source.write_bytes(b"tampered")
+            with self.assertRaises(Exception) as caught:
+                provider._loaded = False
+                provider.infer(source, {}, cache)
+            self.assertEqual(caught.exception.code, "model_artifact_corrupt")
 
     def test_invalid_provider_result_is_rejected_at_runtime_boundary(self):
         class BadProvider:
@@ -80,6 +112,34 @@ class ProductionBoundaryTests(unittest.TestCase):
         for spec in CAPABILITIES.values():
             self.assertEqual(sum(item.recommended for item in spec.models), 1)
             self.assertEqual(spec.model_spec().id, spec.model)
+
+    def test_registry_artifacts_are_pinned_and_bundles_have_manifests(self):
+        for spec in CAPABILITIES.values():
+            for model in spec.models:
+                if model.artifact_kind == "bundle":
+                    self.assertGreaterEqual(len(model.artifact_files), 1)
+                    self.assertTrue(all(item.url.startswith("https://") and len(item.sha256) == 64 for item in model.artifact_files))
+                else:
+                    self.assertIsNotNone(model.artifact_url, spec.name)
+                    self.assertRegex(model.artifact_sha256 or "", r"^[0-9a-f]{64}$")
+
+    def test_bundle_install_is_atomic_and_detects_tampering(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source_a = root / "weights.bin"
+            source_b = root / "config.json"
+            source_a.write_bytes(b"weights")
+            source_b.write_text("{}", encoding="utf-8")
+            files = []
+            for relative, source in (("weights/weights.bin", source_a), ("config.json", source_b)):
+                files.append({"path": relative, "url": source.as_uri(), "sha256": hashlib.sha256(source.read_bytes()).hexdigest()})
+            manager = ModelManager(Cache(root / "home"))
+            result = manager.download_bundle(files, root / "home" / "models" / "bundle", entrypoint="weights/weights.bin")
+            bundle = Path(result["path"])
+            self.assertEqual(manager.verify_bundle(bundle)["entrypoint"], "weights/weights.bin")
+            (bundle / "weights/weights.bin").write_bytes(b"tampered")
+            with self.assertRaises(ModelArtifactError):
+                manager.verify_bundle(bundle)
 
     def test_deepseek_harness_lists_every_core_tool(self):
         tools = json.loads((Path(__file__).parents[1] / "integrations" / "deepseek_harness" / "tools.json").read_text(encoding="utf-8"))["tools"]

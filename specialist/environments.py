@@ -117,6 +117,16 @@ class ProviderEnvironmentManager:
         shutil.rmtree(root)
         return True
 
+    def install_artifact(self, provider: str, artifact: Path) -> dict:
+        """Install a locally verified provider wheel into its isolated env."""
+        python = self.python(provider)
+        if not python.exists() or not artifact.is_file() or artifact.suffix != ".whl":
+            raise EnvironmentError(f"provider artifact is not an installable wheel: {artifact}")
+        uv = shutil.which("uv")
+        command = [uv, "pip", "install", "--python", str(python), str(artifact)] if uv else [str(python), "-m", "pip", "install", str(artifact)]
+        self._run(command)
+        return {"status": "installed", "provider": provider, "artifact": str(artifact), "python": str(python)}
+
     def _run(self, command):
         try:
             completed = subprocess.run(command, capture_output=True, text=True, timeout=self.timeout_seconds, check=False)

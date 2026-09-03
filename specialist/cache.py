@@ -190,8 +190,13 @@ class Cache:
             artifact = Path(installation["artifact_path"]).expanduser() if installation and installation.get("artifact_path") else None
             marker.unlink()
             removed = True
-            if artifact and artifact.is_file() and self.models in artifact.parents:
-                artifact.unlink()
+            if artifact and self.models in artifact.parents:
+                if artifact.is_dir():
+                    import shutil
+
+                    shutil.rmtree(artifact)
+                elif artifact.is_file():
+                    artifact.unlink()
         error_marker.unlink(missing_ok=True)
         return removed
 

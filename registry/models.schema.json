@@ -45,7 +45,22 @@
           "required": ["url", "sha256"],
           "properties": {
             "url": {"type": ["string", "null"]},
-            "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$"}
+            "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$"},
+            "kind": {"type": "string", "enum": ["file", "bundle"]},
+            "filename": {"type": ["string", "null"], "pattern": "^[^/\\\\]+$"},
+            "entrypoint": {"type": ["string", "null"], "minLength": 1},
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path", "url", "sha256"],
+                "properties": {
+                  "path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(^|/)\\.\\.(?:/|$)).+$"},
+                  "url": {"type": "string", "pattern": "^(https?|file)://"},
+                  "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}
+                }
+              }
+            }
           }
         }
       }

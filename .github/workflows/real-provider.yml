@@ -1,0 +1,24 @@
+name: Real Provider Integration
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-provider:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install .
+      - run: python -m pip install ultralytics transformers Pillow torch silero-vad
+      - run: python -m unittest discover -s tests/e2e -p test_real_provider_e2e.py -v
+        env:
+          SPECIALIST_RUN_REAL_PROVIDER_E2E: "1"
+          SPECIALIST_HOME: ${{ runner.temp }}/specialist

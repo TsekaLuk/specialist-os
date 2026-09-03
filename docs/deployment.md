@@ -30,6 +30,10 @@ specialist models clean --max-age-hours 168 --max-entries 5000
 Model downloads must provide a SHA256 checksum. Failed or interrupted
 downloads are removed before an installation marker is committed.
 
+The release contains a CycloneDX SBOM (`sbom.cdx.json`) and GitHub build
+provenance attestation. Keep both with the deployed package record and verify
+the published `SHA256SUMS` file before promotion.
+
 Optional providers do not get permission to invoke their upstream weight
 downloaders by default. Install a verified artifact first, or make the trust
 decision explicit with `--allow-unverified-models` (or
@@ -60,9 +64,8 @@ SPECIALIST_RUN_PACKAGE_E2E=1 python -m unittest discover -s tests/e2e -p test_pa
 Release tags are guarded by `.github/workflows/release.yml`. The tag must match
 the project version (`v<version>`), and
 `scripts/release_check.py --require-artifacts` requires every model entry to
-carry a paired URL and SHA256. The current registry intentionally has no
-unverified production artifacts, so adding real provider weights and their
-license/provenance records is a prerequisite for a publishable release.
+carry a paired HTTPS URL and SHA256. Multi-file providers use an atomic manifest
+that records and verifies every file before loading.
 
 Reference service-manager templates are provided at
 `deploy/systemd/specialist.service` and

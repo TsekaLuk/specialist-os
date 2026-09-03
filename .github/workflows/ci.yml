@@ -43,3 +43,31 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --manifest-path rust-core/Cargo.toml
       - run: PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 cargo check --manifest-path rust-core/Cargo.toml --features python
+
+  macos-arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s tests -v
+      - run: python -m unittest discover -s tests/e2e -v
+      - run: python -m specialist doctor --json
+      - run: python scripts/release_check.py --require-artifacts
+
+  supply-chain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install uv
+      - run: uv lock --check --no-config --default-index https://pypi.org/simple
+      - run: python scripts/release_check.py --require-artifacts
+      - run: python scripts/generate_sbom.py --output dist/sbom.cdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: dist/sbom.cdx.json

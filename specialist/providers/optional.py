@@ -9,6 +9,7 @@ from __future__ import annotations
 import importlib
 import array
 import json
+import os
 import shutil
 import subprocess
 import wave
@@ -16,6 +17,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from .ipc import WorkerError
+from ..models import ModelManager, ModelArtifactError
 
 
 def _missing(package):
@@ -57,6 +59,17 @@ class OptionalProvider:
             installation = cache.installation(self.capability) if cache and hasattr(cache, "installation") else None
             if not self._allow_unverified_models and not (installation and installation.get("artifact_path") and installation.get("sha256")):
                 raise WorkerError("a verified model artifact is required; install with --source and --sha256 or explicitly allow provider downloads", code="model_artifact_required", retryable=False)
+            if installation and installation.get("artifact_path") and not self._allow_unverified_models:
+                try:
+                    manager = ModelManager(cache)
+                    if installation.get("artifact_kind") == "bundle":
+                        verified = manager.verify_bundle(Path(installation["artifact_path"]), Path(installation.get("artifact_manifest") or Path(installation["artifact_path"]) / "artifact-manifest.json"))
+                        if installation.get("sha256") and verified.get("manifest_sha256") != installation.get("sha256"):
+                            raise ModelArtifactError("bundle manifest identity does not match installation metadata")
+                    else:
+                        manager.verify(Path(installation["artifact_path"]), installation.get("sha256"))
+                except (ModelArtifactError, OSError, ValueError) as exc:
+                    raise WorkerError(f"verified model artifact failed integrity check: {exc}", code="model_artifact_corrupt", retryable=False) from exc
             self._load_model()
             self._loaded = True
         return self
@@ -68,6 +81,28 @@ class OptionalProvider:
         raise NotImplementedError
 
     def _load_model(self):
+        return None
+
+    def artifact_path(self):
+        """Return the verified file or bundle entrypoint for this provider."""
+        cache = getattr(self, "_cache", None)
+        installation = cache.installation(self.capability) if cache and hasattr(cache, "installation") else None
+        if not installation or not installation.get("artifact_path"):
+            return None
+        root = Path(installation["artifact_path"])
+        if installation.get("artifact_kind") == "bundle":
+            entrypoint = installation.get("artifact_entrypoint")
+            if entrypoint:
+                return root / entrypoint
+            return root
+        return root
+
+    def artifact_root(self):
+        cache = getattr(self, "_cache", None)
+        installation = cache.installation(self.capability) if cache and hasattr(cache, "installation") else None
+        if installation and installation.get("artifact_path"):
+            path = Path(installation["artifact_path"])
+            return path if installation.get("artifact_kind") == "bundle" else path.parent
         return None
 
 
@@ -83,12 +118,9 @@ class YOLOProvider(OptionalProvider):
         self._check_dependency()
         from ultralytics import YOLO
 
-        model_ref = self.model
-        artifact = getattr(self, "_cache", None)
-        if artifact:
-            candidate = artifact.models / self.capability.replace(".", "__") / self.model
-            if candidate.is_file():
-                model_ref = str(candidate)
+        model_ref = self.artifact_path() or self.model
+        if model_ref is not None:
+            model_ref = str(model_ref)
         self._model = YOLO(model_ref)
 
     def infer(self, input_path, options, cache):
@@ -120,12 +152,8 @@ class UltralyticsSegmentProvider(OptionalProvider):
         self._check_dependency()
         from ultralytics import SAM
 
-        model_ref = {"sam2-small": "sam2_s.pt"}.get(self.model, self.model)
-        artifact = getattr(self, "_cache", None)
-        if artifact:
-            candidate = artifact.models / self.capability.replace(".", "__") / self.model
-            if candidate.is_file():
-                model_ref = str(candidate)
+        model_ref = self.artifact_path() or {"sam2-small": "sam2_s.pt"}.get(self.model, self.model)
+        model_ref = str(model_ref)
         self._model = SAM(model_ref)
 
     def infer(self, input_path, options, cache):
@@ -161,11 +189,24 @@ class PaddleOCRProvider(OptionalProvider):
         self._check_dependency()
         from paddleocr import PaddleOCR
 
-        self._model = PaddleOCR()
+        root = self.artifact_root()
+        kwargs = {}
+        if root:
+            # PaddleOCR accepts local model directories and will not invoke its
+            # downloader when both detection and recognition bundles exist.
+            det = root / "det"
+            rec = root / "rec"
+            if det.is_dir():
+                kwargs["text_detection_model_dir"] = str(det)
+            if rec.is_dir():
+                kwargs["text_recognition_model_dir"] = str(rec)
+        if not kwargs and not self._allow_unverified_models:
+            raise WorkerError("PaddleOCR bundle must contain det/ and rec/ model directories", code="unsupported_artifact", retryable=False)
+        self._model = PaddleOCR(**kwargs)
 
     def infer(self, input_path, options, cache):
         self.load()
-        raw = self._model.predict(str(input_path)) if hasattr(self._model, "predict") else self._model.ocr(str(input_path), cls=True)
+        raw = self._model.predict(str(input_path)) if hasattr(self._model, "predict") else self._model.ocr(str(input_path), cls=False)
         blocks = []
         for page in raw or []:
             if isinstance(page, Mapping) or hasattr(page, "get"):
@@ -208,12 +249,9 @@ class TransformersDepthProvider(OptionalProvider):
         from transformers import pipeline
 
         model_ref = {"depth-anything-v2-small": "depth-anything/Depth-Anything-V2-Small-hf", "depth-anything-v2-base": "depth-anything/Depth-Anything-V2-Base-hf"}.get(self.model, self.model)
-        artifact = getattr(self, "_cache", None)
-        if artifact:
-            candidate = artifact.models / self.capability.replace(".", "__") / self.model
-            if candidate.exists():
-                model_ref = str(candidate)
-        self._pipeline = pipeline("depth-estimation", model=model_ref, cache_dir=str(self._cache.models) if getattr(self, "_cache", None) else None)
+        local = self.artifact_path()
+        model_ref = str(local) if local else model_ref
+        self._pipeline = pipeline("depth-estimation", model=model_ref, local_files_only=True)
 
     def infer(self, input_path, options, cache):
         self.load()
@@ -239,9 +277,17 @@ class SileroVADProvider(OptionalProvider):
 
     def _load_model(self):
         self._check_dependency()
-        from silero_vad import load_silero_vad
+        local = self.artifact_path()
+        if local and Path(local).suffix == ".jit":
+            import torch
 
-        self._model = load_silero_vad()
+            self._model = torch.jit.load(str(local), map_location="cpu")
+        else:
+            from silero_vad import load_silero_vad
+
+            if not self._allow_unverified_models:
+                raise WorkerError("verified Silero artifact must be a .jit file", code="unsupported_artifact", retryable=False)
+            self._model = load_silero_vad()
 
     def infer(self, input_path, options, cache):
         self.load()
@@ -276,11 +322,16 @@ class CommandDocumentProvider(OptionalProvider):
             _missing(self.command)
 
     def infer(self, input_path, options, cache):
+        self.load()
         self._check_dependency()
         output_dir = cache.results / f"document-{cache.input_hash(input_path)[:16]}"
         output_dir.mkdir(parents=True, exist_ok=True)
+        environment = os.environ.copy()
+        root = self.artifact_root()
+        if root:
+            environment["SPECIALIST_MODEL_DIR"] = str(root)
         try:
-            completed = subprocess.run([self.command, "-p", str(input_path), "-o", str(output_dir)], capture_output=True, text=True, timeout=float(options.get("timeout_seconds", 900)), check=False)
+            completed = subprocess.run([self.command, "-p", str(input_path), "-o", str(output_dir)], capture_output=True, text=True, timeout=float(options.get("timeout_seconds", 900)), check=False, env=environment)
         except subprocess.TimeoutExpired as exc:
             raise WorkerError("document parser timed out", code="provider_timeout") from exc
         if completed.returncode:
@@ -302,9 +353,14 @@ class CommandScreenProvider(OptionalProvider):
             _missing(self.command)
 
     def infer(self, input_path, options, cache):
+        self.load()
         self._check_dependency()
+        environment = os.environ.copy()
+        root = self.artifact_root()
+        if root:
+            environment["OMNIPARSER_MODEL_DIR"] = str(root)
         try:
-            completed = subprocess.run([self.command, str(input_path), "--json"], capture_output=True, text=True, timeout=float(options.get("timeout_seconds", 120)), check=False)
+            completed = subprocess.run([self.command, str(input_path), "--json"], capture_output=True, text=True, timeout=float(options.get("timeout_seconds", 120)), check=False, env=environment)
         except subprocess.TimeoutExpired as exc:
             raise WorkerError("screen parser timed out", code="provider_timeout") from exc
         if completed.returncode:
@@ -329,11 +385,10 @@ class WhisperCppProvider(OptionalProvider):
             _missing(self.binary)
 
     def infer(self, input_path, options, cache):
+        self.load()
         self._check_dependency()
-        model_path = self.model
-        installation = cache.installation(self.capability) if hasattr(cache, "installation") else None
-        if installation and installation.get("artifact_path"):
-            model_path = installation["artifact_path"]
+        model_path = self.artifact_path() or self.model
+        model_path = str(model_path)
         command = [self.binary, "-m", model_path, "-f", str(input_path), "--output-json"]
         try:
             completed = subprocess.run(command, capture_output=True, text=True, timeout=float(options.get("timeout_seconds", 300)), check=False)

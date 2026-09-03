@@ -46,8 +46,8 @@ licenses.
 
 Real providers are fail-closed by default: a model must be installed from a
 source with a SHA256 checksum before it can be loaded. The checked-in registry
-intentionally leaves upstream artifact URLs unset until they have a pinned,
-auditable digest. This is the safe production path:
+contains pinned upstream artifact URLs and auditable SHA256 digests. This is
+the safe production path:
 
 ```bash
 specialist install vision.ocr --source https://models.example/ppocr.bin --sha256 <64-hex-digest>
@@ -160,6 +160,12 @@ Run Rust tests with `cargo test --manifest-path rust-core/Cargo.toml`.
 
 ## Development
 
+The development environment is reproducible with the checked-in lockfile:
+
+```bash
+uv sync --locked
+```
+
 ```bash
 python -m unittest discover -s tests -v
 python -m unittest discover -s tests/e2e -v
@@ -180,10 +186,11 @@ Production-provider authentication, model fixtures and hardware-specific
 checks belong in a separate integration environment; the default E2E suite
 keeps those external requirements out of CI.
 
-Release tags run an additional artifact gate. Every model must have an audited
-URL and SHA256 before the release workflow can publish a package; the checked-in
-registry intentionally blocks releases until those production artifacts are
-provided. Tags must also match the project version (`v<version>`).
+Release tags run an additional artifact gate. Every model has an audited HTTPS
+URL and SHA256 (including per-file manifests for multi-file bundles) before the
+release workflow can publish a package. Tags must also match the project
+version (`v<version>`). The release workflow publishes a CycloneDX SBOM and a
+GitHub build-provenance attestation alongside wheel and sdist artifacts.
 
 `doctor --fix` only changes local provider metadata when a provider explicitly
 reports a repairable issue; it never downloads every model, preserving lazy

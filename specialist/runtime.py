@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from .cache import Cache
-from .hardware import detect_hardware, recommended_model
+from .hardware import detect_hardware, recommended_model, target_id
 from .models import ModelManager
 from .environments import EnvironmentError, ProviderEnvironmentManager, PROVIDER_REQUIREMENTS
 from .observability import EventLogger
@@ -69,6 +69,20 @@ class SpecialistRuntime:
         worker.requires_verified_artifact = bool(getattr(provider, "requires_verified_artifact", False) if requires_verified_artifact is None else requires_verified_artifact)
         return worker
 
+    def _verify_installation(self, installation):
+        if not installation:
+            raise ValueError("model installation is missing")
+        artifact = installation.get("artifact_path")
+        if not artifact:
+            raise ValueError("model artifact path is missing")
+        if installation.get("artifact_kind") == "bundle":
+            verified = self.models_manager.verify_bundle(Path(artifact), Path(installation.get("artifact_manifest") or Path(artifact) / "artifact-manifest.json"))
+            expected = installation.get("sha256")
+            if expected and verified.get("manifest_sha256") != expected:
+                raise ValueError(f"bundle manifest checksum mismatch: expected {expected}, got {verified.get('manifest_sha256')}")
+            return verified
+        return {"sha256": self.models_manager.verify(Path(artifact), installation.get("sha256"))}
+
     def metrics(self):
         with self._metrics_lock:
             return dict(self._metrics)
@@ -91,6 +105,10 @@ class SpecialistRuntime:
                     check = provider.doctor(hardware) or {}
                 except Exception as exc:
                     check = {"status": "not ready", "error": {"code": "provider_doctor_failed", "message": str(exc)}}
+                model_spec = spec.model_spec(self._model_for(spec, installation, hardware))
+                platform = target_id(hardware)
+                if platform not in model_spec.platforms:
+                    check = {**check, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
                 if check.get("status") != "ready":
                     state = "unavailable"
                     reason = (check.get("error") or {}).get("message") or check.get("message") or "provider is not ready"
@@ -105,7 +123,7 @@ class SpecialistRuntime:
                         reason = "a verified model artifact is required"
                     else:
                         try:
-                            self.models_manager.verify(Path(artifact), digest)
+                            self._verify_installation(installation)
                         except Exception as exc:
                             state = "corrupt"
                             reason = str(exc)
@@ -173,21 +191,46 @@ class SpecialistRuntime:
                         raise WorkerError("provider install returned a non-object", code="provider_install_invalid", retryable=False)
                     auto_source = source
                     auto_sha256 = sha256
-                    if auto_source is None and model_spec.artifact_url and model_spec.artifact_sha256:
-                        auto_source = model_spec.artifact_url
-                        auto_sha256 = model_spec.artifact_sha256
+                    # Registry artifacts are fetched automatically only for a
+                    # real/optional provider. The dependency-free fallback is
+                    # intentionally offline and must never pull model weights.
+                    if auto_source is None and self.backend != "fallback" and getattr(provider, "requires_verified_artifact", False):
+                        if model_spec.artifact_kind == "bundle" and model_spec.artifact_files:
+                            auto_source = "bundle://registry"
+                        elif model_spec.artifact_url and model_spec.artifact_sha256:
+                            auto_source = model_spec.artifact_url
+                            auto_sha256 = model_spec.artifact_sha256
                     if auto_source:
-                        artifact_path = self.cache.models / name.replace(".", "__") / selected_model
+                        is_bundle = model_spec.artifact_kind == "bundle" and not source
+                        artifact_root = self.cache.models / name.replace(".", "__") / selected_model
+                        if is_bundle:
+                            artifact_path = artifact_root
+                        else:
+                            filename = model_spec.artifact_filename
+                            if not filename:
+                                filename = Path(auto_source.split("?", 1)[0]).name or selected_model
+                            artifact_path = artifact_root / filename
                         self.models_manager.ensure_capacity(artifact_path, model_spec.disk_mb * 1024 * 1024)
-                        self.cache.mark_installed(name, provider.name, selected_model, status="downloading", license_name=spec.license, source=auto_source, sha256=auto_sha256, artifact_path=artifact_path, commercial=spec.commercial, source_url=spec.source_url)
-                        artifact = self.models_manager.download(auto_source, artifact_path, expected_sha256=auto_sha256)
-                        self.cache.mark_installed(name, provider.name, selected_model, status="ready", license_name=spec.license, source=auto_source, sha256=artifact["sha256"], artifact_path=artifact_path, commercial=spec.commercial, source_url=spec.source_url)
+                        marker_fields = {"artifact_kind": "bundle" if is_bundle else "file", "artifact_entrypoint": model_spec.artifact_entrypoint, "artifact_manifest": str(artifact_path / "artifact-manifest.json") if is_bundle else None}
+                        self.cache.mark_installed(name, provider.name, selected_model, status="downloading", license_name=spec.license, source=auto_source, sha256=auto_sha256, artifact_path=artifact_path, commercial=spec.commercial, source_url=spec.source_url, **marker_fields)
+                        if is_bundle:
+                            artifact = self.models_manager.download_bundle(model_spec.artifact_files, artifact_path, entrypoint=model_spec.artifact_entrypoint)
+                        else:
+                            artifact = self.models_manager.download(auto_source, artifact_path, expected_sha256=auto_sha256)
+                        if dependency_env and artifact_path.suffix == ".whl":
+                            details["provider_artifact"] = self.environments.install_artifact(spec.provider, artifact_path)
+                        self.cache.mark_installed(name, provider.name, selected_model, status="ready", license_name=spec.license, source=auto_source, sha256=artifact["sha256"], artifact_path=artifact_path, commercial=spec.commercial, source_url=spec.source_url, **marker_fields)
                         details.update({"artifact": artifact, "verification": "sha256"})
-                    installed.append({"capability": name, "provider": spec.provider, "model": selected_model, "environment": dependency_env, "registry_model": {"source_url": spec.source_url, "memory_mb": model_spec.memory_mb, "disk_mb": model_spec.disk_mb, "platforms": list(model_spec.platforms), "devices": list(model_spec.devices), "artifact_url": model_spec.artifact_url, "artifact_sha256": model_spec.artifact_sha256}, **details})
+                    installed.append({"capability": name, "provider": spec.provider, "model": selected_model, "environment": dependency_env, "registry_model": {"source_url": spec.source_url, "memory_mb": model_spec.memory_mb, "disk_mb": model_spec.disk_mb, "platforms": list(model_spec.platforms), "devices": list(model_spec.devices), "artifact_url": model_spec.artifact_url, "artifact_sha256": model_spec.artifact_sha256, "artifact_kind": model_spec.artifact_kind, "artifact_entrypoint": model_spec.artifact_entrypoint, "artifact_files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in model_spec.artifact_files]}, **details})
                 except Exception as exc:
                     self.cache.mark_error(name, provider.name, selected_model, str(exc), source=source)
                     artifact_path = self.cache.models / name.replace(".", "__") / selected_model
-                    artifact_path.unlink(missing_ok=True)
+                    if artifact_path.is_dir():
+                        import shutil
+
+                        shutil.rmtree(artifact_path, ignore_errors=True)
+                    else:
+                        artifact_path.unlink(missing_ok=True)
                     raise
         return installed
 
@@ -204,6 +247,10 @@ class SpecialistRuntime:
             provider = self.providers[spec.name]
             installation = self.cache.installation(spec.name)
             details = provider.doctor(hardware)
+            model_spec = spec.model_spec(self._model_for(spec, installation, hardware))
+            platform = target_id(hardware)
+            if platform not in model_spec.platforms:
+                details = {**details, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
             environment = self.environments.status(spec.provider) if spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency] else None
             if environment and environment.get("status") == "ready" and not self.environments.verify(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency]):
                 environment = {**environment, "status": "corrupt", "message": "provider environment imports are not usable"}
@@ -220,15 +267,16 @@ class SpecialistRuntime:
             verification = None
             if installation and installation.get("artifact_path"):
                 try:
-                    digest = self.models_manager.verify(Path(installation["artifact_path"]), installation.get("sha256"))
-                    verification = {"status": "verified", "sha256": digest}
+                    verified = self._verify_installation(installation)
+                    verification = {"status": "verified", **verified}
                 except Exception as exc:
                     verification = {"status": "corrupt", "error": str(exc)}
                     self.cache.update_state(spec.name, "corrupt")
                     if fix:
                         model_spec = spec.model_spec(self._model_for(spec, installation, hardware))
-                        if model_spec.artifact_url and model_spec.artifact_sha256:
+                        if (model_spec.artifact_kind == "bundle" and model_spec.artifact_files) or (model_spec.artifact_url and model_spec.artifact_sha256):
                             try:
+                                self.cache.remove_model(spec.name)
                                 self.install(spec.name, source=model_spec.artifact_url, sha256=model_spec.artifact_sha256, with_dependencies=self.with_dependencies)
                                 installation = self.cache.installation(spec.name)
                                 verification = {"status": "verified", "sha256": model_spec.artifact_sha256}
@@ -244,7 +292,7 @@ class SpecialistRuntime:
             if details.get("status") != "ready":
                 state = "unavailable"
             capabilities.append({"capability": spec.name, "provider": spec.provider, "model": self._model_for(spec, installation, hardware), "installation": installation, "error": error_state, "environment": environment, "verification": verification, "registry": {"source_url": spec.source_url, "models": [model.id for model in spec.models]}, **details, "status": state})
-        return {"version": "0.2.0", "home": str(self.cache.home), "system": hardware, "capabilities": capabilities, "fixes": fixes, "warnings": warnings}
+        return {"version": "1.0.0", "home": str(self.cache.home), "system": hardware, "capabilities": capabilities, "fixes": fixes, "warnings": warnings}
 
     def models(self):
         output = []
@@ -257,7 +305,7 @@ class SpecialistRuntime:
                 artifact = installation.get("artifact_path")
                 if artifact:
                     try:
-                        verification = {"status": "verified", "sha256": self.models_manager.verify(Path(artifact), installation.get("sha256"))}
+                        verification = {"status": "verified", **self._verify_installation(installation)}
                     except Exception as exc:
                         state = "corrupt"
                         verification = {"status": "corrupt", "error": str(exc)}
@@ -265,7 +313,7 @@ class SpecialistRuntime:
             if not installation and error_state:
                 state = "error"
             registry_model = spec.model_spec(self._model_for(spec, installation))
-            output.append({"capability": spec.name, "provider": spec.provider, "model": self._model_for(spec, installation), "status": state, "installation": installation, "error": error_state, "registry": {"source_url": spec.source_url, "recommended": registry_model.recommended, "memory_mb": registry_model.memory_mb, "disk_mb": registry_model.disk_mb, "platforms": list(registry_model.platforms), "devices": list(registry_model.devices), "artifact_url": registry_model.artifact_url, "artifact_sha256": registry_model.artifact_sha256}, "verification": verification})
+            output.append({"capability": spec.name, "provider": spec.provider, "model": self._model_for(spec, installation), "status": state, "installation": installation, "error": error_state, "registry": {"source_url": spec.source_url, "recommended": registry_model.recommended, "memory_mb": registry_model.memory_mb, "disk_mb": registry_model.disk_mb, "platforms": list(registry_model.platforms), "devices": list(registry_model.devices), "artifact_url": registry_model.artifact_url, "artifact_sha256": registry_model.artifact_sha256, "artifact_kind": registry_model.artifact_kind, "artifact_entrypoint": registry_model.artifact_entrypoint, "artifact_files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in registry_model.artifact_files]}, "verification": verification})
         return output
 
     def remove_model(self, target):
@@ -392,6 +440,9 @@ class SpecialistRuntime:
         requested_device = options.get("device", "cpu")
         if requested_device not in getattr(provider, "supported_devices", ("cpu",)):
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", f"device must be one of {list(getattr(provider, 'supported_devices', ('cpu',)))}").to_dict())
+        requested_model_spec = spec.model_spec(self._model_for(spec))
+        if requested_device not in requested_model_spec.devices:
+            return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "unsupported_device", f"model {requested_model_spec.id} does not support device {requested_device}").to_dict())
         if not path.exists():
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "input_not_found", f"Input file does not exist: {path}").to_dict())
         if not path.is_file():

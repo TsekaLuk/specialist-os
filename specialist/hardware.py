@@ -83,6 +83,15 @@ def detect_hardware() -> dict[str, Any]:
     }
 
 
+def target_id(hardware: dict[str, Any] | None = None) -> str:
+    """Return the registry platform identifier for the current host."""
+    hardware = hardware or detect_hardware()
+    system = str(hardware.get("os", "")).split(" ", 1)[0].lower()
+    architecture = str(hardware.get("architecture", "")).lower()
+    normalized = "arm64" if architecture in {"arm64", "aarch64"} else "x64" if architecture in {"x86_64", "amd64", "x64"} else architecture
+    return {"darwin": f"macos-{normalized}", "linux": f"linux-{normalized}", "windows": f"windows-{normalized}"}.get(system, f"{system}-{normalized}")
+
+
 def recommended_model(spec, hardware=None) -> str:
     hardware = hardware or detect_hardware()
     memory = hardware.get("memory_gb") or 8

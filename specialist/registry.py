@@ -18,6 +18,13 @@ class RegistryError(RuntimeError):
 
 
 @dataclass(frozen=True)
+class ArtifactFileSpec:
+    path: str
+    url: str
+    sha256: str
+
+
+@dataclass(frozen=True)
 class ModelSpec:
     id: str
     recommended: bool
@@ -27,6 +34,10 @@ class ModelSpec:
     devices: tuple[str, ...]
     artifact_url: str | None = None
     artifact_sha256: str | None = None
+    artifact_kind: str = "file"
+    artifact_filename: str | None = None
+    artifact_entrypoint: str | None = None
+    artifact_files: tuple[ArtifactFileSpec, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -108,12 +119,37 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
             checksum = _validate_sha(artifact.get("sha256"), f"{name}.artifact.sha256")
             if (url is None) != (checksum is None):
                 raise RegistryError(f"{name}: artifact.url and artifact.sha256 must be specified together")
+            kind = artifact.get("kind", "file")
+            if kind not in {"file", "bundle"}:
+                raise RegistryError(f"{name}: artifact.kind must be 'file' or 'bundle'")
+            filename = artifact.get("filename")
+            if filename is not None and (not isinstance(filename, str) or not filename or Path(filename).name != filename):
+                raise RegistryError(f"{name}: artifact.filename must be a simple file name")
+            entrypoint = artifact.get("entrypoint")
+            if entrypoint is not None and (not isinstance(entrypoint, str) or not entrypoint or Path(entrypoint).is_absolute() or ".." in Path(entrypoint).parts):
+                raise RegistryError(f"{name}: artifact.entrypoint must be a relative path")
+            artifact_files: list[ArtifactFileSpec] = []
+            for file_item in artifact.get("files", []) or []:
+                if not isinstance(file_item, dict):
+                    raise RegistryError(f"{name}: artifact.files entries must be objects")
+                file_path = file_item.get("path")
+                file_url = file_item.get("url")
+                file_sha = _validate_sha(file_item.get("sha256"), f"{name}.artifact.files.sha256")
+                if not isinstance(file_path, str) or not file_path or Path(file_path).is_absolute() or ".." in Path(file_path).parts:
+                    raise RegistryError(f"{name}: artifact file path must be relative")
+                if not isinstance(file_url, str) or not file_url.startswith(("https://", "http://", "file://")) or not file_sha:
+                    raise RegistryError(f"{name}: artifact files require a URL and SHA256")
+                artifact_files.append(ArtifactFileSpec(file_path, file_url, file_sha))
+            if kind == "bundle" and not artifact_files:
+                raise RegistryError(f"{name}: bundle artifacts require at least one file")
+            if kind == "bundle" and (url is not None or checksum is not None):
+                raise RegistryError(f"{name}: bundle artifacts must use per-file digests and leave top-level URL/SHA256 null")
             model_id = model.get("id")
             platforms = model.get("platforms")
             devices = model.get("devices")
             if not isinstance(model_id, str) or not model_id or not isinstance(platforms, list) or not platforms or not isinstance(devices, list) or not devices:
                 raise RegistryError(f"{name}: model id, platforms and devices are required")
-            models.append(ModelSpec(model_id, bool(model.get("recommended", False)), int(model.get("memory_mb", 0)), int(model.get("disk_mb", 0)), tuple(platforms), tuple(devices), url, checksum))
+            models.append(ModelSpec(model_id, bool(model.get("recommended", False)), int(model.get("memory_mb", 0)), int(model.get("disk_mb", 0)), tuple(platforms), tuple(devices), url, checksum, kind, filename, entrypoint, tuple(artifact_files)))
         if not models or sum(model.recommended for model in models) != 1:
             raise RegistryError(f"{name}: exactly one recommended model is required")
         default_model = item["model"]
@@ -162,7 +198,7 @@ def registry_snapshot() -> list[dict[str, Any]]:
             "source_url": spec.source_url,
             "license": {"code": REGISTRY_DOCUMENT.get("code_license", "MIT"), "weights": spec.license, "commercial": spec.commercial},
             "models": [
-                {"id": model.id, "recommended": model.recommended, "memory_mb": model.memory_mb, "disk_mb": model.disk_mb, "platforms": list(model.platforms), "devices": list(model.devices), "artifact": {"url": model.artifact_url, "sha256": model.artifact_sha256}}
+                {"id": model.id, "recommended": model.recommended, "memory_mb": model.memory_mb, "disk_mb": model.disk_mb, "platforms": list(model.platforms), "devices": list(model.devices), "artifact": {"url": model.artifact_url, "sha256": model.artifact_sha256, "kind": model.artifact_kind, "filename": model.artifact_filename, "entrypoint": model.artifact_entrypoint, "files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in model.artifact_files]}}
                 for model in spec.models
             ],
         }

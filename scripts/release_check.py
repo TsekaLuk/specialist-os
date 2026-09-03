@@ -50,8 +50,38 @@ def check_registry(require_artifacts: bool) -> list[str]:
                 failures.append(f"{name}/{model.get('id')}: artifact URL must use https://, http:// or file://")
             if digest is not None and (not isinstance(digest, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", digest)):
                 failures.append(f"{name}/{model.get('id')}: artifact SHA256 must be 64 hexadecimal characters")
-            if require_artifacts and (url is None or digest is None):
-                failures.append(f"{name}/{model.get('id')}: verified artifact is required for release")
+            kind = artifact.get("kind", "file")
+            if kind not in {"file", "bundle"}:
+                failures.append(f"{name}/{model.get('id')}: artifact kind must be file or bundle")
+            files = artifact.get("files") or []
+            if kind == "bundle" and not files:
+                failures.append(f"{name}/{model.get('id')}: bundle artifact must enumerate files")
+            if kind == "bundle" and (url is not None or digest is not None):
+                failures.append(f"{name}/{model.get('id')}: bundle artifacts must use per-file digests and leave top-level URL/SHA256 null")
+            seen_paths = set()
+            for file_item in files:
+                file_path = file_item.get("path") if isinstance(file_item, dict) else None
+                file_url = file_item.get("url") if isinstance(file_item, dict) else None
+                file_digest = file_item.get("sha256") if isinstance(file_item, dict) else None
+                if not isinstance(file_path, str) or not file_path or file_path.startswith("/") or ".." in Path(file_path).parts or file_path in seen_paths:
+                    failures.append(f"{name}/{model.get('id')}: artifact file paths must be unique, relative and safe")
+                seen_paths.add(file_path)
+                if not isinstance(file_url, str) or not file_url.startswith(("https://", "http://", "file://")):
+                    failures.append(f"{name}/{model.get('id')}/{file_path}: artifact file URL is invalid")
+                if not isinstance(file_digest, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", file_digest):
+                    failures.append(f"{name}/{model.get('id')}/{file_path}: artifact file SHA256 is invalid")
+            if require_artifacts:
+                if kind == "bundle":
+                    if not files or any(not isinstance(item, dict) or not item.get("url", "").startswith("https://") or not re.fullmatch(r"[0-9a-fA-F]{64}", str(item.get("sha256", ""))) for item in files):
+                        failures.append(f"{name}/{model.get('id')}: every bundle file must have an audited HTTPS URL and SHA256")
+                elif url is None or digest is None:
+                    failures.append(f"{name}/{model.get('id')}: verified artifact is required for release")
+                elif not url.startswith("https://"):
+                    failures.append(f"{name}/{model.get('id')}: release artifacts must use HTTPS")
+                if kind == "bundle" and artifact.get("entrypoint"):
+                    entrypoint = artifact["entrypoint"]
+                    if entrypoint not in seen_paths:
+                        failures.append(f"{name}/{model.get('id')}: bundle entrypoint is not listed in files")
     return failures
 
 

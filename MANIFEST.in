@@ -6,3 +6,4 @@ recursive-include deploy *.service *.plist
 recursive-include registry *.yaml *.json
 recursive-include schemas *.json
 recursive-include tests *.py
+recursive-include tests/assets *
