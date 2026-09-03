@@ -29,6 +29,19 @@ These are representative captures from the dependency-free E2E suite. The
 same result envelope is available through the CLI, HTTP server and MCP
 transport, so an agent can switch interfaces without changing capability code.
 
+## What users get
+
+The runtime is designed to make specialist output immediately useful, not just
+available. One local request can return visual annotations, OCR text blocks,
+preview artifacts and a typed result envelope that an agent or application can
+route into its next step.
+
+<p align="center">
+  <img src="docs/assets/user-results.png" alt="User-visible Specialist Runtime results: annotated room image, OCR text blocks, depth preview and normalized result envelope" width="100%">
+</p>
+
+<p align="center"><sub>Representative output from the stable capability contracts. Providers can change; capability names and result schemas stay predictable.</sub></p>
+
 <table>
   <tr>
     <td width="33%"><img src="docs/assets/e2e-cli.png" alt="CLI E2E showing capability discovery and OCR result"></td>
