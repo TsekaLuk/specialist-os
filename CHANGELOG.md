@@ -5,6 +5,7 @@
 - Added process-boundary E2E coverage for the CLI, HTTP API, MCP stdio server,
   isolated workers and optional wheel installation.
 - Added provider-aware readiness and a `doctor --strict` deployment gate.
+- Added release metadata validation and systemd/launchd service templates.
 - MCP SIGTERM now exits cleanly without emitting a traceback or non-JSON
   stdout.
 

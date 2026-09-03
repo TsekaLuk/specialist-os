@@ -1,0 +1,23 @@
+[Unit]
+Description=Specialist Runtime local capability service
+After=network.target
+
+[Service]
+Type=simple
+User=specialist
+Group=specialist
+WorkingDirectory=/var/lib/specialist
+EnvironmentFile=-/etc/specialist/runtime.env
+ExecStart=/usr/local/bin/specialist --home /var/lib/specialist serve --host 127.0.0.1 --port 8741
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/specialist
+UMask=0077
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

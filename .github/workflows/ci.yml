@@ -22,6 +22,7 @@ jobs:
       - run: python -m json.tool registry/models.schema.json >/dev/null
       - run: python -m json.tool schemas/result-envelope.schema.json >/dev/null
       - run: python -m json.tool schemas/capability-results.schema.json >/dev/null
+      - run: python scripts/release_check.py
       - run: python -m pip install build setuptools
       - run: python -m build
 

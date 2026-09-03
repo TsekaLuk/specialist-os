@@ -31,5 +31,15 @@ Provider credentials, verified model artifacts and hardware-specific coverage
 should be supplied by a separate integration job rather than committed as
 test fixtures.
 
+Release metadata can be checked locally with:
+
+```bash
+python scripts/release_check.py
+python scripts/release_check.py --require-artifacts
+```
+
+The strict form is expected to fail until every production model has an
+audited, downloadable artifact and checksum.
+
 Do not add telemetry, remote inference, or heavyweight dependencies to the core
 runtime without an explicit design discussion.
