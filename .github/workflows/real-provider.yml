@@ -2,6 +2,12 @@ name: Real Provider Integration
 
 on:
   workflow_dispatch:
+    inputs:
+      run_heavy:
+        description: "Run Depth Anything (requires at least 2 GiB available RAM)"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -21,4 +27,5 @@ jobs:
       - run: python -m unittest discover -s tests/e2e -p test_real_provider_e2e.py -v
         env:
           SPECIALIST_RUN_REAL_PROVIDER_E2E: "1"
+          SPECIALIST_RUN_HEAVY_REAL: ${{ inputs.run_heavy }}
           SPECIALIST_HOME: ${{ runner.temp }}/specialist
