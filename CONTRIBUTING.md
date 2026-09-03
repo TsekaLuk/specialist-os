@@ -14,8 +14,22 @@ Run the local checks before opening a pull request:
 
 ```bash
 python -m unittest discover -s tests -v
+python -m unittest discover -s tests/e2e -v
 cargo test --manifest-path rust-core/Cargo.toml
 ```
+
+The E2E tests exercise real subprocess and transport boundaries with temporary
+homes and fallback providers. They do not download model weights. The optional
+wheel-installation E2E can be run after installing `build`:
+
+```bash
+python -m pip install build setuptools
+SPECIALIST_RUN_PACKAGE_E2E=1 python -m unittest discover -s tests/e2e -p test_package_e2e.py -v
+```
+
+Provider credentials, verified model artifacts and hardware-specific coverage
+should be supplied by a separate integration job rather than committed as
+test fixtures.
 
 Do not add telemetry, remote inference, or heavyweight dependencies to the core
 runtime without an explicit design discussion.

@@ -34,6 +34,22 @@ Use `specialist models list` and `specialist doctor --json` in deployment
 health checks. A tampered artifact is reported as `corrupt` and will not be
 silently replaced.
 
+Before promoting a release, run the process-boundary E2E suite from a clean
+checkout. It uses fallback providers and temporary state, so it does not
+download model weights:
+
+```bash
+python -m unittest discover -s tests/e2e -v
+```
+
+The release-path check builds a wheel, installs it into a clean virtual
+environment, and runs the CLI without the source checkout on `PYTHONPATH`:
+
+```bash
+python -m pip install build setuptools
+SPECIALIST_RUN_PACKAGE_E2E=1 python -m unittest discover -s tests/e2e -p test_package_e2e.py -v
+```
+
 To explicitly repair provider environments, run:
 
 ```bash

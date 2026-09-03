@@ -16,13 +16,24 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m unittest discover -s tests -v
+      - run: python -m unittest discover -s tests/e2e -v
       - run: python -m specialist doctor
       - run: python -m json.tool registry/models.yaml >/dev/null
       - run: python -m json.tool registry/models.schema.json >/dev/null
       - run: python -m json.tool schemas/result-envelope.schema.json >/dev/null
       - run: python -m json.tool schemas/capability-results.schema.json >/dev/null
-      - run: python -m pip install build
+      - run: python -m pip install build setuptools
       - run: python -m build
+
+  package-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install build setuptools
+      - run: SPECIALIST_RUN_PACKAGE_E2E=1 python -m unittest discover -s tests/e2e -p test_package_e2e.py -v
 
   rust:
     runs-on: ubuntu-latest

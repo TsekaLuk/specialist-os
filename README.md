@@ -162,8 +162,23 @@ Run Rust tests with `cargo test --manifest-path rust-core/Cargo.toml`.
 
 ```bash
 python -m unittest discover -s tests -v
+python -m unittest discover -s tests/e2e -v
 python -m specialist doctor --fix
 ```
+
+The E2E suite starts real CLI, HTTP, MCP and isolated-worker subprocesses
+using temporary homes and dependency-free fallback providers, so it never
+downloads heavyweight model weights. To exercise the release artifact as an
+installed package, install the `build` package and opt in explicitly:
+
+```bash
+python -m pip install build setuptools
+SPECIALIST_RUN_PACKAGE_E2E=1 python -m unittest discover -s tests/e2e -p test_package_e2e.py -v
+```
+
+Production-provider authentication, model fixtures and hardware-specific
+checks belong in a separate integration environment; the default E2E suite
+keeps those external requirements out of CI.
 
 `doctor --fix` only changes local provider metadata when a provider explicitly
 reports a repairable issue; it never downloads every model, preserving lazy

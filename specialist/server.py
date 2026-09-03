@@ -195,43 +195,51 @@ def serve_mcp(runtime, max_request_bytes=4 * 1024 * 1024):
 
     signal.signal(signal.SIGTERM, stop_mcp)
     try:
-        for line in sys.stdin:
-            request_id = None
-            try:
-                if len(line.encode("utf-8", errors="replace")) > max_request_bytes:
-                    raise ValueError(f"MCP request exceeds {max_request_bytes} bytes")
-                request = json.loads(line)
-                if not isinstance(request, dict):
-                    raise ValueError("JSON-RPC request must be an object")
-                if request.get("jsonrpc") not in {None, "2.0"}:
-                    raise ValueError("jsonrpc must be 2.0")
-                method = request.get("method")
-                request_id = request.get("id")
-                if method == "initialize":
-                    result = {"protocolVersion": "2024-11-05", "capabilities": {"tools": {}}, "serverInfo": {"name": "specialist-runtime", "version": "0.2.0"}}
-                elif method == "notifications/initialized":
-                    continue
-                elif method == "tools/list":
-                    result = {"tools": [_tool_schema(name) for name in CAPABILITIES]}
-                elif method == "tools/call":
-                    params = request.get("params") or {}
-                    tool_name = params.get("name", "").replace("_", ".")
-                    capability = tool_name if tool_name in CAPABILITIES else next((name for name in CAPABILITIES if name.replace(".", "_") == params.get("name")), None)
-                    arguments = params.get("arguments") or {}
-                    if capability not in CAPABILITIES or not isinstance(arguments.get("path"), str):
-                        raise ValueError("tools/call requires a known tool and string arguments.path")
-                    value = runtime.run(capability, arguments["path"], arguments.get("options") or {})
-                    result = {"content": [{"type": "text", "text": json.dumps(value, ensure_ascii=True)}], "structuredContent": value, "isError": value.get("error") is not None}
-                else:
-                    if request_id is None:
+        try:
+            for line in sys.stdin:
+                request_id = None
+                is_notification = False
+                try:
+                    if len(line.encode("utf-8", errors="replace")) > max_request_bytes:
+                        raise ValueError(f"MCP request exceeds {max_request_bytes} bytes")
+                    request = json.loads(line)
+                    if not isinstance(request, dict):
+                        raise ValueError("JSON-RPC request must be an object")
+                    request_id = request.get("id")
+                    if request.get("jsonrpc") not in {None, "2.0"}:
+                        raise ValueError("jsonrpc must be 2.0")
+                    method = request.get("method")
+                    is_notification = "id" not in request
+                    if method == "initialize":
+                        result = {"protocolVersion": "2024-11-05", "capabilities": {"tools": {}}, "serverInfo": {"name": "specialist-runtime", "version": "0.2.0"}}
+                    elif method == "notifications/initialized":
                         continue
-                    raise ValueError(f"Method not found: {method}")
-                if request_id is not None:
-                    print(json.dumps({"jsonrpc": "2.0", "id": request_id, "result": result}, ensure_ascii=True), flush=True)
-            except Exception as exc:
-                if request_id is None:
-                    continue
-                print(json.dumps({"jsonrpc": "2.0", "id": request_id, "error": {"code": -32600, "message": str(exc)}}, ensure_ascii=True), flush=True)
+                    elif method == "tools/list":
+                        result = {"tools": [_tool_schema(name) for name in CAPABILITIES]}
+                    elif method == "tools/call":
+                        params = request.get("params") or {}
+                        tool_name = params.get("name", "").replace("_", ".")
+                        capability = tool_name if tool_name in CAPABILITIES else next((name for name in CAPABILITIES if name.replace(".", "_") == params.get("name")), None)
+                        arguments = params.get("arguments") or {}
+                        if capability not in CAPABILITIES or not isinstance(arguments.get("path"), str):
+                            raise ValueError("tools/call requires a known tool and string arguments.path")
+                        value = runtime.run(capability, arguments["path"], arguments.get("options") or {})
+                        result = {"content": [{"type": "text", "text": json.dumps(value, ensure_ascii=True)}], "structuredContent": value, "isError": value.get("error") is not None}
+                    else:
+                        if is_notification:
+                            continue
+                        raise ValueError(f"Method not found: {method}")
+                    if request_id is not None:
+                        print(json.dumps({"jsonrpc": "2.0", "id": request_id, "result": result}, ensure_ascii=True), flush=True)
+                except Exception as exc:
+                    if is_notification:
+                        continue
+                    error_code = -32700 if isinstance(exc, json.JSONDecodeError) else -32600
+                    print(json.dumps({"jsonrpc": "2.0", "id": request_id, "error": {"code": error_code, "message": str(exc)}}, ensure_ascii=True), flush=True)
+        except KeyboardInterrupt:
+            # SIGTERM is translated to KeyboardInterrupt so stdin processing
+            # can stop cleanly without a traceback or non-JSON stdout output.
+            pass
     finally:
         signal.signal(signal.SIGTERM, previous)
         runtime.close()

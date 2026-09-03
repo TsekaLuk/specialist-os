@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added process-boundary E2E coverage for the CLI, HTTP API, MCP stdio server,
+  isolated workers and optional wheel installation.
+- MCP SIGTERM now exits cleanly without emitting a traceback or non-JSON
+  stdout.
+
 ## 0.2.0
 
 - Added a validated capability/model registry with provenance and license metadata.
