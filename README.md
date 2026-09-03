@@ -29,18 +29,28 @@ These are representative captures from the dependency-free E2E suite. The
 same result envelope is available through the CLI, HTTP server and MCP
 transport, so an agent can switch interfaces without changing capability code.
 
-## What users get
+## Real provider output
 
-The runtime is designed to make specialist output immediately useful, not just
-available. One local request can return visual annotations, OCR text blocks,
-preview artifacts and a typed result envelope that an agent or application can
-route into its next step.
+This is an actual model output captured through Specialist Runtime, not a mock
+or an illustration. The runtime selected the pinned Ultralytics YOLO11s
+artifact, verified its SHA256, and returned one bus plus four people with
+confidence scores in the normalized result envelope.
 
 <p align="center">
-  <img src="docs/assets/user-results.png" alt="User-visible Specialist Runtime results: annotated room image, OCR text blocks, depth preview and normalized result envelope" width="100%">
+  <img src="docs/assets/real-yolo-bus.jpg" alt="Real Specialist Runtime YOLO11s output showing one bus and four people detected in a street photo" width="810">
 </p>
 
-<p align="center"><sub>Representative output from the stable capability contracts. Providers can change; capability names and result schemas stay predictable.</sub></p>
+<p align="center"><sub>Provider: <code>yolo</code> &middot; Model: <code>yolo11s</code> &middot; Package: <code>ultralytics==8.3.0</code> &middot; Device: CPU &middot; Input: <a href="https://www.ultralytics.com/images/bus.jpg">Ultralytics bus.jpg</a></sub></p>
+
+Reproduce the capture with the verified registry artifact:
+
+```bash
+curl -L https://www.ultralytics.com/images/bus.jpg -o bus.jpg
+specialist --backend real --isolate install vision.detect \
+  --source https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s.pt \
+  --sha256 85a76fe86dd8afe384648546b56a7a78580c7cb7b404fc595f97969322d502d5
+specialist --backend real --isolate detect bus.jpg --json
+```
 
 <table>
   <tr>
