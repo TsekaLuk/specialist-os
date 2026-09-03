@@ -7,6 +7,10 @@
   handling, PaddleOCR PP-OCRv5 compatibility, and process-group cleanup on
   timeout.
 
+## 1.0.3
+
+- Disable the PaddleOCR oneDNN executor for the pinned PP-OCRv5 CPU bundle.
+
 ## 1.0.2
 
 - Disable the unsupported PaddlePaddle oneDNN path for PP-OCRv5 CPU bundles.

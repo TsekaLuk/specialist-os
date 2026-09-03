@@ -44,4 +44,4 @@ class Specialist:
 
 
 __all__ = ["Specialist", "SpecialistRuntime"]
-__version__ = "1.0.2"
+__version__ = "1.0.3"

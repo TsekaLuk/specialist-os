@@ -241,6 +241,7 @@ class ProductionBoundaryTests(unittest.TestCase):
             self.assertFalse(captured["use_doc_orientation_classify"])
             self.assertFalse(captured["use_doc_unwarping"])
             self.assertFalse(captured["use_textline_orientation"])
+            self.assertFalse(captured["enable_mkldnn"])
 
     def test_whisper_rejects_invalid_audio_and_removes_stale_sidecar(self):
         with tempfile.TemporaryDirectory() as temp:
