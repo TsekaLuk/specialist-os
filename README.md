@@ -2,6 +2,18 @@
 
 Give any LLM specialist superpowers.
 
+<p align="center">
+  <a href="https://github.com/TsekaLuk/specialist-runtime/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/TsekaLuk/specialist-runtime/ci.yml?label=CI&logo=github" alt="CI status"></a>
+  <a href="https://github.com/TsekaLuk/specialist-runtime/releases/latest"><img src="https://img.shields.io/github/v/release/TsekaLuk/specialist-runtime?display_name=tag&sort=semver" alt="Latest release"></a>
+  <a href="https://pypi.org/project/specialist-runtime/"><img src="https://img.shields.io/pypi/pyversions/specialist-runtime?logo=python&logoColor=white" alt="Python versions"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/TsekaLuk/specialist-runtime" alt="MIT license"></a>
+</p>
+
+<p align="center">
+  <strong>One local runtime for vision, audio, screen and document specialists.</strong><br>
+  CLI &nbsp;&middot;&nbsp; Python SDK &nbsp;&middot;&nbsp; HTTP &nbsp;&middot;&nbsp; MCP
+</p>
+
 Specialist Runtime is a local-first capability layer for deterministic vision,
 audio, screen and document tasks. It gives agents stable names such as
 `vision.ocr` and `audio.transcribe` while providers remain replaceable.
@@ -10,6 +22,31 @@ The repository is intentionally useful on a fresh machine. The core CLI and
 fallback providers use only Python's standard library; optional model providers
 can be installed independently later. A small Rust core is available for stable
 cache-key and input-safety primitives.
+
+## E2E in action
+
+These are representative captures from the dependency-free E2E suite. The
+same result envelope is available through the CLI, HTTP server and MCP
+transport, so an agent can switch interfaces without changing capability code.
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/assets/e2e-cli.png" alt="CLI E2E showing capability discovery and OCR result"></td>
+    <td width="33%"><img src="docs/assets/e2e-http.png" alt="HTTP E2E showing health, readiness and metrics"></td>
+    <td width="33%"><img src="docs/assets/e2e-mcp.png" alt="MCP E2E showing initialization, tool discovery and OCR call"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>CLI</b> &nbsp; discover and run</sub></td>
+    <td align="center"><sub><b>HTTP</b> &nbsp; health and metrics</sub></td>
+    <td align="center"><sub><b>MCP</b> &nbsp; tools for any agent</sub></td>
+  </tr>
+</table>
+
+Run the captures' underlying checks locally:
+
+```bash
+python -m unittest discover -s tests/e2e -v
+```
 
 ## Quick start
 
