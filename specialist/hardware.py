@@ -31,6 +31,16 @@ def detect_hardware() -> dict[str, Any]:
         except OSError:
             pass
     memory_gb = round(memory_bytes / 1024**3, 1) if memory_bytes else None
+    memory_limit_bytes = None
+    if system == "linux":
+        try:
+            with open("/sys/fs/cgroup/memory.max", encoding="utf-8") as stream:
+                raw_limit = stream.read().strip()
+            if raw_limit != "max":
+                memory_limit_bytes = int(raw_limit)
+        except (OSError, ValueError):
+            pass
+    memory_limit_gb = round(memory_limit_bytes / 1024**3, 1) if memory_limit_bytes else None
     mps = system == "darwin" and machine in {"arm64", "aarch64"}
     cuda = False
     torch_available = importlib.util.find_spec("torch") is not None
@@ -71,6 +81,7 @@ def detect_hardware() -> dict[str, Any]:
         "python": platform.python_version(),
         "cpu": cpu,
         "memory_gb": memory_gb,
+        "memory_limit_gb": memory_limit_gb,
         "metal": mps,
         "mps": mps,
         "cuda": cuda or bool(cuda_visible and cuda_visible != "-1"),

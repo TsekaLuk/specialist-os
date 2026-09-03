@@ -109,6 +109,9 @@ class SpecialistRuntime:
                 platform = target_id(hardware)
                 if platform not in model_spec.platforms:
                     check = {**check, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
+                effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
+                if effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
+                    check = {**check, "status": "not ready", "error": {"code": "insufficient_memory", "message": f"model requires {model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB"}}
                 if check.get("status") != "ready":
                     state = "unavailable"
                     reason = (check.get("error") or {}).get("message") or check.get("message") or "provider is not ready"
@@ -251,6 +254,9 @@ class SpecialistRuntime:
             platform = target_id(hardware)
             if platform not in model_spec.platforms:
                 details = {**details, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
+            effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
+            if effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
+                details = {**details, "status": "not ready", "error": {"code": "insufficient_memory", "message": f"model requires {model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB"}}
             environment = self.environments.status(spec.provider) if spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency] else None
             if environment and environment.get("status") == "ready" and not self.environments.verify(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency]):
                 environment = {**environment, "status": "corrupt", "message": "provider environment imports are not usable"}
@@ -443,6 +449,10 @@ class SpecialistRuntime:
         requested_model_spec = spec.model_spec(self._model_for(spec))
         if requested_device not in requested_model_spec.devices:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "unsupported_device", f"model {requested_model_spec.id} does not support device {requested_device}").to_dict())
+        hardware = detect_hardware()
+        effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
+        if (self.backend == "real" or getattr(provider, "requires_verified_artifact", False)) and effective_memory_mb and effective_memory_mb < requested_model_spec.memory_mb:
+            return self._finish(ResultEnvelope.failure(canonical, spec.provider, requested_model_spec.id, input_info, "insufficient_memory", f"model requires {requested_model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB").to_dict())
         if not path.exists():
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "input_not_found", f"Input file does not exist: {path}").to_dict())
         if not path.is_file():
