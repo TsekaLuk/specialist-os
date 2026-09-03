@@ -32,6 +32,18 @@ class SpecialistRuntime:
         self.allow_unverified_models = bool(os.environ.get("SPECIALIST_ALLOW_UNVERIFIED_MODELS") == "1") if allow_unverified_models is None else bool(allow_unverified_models)
         self.max_loaded = max(1, int(max_loaded))
         self.providers = provider_map(backend)
+        self.environments = ProviderEnvironmentManager(self.cache)
+        if backend == "auto":
+            # Promote only capabilities with a persisted artifact. This keeps
+            # a fresh install deterministic while allowing a later process to
+            # use an installed command provider such as whisper.cpp or MinerU.
+            real_providers = provider_map("real")
+            for name, provider in list(self.providers.items()):
+                installation = self.cache.installation(name)
+                if installation and installation.get("artifact_path") and name in real_providers:
+                    selected = real_providers[name]
+                    selected._allow_unverified_models = self.allow_unverified_models
+                    self.providers[name] = selected
         if provider_overrides:
             self.providers.update(provider_overrides)
         for provider in self.providers.values():
@@ -47,9 +59,24 @@ class SpecialistRuntime:
         self._locks = {name: threading.RLock() for name in self.providers}
         self._metrics_lock = threading.Lock()
         self.models_manager = ModelManager(self.cache)
-        self.environments = ProviderEnvironmentManager(self.cache)
         self.logger = EventLogger(self.cache.home, enabled=True)
         self._metrics = {"requests_total": 0, "errors_total": 0, "cache_hits_total": 0, "latency_ms_total": 0}
+
+        # On a subsequent process start, reuse an already-created provider
+        # environment instead of silently wrapping the dependency-free
+        # fallback with the host interpreter. This keeps ``doctor`` and actual
+        # inference aligned after a production install.
+        if self.with_dependencies and self.backend != "fallback":
+            real_providers = provider_map("real")
+            for name, spec in CAPABILITIES.items():
+                requirements = PROVIDER_REQUIREMENTS.get(spec.optional_dependency or "", [])
+                if not requirements or name in (provider_overrides or {}):
+                    continue
+                environment = self.environments.status(spec.provider)
+                if environment.get("status") == "ready":
+                    selected = real_providers[name]
+                    selected._allow_unverified_models = self.allow_unverified_models
+                    self.providers[name] = self._worker_provider(name, selected, environment["python"], requires_verified_artifact=True)
 
     def capabilities(self):
         return registry_snapshot()
@@ -65,8 +92,39 @@ class SpecialistRuntime:
         current_pythonpath = os.environ.get("PYTHONPATH", "")
         pythonpath = package_root if not current_pythonpath else package_root + os.pathsep + current_pythonpath
         timeout = self.TIMEOUTS.get(name, 120)
-        worker = JsonlProcessProvider(provider.name, name, provider.model, [str(python), "-m", "specialist", "_worker", "--capability", name, "--backend", self.backend], timeout_seconds=timeout, cpu_limit_seconds=timeout + 10, env={"SPECIALIST_HOME": str(self.cache.home), "PYTHONPATH": pythonpath, "SPECIALIST_ALLOW_UNVERIFIED_MODELS": "1" if self.allow_unverified_models else "0"}, log_path=self.cache.logs / f"{name.replace('.', '__')}.worker.log")
-        worker.requires_verified_artifact = bool(getattr(provider, "requires_verified_artifact", False) if requires_verified_artifact is None else requires_verified_artifact)
+        worker_env = {
+            "SPECIALIST_HOME": str(self.cache.home),
+            "PYTHONPATH": pythonpath,
+            "SPECIALIST_ALLOW_UNVERIFIED_MODELS": "1" if self.allow_unverified_models else "0",
+        }
+        # Provider selection and local model configuration happen again inside
+        # the worker process. Carry the reviewed operator settings across that
+        # process boundary so an isolated worker uses the same binary/model
+        # directories as the parent runtime.
+        for key in (
+            "SPECIALIST_WHISPER_BINARY",
+            "SPECIALIST_MINERU_COMMAND",
+            "SPECIALIST_MINERU_MODEL_DIR",
+            "SPECIALIST_OMNIPARSER_COMMAND",
+            "OMNIPARSER_MODEL_DIR",
+            "MINERU_TOOLS_CONFIG_JSON",
+        ):
+            if key in os.environ:
+                worker_env[key] = os.environ[key]
+        # Console entry points installed in an isolated provider environment
+        # live beside its Python executable. Prepend that directory so command
+        # providers are resolved by both provider_map and the worker process.
+        if python:
+            # Do not resolve the venv's ``bin/python`` symlink: console scripts
+            # live beside the logical interpreter path, not beside its system
+            # Python target.
+            bin_dir = str(Path(python).parent)
+            worker_env["PATH"] = bin_dir + os.pathsep + os.environ.get("PATH", "")
+        artifact_required = bool(getattr(provider, "requires_verified_artifact", False) if requires_verified_artifact is None else requires_verified_artifact)
+        worker_backend = "real" if self.backend == "auto" and artifact_required else self.backend
+        worker = JsonlProcessProvider(provider.name, name, provider.model, [str(python), "-m", "specialist", "_worker", "--capability", name, "--backend", worker_backend], timeout_seconds=timeout, cpu_limit_seconds=timeout + 10, env=worker_env, log_path=self.cache.logs / f"{name.replace('.', '__')}.worker.log")
+        worker.requires_verified_artifact = artifact_required
+        worker.requires_local_model_directory = bool(getattr(provider, "requires_local_model_directory", False))
         return worker
 
     def _verify_installation(self, installation):
@@ -184,6 +242,13 @@ class SpecialistRuntime:
                 dependency_env = None
                 try:
                     if install_dependencies and self.backend != "fallback" and spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency]:
+                        # ``auto`` initially selects fallbacks when the host
+                        # interpreter lacks the optional package. Once the
+                        # isolated environment is requested, switch to the
+                        # real provider before installing its artifact.
+                        if not getattr(provider, "requires_verified_artifact", False):
+                            provider = provider_map("real")[name]
+                            provider._allow_unverified_models = self.allow_unverified_models
                         dependency_env = self.environments.ensure(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency])
                         provider = self._worker_provider(name, provider, dependency_env["python"], requires_verified_artifact=True)
                         self.providers[name] = provider
@@ -204,6 +269,8 @@ class SpecialistRuntime:
                             auto_source = model_spec.artifact_url
                             auto_sha256 = model_spec.artifact_sha256
                     if auto_source:
+                        if getattr(provider, "requires_provider_environment", False) and dependency_env is None:
+                            raise WorkerError("this provider artifact must be installed into an isolated environment; rerun with --with-dependencies", code="provider_environment_required", retryable=False)
                         is_bundle = model_spec.artifact_kind == "bundle" and not source
                         artifact_root = self.cache.models / name.replace(".", "__") / selected_model
                         if is_bundle:
@@ -262,6 +329,9 @@ class SpecialistRuntime:
                 environment = {**environment, "status": "corrupt", "message": "provider environment imports are not usable"}
             if fix and self.with_dependencies and self.backend != "fallback" and spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency] and environment and environment.get("status") != "ready":
                 try:
+                    if not getattr(provider, "requires_verified_artifact", False):
+                        provider = provider_map("real")[spec.name]
+                        provider._allow_unverified_models = self.allow_unverified_models
                     environment = self.environments.ensure(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency])
                     provider = self._worker_provider(spec.name, provider, environment["python"], requires_verified_artifact=True)
                     self.providers[spec.name] = provider
@@ -298,7 +368,9 @@ class SpecialistRuntime:
             if details.get("status") != "ready":
                 state = "unavailable"
             capabilities.append({"capability": spec.name, "provider": spec.provider, "model": self._model_for(spec, installation, hardware), "installation": installation, "error": error_state, "environment": environment, "verification": verification, "registry": {"source_url": spec.source_url, "models": [model.id for model in spec.models]}, **details, "status": state})
-        return {"version": "1.0.0", "home": str(self.cache.home), "system": hardware, "capabilities": capabilities, "fixes": fixes, "warnings": warnings}
+        from . import __version__
+
+        return {"version": __version__, "home": str(self.cache.home), "system": hardware, "capabilities": capabilities, "fixes": fixes, "warnings": warnings}
 
     def models(self):
         output = []
@@ -446,7 +518,9 @@ class SpecialistRuntime:
         requested_device = options.get("device", "cpu")
         if requested_device not in getattr(provider, "supported_devices", ("cpu",)):
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", f"device must be one of {list(getattr(provider, 'supported_devices', ('cpu',)))}").to_dict())
-        requested_model_spec = spec.model_spec(self._model_for(spec))
+        installation = self.cache.installation(canonical)
+        selected_model = self._model_for(spec, installation)
+        requested_model_spec = spec.model_spec(selected_model)
         if requested_device not in requested_model_spec.devices:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "unsupported_device", f"model {requested_model_spec.id} does not support device {requested_device}").to_dict())
         hardware = detect_hardware()
@@ -465,8 +539,6 @@ class SpecialistRuntime:
             except ValueError as exc:
                 return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "unsafe_input", str(exc)).to_dict())
         input_info.update({"size_bytes": path.stat().st_size, "sha256": self.cache.input_hash(path)})
-        installation = self.cache.installation(canonical)
-        selected_model = self._model_for(spec, installation)
         if hasattr(provider, "model"):
             provider.model = selected_model
         key = self.cache.result_key(path, canonical, provider.name, selected_model, options)
@@ -496,6 +568,10 @@ class SpecialistRuntime:
                     selected_model = self._model_for(spec, installation)
                 if hasattr(provider, "model"):
                     provider.model = selected_model
+                # Installation can promote a fallback to a real provider and
+                # can persist a hardware-aware model choice. Recompute the
+                # cache identity before reading or writing the result.
+                key = self.cache.result_key(path, canonical, provider.name, selected_model, options)
             except WorkerError as exc:
                 return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, exc.code, str(exc), retryable=exc.retryable).to_dict())
             except Exception as exc:

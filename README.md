@@ -19,7 +19,7 @@ specialist doctor
 specialist ocr invoice.png
 specialist depth room.jpg --json
 specialist --isolate ocr invoice.png --json
-specialist --backend auto --with-dependencies --allow-unverified-models install vision.ocr
+specialist --backend real --with-dependencies install vision.ocr
 ```
 
 You can also run directly from a checkout:
@@ -44,19 +44,59 @@ provider worker with that environment's Python. It is explicit because provider
 packages can be large and some upstream projects have platform-specific
 licenses.
 
+Provider environments are pinned to the versions exercised by the release
+matrix. Re-running the command after an upgrade replaces an environment when
+its recorded requirement set changes. Command providers can be pointed at
+operator-managed binaries with `SPECIALIST_WHISPER_BINARY`,
+`SPECIALIST_MINERU_COMMAND`, and `SPECIALIST_OMNIPARSER_COMMAND`.
+
 Real providers are fail-closed by default: a model must be installed from a
 source with a SHA256 checksum before it can be loaded. The checked-in registry
 contains pinned upstream artifact URLs and auditable SHA256 digests. This is
 the safe production path:
 
 ```bash
-specialist install vision.ocr --source https://models.example/ppocr.bin --sha256 <64-hex-digest>
+specialist --backend real --with-dependencies install vision.ocr --source https://models.example/ppocr.bin --sha256 <64-hex-digest>
 ```
 
 For a controlled environment where the upstream provider's own downloader is
 trusted, opt in explicitly with `--allow-unverified-models` or
 `SPECIALIST_ALLOW_UNVERIFIED_MODELS=1`. This setting should not be used for
 untrusted or reproducible deployments.
+
+## Production acceptance
+
+The release gate has two layers: dependency-free process E2E for every
+interface, and opt-in real-provider acceptance against pinned artifacts. Run
+the latter on a host with the provider packages installed:
+
+```bash
+SPECIALIST_RUN_REAL_PROVIDER_E2E=1 \
+SPECIALIST_REAL_PROVIDERS=yolo,sam,paddleocr,silero,whisper \
+python -m unittest discover -s tests/e2e -p test_real_provider_e2e.py -v
+```
+
+The supported provider contracts are:
+
+| Provider | Production input | Offline boundary |
+| --- | --- | --- |
+| YOLO / SAM | `ultralytics==8.3.0` | pinned `.pt` artifact |
+| PaddleOCR | `paddleocr==3.7.0`, `paddlepaddle==3.3.1` | PP-OCRv5 det/rec bundle; extra OCR stages disabled |
+| Depth Anything | `transformers==4.57.3`, `torch==2.14.0` | local Hugging Face bundle (`local_files_only`) |
+| Silero VAD | `silero-vad==6.2.1`, `torch==2.14.0` | verified `.jit` artifact |
+| whisper.cpp | operator-provided `whisper-cli` | verified `ggml-base.en.bin` |
+| MinerU | `mineru==3.4.5` | verified wheel plus operator-provisioned local pipeline models |
+| OmniParser | operator-provided JSON CLI | verified bundle exposed through `OMNIPARSER_MODEL_DIR` |
+
+MinerU and OmniParser intentionally require an operator-supplied local model
+directory or wrapper because their upstream projects do not publish a single,
+stable, checksum-addressable runtime artifact. In verified mode Specialist sets
+`MINERU_MODEL_SOURCE=local`, `HF_HUB_OFFLINE=1`, and `TRANSFORMERS_OFFLINE=1`
+for command providers; missing local weights fail closed instead of triggering
+a network download. Set `SPECIALIST_MINERU_MODEL_DIR` to the provisioned
+pipeline model directory before running `document.parse`. Use
+`--allow-unverified-models` only as an explicit,
+audited exception.
 
 ## Interfaces
 

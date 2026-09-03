@@ -48,6 +48,7 @@ class JsonlProcessProvider:
         self.disk_requirement_mb = 0
         self.license = "provider terms"
         self.requires_verified_artifact = False
+        self.requires_local_model_directory = False
         self._process = None
         self._responses = queue.Queue()
         self._reader_thread = None
@@ -62,9 +63,15 @@ class JsonlProcessProvider:
 
     def doctor(self, hardware):
         executable = self.command[0] if self.command else ""
-        path_entries = os.environ.get("PATH", "").split(os.pathsep)
+        path = self.env.get("PATH", os.environ.get("PATH", ""))
+        path_entries = path.split(os.pathsep)
         available = bool(executable and (Path(executable).exists() or any(Path(item, executable).exists() for item in path_entries)))
-        return {"status": "ready" if available else "not ready", "backend": "isolated-worker", "worker": executable, "memory_limit_bytes": self.memory_limit_bytes, "cpu_limit_seconds": self.cpu_limit_seconds, "hardware": hardware}
+        details = {"status": "ready" if available else "not ready", "backend": "isolated-worker", "worker": executable, "memory_limit_bytes": self.memory_limit_bytes, "cpu_limit_seconds": self.cpu_limit_seconds, "hardware": hardware}
+        if available and self.requires_local_model_directory:
+            model_dir = self.env.get("SPECIALIST_MINERU_MODEL_DIR") or os.environ.get("SPECIALIST_MINERU_MODEL_DIR")
+            if not model_dir or not Path(model_dir).expanduser().is_dir() or not any(Path(model_dir).expanduser().iterdir()):
+                details.update({"status": "not ready", "error": {"code": "model_directory_required", "message": "MinerU pipeline models require SPECIALIST_MINERU_MODEL_DIR"}})
+        return details
 
     def load(self):
         with self._io_lock:
@@ -193,7 +200,7 @@ class JsonlProcessProvider:
                 response_line = self._responses.get(timeout=timeout)
             except queue.Empty as exc:
                 self._stop_worker()
-                raise WorkerError(f"provider worker timed out after {self.timeout_seconds}s", code="provider_timeout") from exc
+                raise WorkerError(f"provider worker timed out after {timeout}s", code="provider_timeout") from exc
             if isinstance(response_line, Exception):
                 self._stop_worker()
                 raise WorkerError(f"provider worker stream failed: {response_line}", code="worker_stream_failed") from response_line

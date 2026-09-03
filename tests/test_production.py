@@ -9,6 +9,8 @@ import threading
 import unittest
 import urllib.error
 import urllib.request
+from types import ModuleType
+from unittest.mock import patch
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 
@@ -18,7 +20,7 @@ from specialist.models import ModelArtifactError, ModelManager
 from specialist.registry import CAPABILITIES, REGISTRY_DOCUMENT
 from specialist.runtime import SpecialistRuntime
 from specialist.server import RuntimeRequestHandler
-from specialist.providers.optional import OptionalProvider
+from specialist.providers.optional import CommandDocumentProvider, OptionalProvider, PaddleOCRProvider, WhisperCppProvider
 
 
 class ProductionBoundaryTests(unittest.TestCase):
@@ -153,6 +155,120 @@ class ProductionBoundaryTests(unittest.TestCase):
             self.assertEqual(first["status"], "ready")
             self.assertEqual(second["status"], "ready")
             self.assertTrue(manager.verify("test-provider", []))
+
+    def test_mineru_environment_verifies_the_published_module(self):
+        # The wheel publishes ``mineru`` and the CLI entry point is also named
+        # ``mineru``; the old magic_pdf probe incorrectly marked good envs as
+        # corrupt and made production installs unusable.
+        from specialist.environments import PROVIDER_IMPORTS, REQUIREMENT_IMPORTS
+
+        self.assertEqual(PROVIDER_IMPORTS["mineru"], ["mineru"])
+        self.assertEqual(REQUIREMENT_IMPORTS["mineru"], "mineru")
+
+    def test_isolated_worker_path_contains_provider_environment_bin(self):
+        with tempfile.TemporaryDirectory() as temp:
+            runtime = SpecialistRuntime(home=Path(temp) / "home", backend="real")
+            provider = CommandDocumentProvider(command="mineru")
+            with patch.dict(
+                os.environ,
+                {
+                    "SPECIALIST_MINERU_COMMAND": "/opt/mineru",
+                    "SPECIALIST_MINERU_MODEL_DIR": "/opt/mineru-models",
+                    "MINERU_TOOLS_CONFIG_JSON": "/opt/mineru.json",
+                },
+            ):
+                worker = runtime._worker_provider("document.parse", provider, Path(temp) / "env" / "bin" / "python")
+            self.assertTrue(worker.env["PATH"].split(os.pathsep)[0].endswith("env/bin"))
+            self.assertEqual(worker.command[0], str(Path(temp) / "env" / "bin" / "python"))
+            self.assertEqual(worker.env["SPECIALIST_MINERU_COMMAND"], "/opt/mineru")
+            self.assertEqual(worker.env["SPECIALIST_MINERU_MODEL_DIR"], "/opt/mineru-models")
+            self.assertEqual(worker.env["MINERU_TOOLS_CONFIG_JSON"], "/opt/mineru.json")
+            runtime.close()
+
+    def test_wheel_provider_requires_an_isolated_environment(self):
+        with tempfile.TemporaryDirectory() as temp:
+            runtime = SpecialistRuntime(
+                home=Path(temp) / "home",
+                backend="real",
+                provider_overrides={"document.parse": CommandDocumentProvider(command="/usr/bin/true")},
+            )
+            with self.assertRaises(Exception) as caught:
+                runtime.install("document.parse", with_dependencies=False)
+            self.assertEqual(caught.exception.code, "provider_environment_required")
+            runtime.close()
+
+    def test_paddleocr_uses_pinned_v5_bundle_without_extra_downloads(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            bundle = root / "bundle"
+            (bundle / "det").mkdir(parents=True)
+            (bundle / "rec").mkdir(parents=True)
+            manifest = bundle / "artifact-manifest.json"
+            manifest.write_text("{}", encoding="utf-8")
+            cache = Cache(root / "home")
+            cache.mark_installed(
+                "vision.ocr",
+                "paddleocr",
+                "pp-ocrv5-mobile",
+                status="ready",
+                artifact_path=bundle,
+                artifact_kind="bundle",
+                artifact_manifest=str(manifest),
+                sha256="a" * 64,
+            )
+            captured = {}
+
+            class FakeOCR:
+                def __init__(self, **kwargs):
+                    captured.update(kwargs)
+
+            fake_module = ModuleType("paddleocr")
+            fake_module.PaddleOCR = FakeOCR
+            provider = PaddleOCRProvider()
+            provider._cache = cache
+            with patch.dict("sys.modules", {"paddleocr": fake_module, "paddle": ModuleType("paddle")}):
+                with patch("specialist.providers.optional.importlib.util.find_spec", return_value=object()):
+                    provider._load_model()
+            self.assertEqual(captured["text_detection_model_name"], "PP-OCRv5_mobile_det")
+            self.assertEqual(captured["text_recognition_model_name"], "PP-OCRv5_mobile_rec")
+            self.assertFalse(captured["use_doc_orientation_classify"])
+            self.assertFalse(captured["use_doc_unwarping"])
+            self.assertFalse(captured["use_textline_orientation"])
+
+    def test_whisper_rejects_invalid_audio_and_removes_stale_sidecar(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            cache = Cache(root / "home")
+            model = root / "model.bin"
+            model.write_bytes(b"model")
+            digest = hashlib.sha256(model.read_bytes()).hexdigest()
+            cache.mark_installed("audio.transcribe", "whisper.cpp", "ggml-base.en", status="ready", artifact_path=model, sha256=digest)
+            invalid = root / "bad.wav"
+            invalid.write_bytes(b"not wav")
+            provider = WhisperCppProvider(binary="missing-whisper")
+            provider._cache = cache
+            with self.assertRaises(Exception) as caught:
+                provider.infer(invalid, {}, cache)
+            self.assertEqual(caught.exception.code, "dependency_missing")
+
+            import wave
+
+            audio = root / "sample.wav"
+            with wave.open(str(audio), "wb") as stream:
+                stream.setnchannels(1)
+                stream.setsampwidth(2)
+                stream.setframerate(16000)
+                stream.writeframes(b"\0\0" * 1600)
+            sidecar = audio.with_suffix(".json")
+            sidecar.write_text("{\"stale\": true}", encoding="utf-8")
+            executable = root / "whisper-cli"
+            executable.write_text("#!/bin/sh\nprintf '%s' '{\"segments\":[{\"timestamps\":{\"from\":0,\"to\":1},\"text\":\" hello \"}]}' > \"$4.json\"\n", encoding="utf-8")
+            executable.chmod(0o755)
+            provider = WhisperCppProvider(binary=str(executable))
+            provider._cache = cache
+            result, _warnings = provider.infer(audio, {}, cache)
+            self.assertEqual(result["text"], "hello")
+            self.assertEqual(result["segments"][0]["start"], 0)
 
     def test_corrupt_artifact_is_reported_by_models_and_doctor(self):
         with tempfile.TemporaryDirectory() as temp:

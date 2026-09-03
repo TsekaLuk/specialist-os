@@ -99,6 +99,12 @@ class RuntimeTests(unittest.TestCase):
             self.runtime.install("vision.ocr", source=artifact.as_uri(), sha256="0" * 64)
         self.assertIsNone(self.runtime.cache.installation("vision.ocr"))
 
+    def test_existing_model_marker_controls_result_identity(self):
+        self.runtime.cache.mark_installed("vision.detect", "yolo", "yolo11n", status="ready")
+        result = self.runtime.run("vision.detect", self.input)
+        self.assertEqual(result["model"], "yolo11n")
+        self.assertEqual(result["provider"], "yolo")
+
     def test_remote_artifacts_require_checksum(self):
         with self.assertRaises(ValueError):
             self.runtime.install("vision.ocr", source="https://example.invalid/model.bin")

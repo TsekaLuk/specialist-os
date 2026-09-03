@@ -24,6 +24,38 @@ def _missing(package):
     raise WorkerError(f"optional dependency '{package}' is not installed; install it in the provider environment with `specialist --with-dependencies install <capability>`", code="dependency_missing", retryable=False)
 
 
+def _run_external(command, *, timeout, env=None):
+    """Run a provider command and terminate its whole process group on timeout."""
+    kwargs = {"stdout": subprocess.PIPE, "stderr": subprocess.PIPE, "text": True, "env": env}
+    if os.name == "posix":
+        kwargs["start_new_session"] = True
+    process = subprocess.Popen(command, **kwargs)
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        try:
+            if os.name == "posix":
+                import signal
+
+                os.killpg(process.pid, signal.SIGTERM)
+            else:
+                process.terminate()
+            process.wait(timeout=0.5)
+        except (OSError, subprocess.TimeoutExpired):
+            try:
+                if os.name == "posix":
+                    import signal
+
+                    os.killpg(process.pid, signal.SIGKILL)
+                else:
+                    process.kill()
+            except OSError:
+                pass
+        process.communicate()
+        raise
+    return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+
+
 class OptionalProvider:
     requires_verified_artifact = True
     supported_platforms = ("macos-arm64", "linux-x64", "windows-x64")
@@ -192,14 +224,25 @@ class PaddleOCRProvider(OptionalProvider):
         root = self.artifact_root()
         kwargs = {}
         if root:
-            # PaddleOCR accepts local model directories and will not invoke its
-            # downloader when both detection and recognition bundles exist.
+            # PaddleOCR 3.x otherwise defaults to PP-OCRv6 and downloads its
+            # document-orientation/unwarping models. Pin the model names to
+            # the checked-in PP-OCRv5 bundle and disable those extra stages so
+            # an offline, verified install remains deterministic.
             det = root / "det"
             rec = root / "rec"
             if det.is_dir():
+                kwargs["text_detection_model_name"] = "PP-OCRv5_mobile_det"
                 kwargs["text_detection_model_dir"] = str(det)
             if rec.is_dir():
+                kwargs["text_recognition_model_name"] = "PP-OCRv5_mobile_rec"
                 kwargs["text_recognition_model_dir"] = str(rec)
+            kwargs.update(
+                {
+                    "use_doc_orientation_classify": False,
+                    "use_doc_unwarping": False,
+                    "use_textline_orientation": False,
+                }
+            )
         if not kwargs and not self._allow_unverified_models:
             raise WorkerError("PaddleOCR bundle must contain det/ and rec/ model directories", code="unsupported_artifact", retryable=False)
         self._model = PaddleOCR(**kwargs)
@@ -313,13 +356,46 @@ class SileroVADProvider(OptionalProvider):
 class CommandDocumentProvider(OptionalProvider):
     """Adapter for MinerU-compatible CLI commands configured in the environment."""
 
-    def __init__(self, command="magic-pdf", model="mineru-2"):
+    requires_provider_environment = True
+    requires_local_model_directory = True
+
+    def __init__(self, command="mineru", model="mineru-2"):
         super().__init__("mineru", "document.parse", model)
         self.command = command
 
     def _check_dependency(self):
         if shutil.which(self.command) is None:
             _missing(self.command)
+
+    @staticmethod
+    def _configured_model_dir():
+        explicit = os.environ.get("SPECIALIST_MINERU_MODEL_DIR")
+        if explicit:
+            return Path(explicit).expanduser()
+        config_path = Path(os.environ.get("MINERU_TOOLS_CONFIG_JSON", "~/mineru.json")).expanduser()
+        try:
+            config = json.loads(config_path.read_text(encoding="utf-8"))
+            models_dir = config.get("models-dir") if isinstance(config, dict) else None
+            pipeline = models_dir.get("pipeline") if isinstance(models_dir, dict) else None
+            return Path(pipeline).expanduser() if isinstance(pipeline, str) and pipeline.strip() else None
+        except (OSError, ValueError, TypeError):
+            return None
+
+    def doctor(self, hardware):
+        details = super().doctor(hardware)
+        if details.get("status") != "ready" or self._allow_unverified_models:
+            return details
+        model_dir = self._configured_model_dir()
+        if not model_dir or not model_dir.is_dir() or not any(model_dir.iterdir()):
+            return {
+                **details,
+                "status": "not ready",
+                "error": {
+                    "code": "model_directory_required",
+                    "message": "MinerU pipeline models are not configured; set SPECIALIST_MINERU_MODEL_DIR or configure ~/mineru.json",
+                },
+            }
+        return {**details, "model_directory": str(model_dir)}
 
     def infer(self, input_path, options, cache):
         self.load()
@@ -328,10 +404,22 @@ class CommandDocumentProvider(OptionalProvider):
         output_dir.mkdir(parents=True, exist_ok=True)
         environment = os.environ.copy()
         root = self.artifact_root()
-        if root:
-            environment["SPECIALIST_MODEL_DIR"] = str(root)
+        artifact = self.artifact_path()
+        model_dir = self._configured_model_dir()
+        if not self._allow_unverified_models and (not model_dir or not model_dir.is_dir() or not any(model_dir.iterdir())):
+            raise WorkerError("MinerU pipeline models are not configured; set SPECIALIST_MINERU_MODEL_DIR or configure ~/mineru.json", code="model_directory_required", retryable=False)
+        if model_dir:
+            environment["SPECIALIST_MODEL_DIR"] = str(model_dir)
+        if artifact:
+            environment["SPECIALIST_MODEL_ARTIFACT"] = str(artifact)
+        if not self._allow_unverified_models:
+            # MinerU's CLI downloads pipeline/VLM weights on demand. A
+            # verified Specialist artifact must be an offline boundary; an
+            # operator can provision local models and set MINERU_MODEL_SOURCE
+            # explicitly when using a controlled environment.
+            environment["MINERU_MODEL_SOURCE"] = "local"
         try:
-            completed = subprocess.run([self.command, "-p", str(input_path), "-o", str(output_dir)], capture_output=True, text=True, timeout=float(options.get("timeout_seconds", 900)), check=False, env=environment)
+            completed = _run_external([self.command, "-p", str(input_path), "-o", str(output_dir)], timeout=float(options.get("timeout_seconds", 900)), env=environment)
         except subprocess.TimeoutExpired as exc:
             raise WorkerError("document parser timed out", code="provider_timeout") from exc
         if completed.returncode:
@@ -357,10 +445,19 @@ class CommandScreenProvider(OptionalProvider):
         self._check_dependency()
         environment = os.environ.copy()
         root = self.artifact_root()
+        artifact = self.artifact_path()
         if root:
-            environment["OMNIPARSER_MODEL_DIR"] = str(root)
+            environment.setdefault("OMNIPARSER_MODEL_DIR", str(root))
+            environment.setdefault("SPECIALIST_MODEL_DIR", str(root))
+        if artifact:
+            environment["SPECIALIST_MODEL_ARTIFACT"] = str(artifact)
+        if not self._allow_unverified_models:
+            # Prevent a wrapper from silently reaching Hugging Face/ModelScope
+            # when the checked-in bundle is the declared source of truth.
+            environment["HF_HUB_OFFLINE"] = "1"
+            environment["TRANSFORMERS_OFFLINE"] = "1"
         try:
-            completed = subprocess.run([self.command, str(input_path), "--json"], capture_output=True, text=True, timeout=float(options.get("timeout_seconds", 120)), check=False, env=environment)
+            completed = _run_external([self.command, str(input_path), "--json"], timeout=float(options.get("timeout_seconds", 120)), env=environment)
         except subprocess.TimeoutExpired as exc:
             raise WorkerError("screen parser timed out", code="provider_timeout") from exc
         if completed.returncode:
@@ -387,16 +484,26 @@ class WhisperCppProvider(OptionalProvider):
     def infer(self, input_path, options, cache):
         self.load()
         self._check_dependency()
+        try:
+            with wave.open(str(input_path), "rb") as audio:
+                if audio.getsampwidth() != 2 or audio.getnchannels() not in (1, 2):
+                    raise WorkerError("whisper.cpp currently requires mono/stereo 16-bit PCM WAV", code="unsupported_audio_format", retryable=False)
+        except (OSError, EOFError, wave.Error) as exc:
+            raise WorkerError("whisper.cpp requires a valid PCM WAV input", code="unsupported_audio_format", retryable=False) from exc
         model_path = self.artifact_path() or self.model
         model_path = str(model_path)
-        command = [self.binary, "-m", model_path, "-f", str(input_path), "--output-json"]
+        # Remove stale sidecar output so a failed invocation cannot be
+        # mistaken for a successful result from an earlier request.
+        candidates = [Path(str(input_path) + ".json"), input_path.with_suffix(".json")]
+        for candidate in candidates:
+            candidate.unlink(missing_ok=True)
+        command = [self.binary, "-m", model_path, "-f", str(input_path), "--output-json", "--no-prints"]
         try:
-            completed = subprocess.run(command, capture_output=True, text=True, timeout=float(options.get("timeout_seconds", 300)), check=False)
+            completed = _run_external(command, timeout=float(options.get("timeout_seconds", 300)))
         except subprocess.TimeoutExpired as exc:
             raise WorkerError("whisper.cpp timed out", code="provider_timeout") from exc
         if completed.returncode:
             raise WorkerError(completed.stderr.strip()[-2000:] or "whisper.cpp failed", code="provider_error", retryable=True)
-        candidates = [Path(str(input_path) + ".json"), input_path.with_suffix(".json")]
         parsed = None
         for candidate in candidates:
             if candidate.is_file():
@@ -412,12 +519,32 @@ class WhisperCppProvider(OptionalProvider):
                 raise WorkerError("whisper.cpp returned invalid JSON", code="provider_invalid_output", retryable=False) from exc
         if not isinstance(parsed, dict):
             raise WorkerError("whisper.cpp returned a JSON value instead of an object", code="provider_invalid_output", retryable=False)
+
+        def timestamp(value):
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                return float(value)
+            if isinstance(value, str):
+                value = value.strip().replace(",", ".")
+                try:
+                    parts = value.split(":")
+                    if len(parts) == 3:
+                        hours, minutes, seconds = parts
+                        return float(hours) * 3600 + float(minutes) * 60 + float(seconds)
+                    return float(value)
+                except ValueError:
+                    return None
+            return None
+
         raw_segments = parsed.get("segments") or parsed.get("transcription") or []
         segments = []
         for item in raw_segments:
             if not isinstance(item, dict):
                 continue
             timestamps = item.get("timestamps") or {}
-            segments.append({"start": item.get("start", timestamps.get("from")), "end": item.get("end", timestamps.get("to")), "text": str(item.get("text", "")).strip()})
+            start = timestamp(item.get("start", timestamps.get("from")))
+            end = timestamp(item.get("end", timestamps.get("to")))
+            if start is None or end is None or end < start:
+                continue
+            segments.append({"start": start, "end": end, "text": str(item.get("text", "")).strip()})
         text = parsed.get("text") or " ".join(item["text"] for item in segments if item["text"]).strip()
         return {"text": str(text), "segments": segments}, []

@@ -16,12 +16,15 @@ class EnvironmentError(RuntimeError):
 
 
 PROVIDER_REQUIREMENTS = {
-    "ultralytics": ["ultralytics"],
-    "paddleocr": ["paddleocr", "paddlepaddle"],
-    "torch": ["torch"],
-    "transformers": ["transformers", "Pillow", "torch"],
-    "silero-vad": ["silero-vad", "torch"],
-    "mineru": ["mineru"],
+    # Keep provider environments reproducible and aligned with the artifact
+    # formats recorded in registry/models.yaml. These versions are tested on
+    # the supported Python 3.12 macOS/Linux matrix.
+    "ultralytics": ["ultralytics==8.3.0"],
+    "paddleocr": ["paddleocr==3.7.0", "paddlepaddle==3.3.1"],
+    "torch": ["torch==2.14.0"],
+    "transformers": ["transformers==4.57.3", "Pillow==12.3.0", "torch==2.14.0"],
+    "silero-vad": ["silero-vad==6.2.1", "torch==2.14.0"],
+    "mineru": ["mineru==3.4.5"],
     "omniparser": [],
 }
 
@@ -31,14 +34,14 @@ PROVIDER_IMPORTS = {
     "torch": ["torch"],
     "transformers": ["transformers", "PIL", "torch"],
     "silero-vad": ["silero_vad", "torch"],
-    "mineru": ["magic_pdf"],
+    "mineru": ["mineru"],
 }
 
 REQUIREMENT_IMPORTS = {
     "paddlepaddle": "paddle",
     "Pillow": "PIL",
     "silero-vad": "silero_vad",
-    "mineru": "magic_pdf",
+    "mineru": "mineru",
 }
 
 

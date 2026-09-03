@@ -15,7 +15,11 @@ permissions:
 jobs:
   real-provider:
     runs-on: ubuntu-22.04
-    timeout-minutes: 45
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [yolo, sam, paddleocr, silero, whisper, depth]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,9 +27,27 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install --upgrade pip
       - run: python -m pip install .
-      - run: python -m pip install ultralytics transformers Pillow torch silero-vad
+      - name: Install provider dependencies
+        env:
+          PROVIDER: ${{ matrix.provider }}
+        run: |
+          case "$PROVIDER" in
+            yolo|sam) python -m pip install "ultralytics==8.3.0" ;;
+            paddleocr) python -m pip install "paddleocr==3.7.0" "paddlepaddle==3.3.1" ;;
+            silero) python -m pip install "silero-vad==6.2.1" "torch==2.14.0" ;;
+            depth) python -m pip install "transformers==4.57.3" "Pillow==12.3.0" "torch==2.14.0" ;;
+            whisper)
+              sudo apt-get update
+              sudo apt-get install -y cmake build-essential
+              git clone --depth 1 --branch v1.9.2 https://github.com/ggml-org/whisper.cpp "$RUNNER_TEMP/whisper.cpp"
+              cmake -S "$RUNNER_TEMP/whisper.cpp" -B "$RUNNER_TEMP/whisper.cpp/build" -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_EXAMPLES=ON
+              cmake --build "$RUNNER_TEMP/whisper.cpp/build" --config Release -j2
+              ;;
+          esac
       - run: python -m unittest discover -s tests/e2e -p test_real_provider_e2e.py -v
         env:
           SPECIALIST_RUN_REAL_PROVIDER_E2E: "1"
+          SPECIALIST_REAL_PROVIDERS: ${{ matrix.provider }}
           SPECIALIST_RUN_HEAVY_REAL: ${{ inputs.run_heavy }}
+          SPECIALIST_WHISPER_BINARY: ${{ runner.temp }}/whisper.cpp/build/bin/whisper-cli
           SPECIALIST_HOME: ${{ runner.temp }}/specialist

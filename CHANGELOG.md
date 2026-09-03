@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Hardened real-provider installation and acceptance: pinned provider
+  environments, offline command-provider boundaries, venv console-script PATH
+  handling, PaddleOCR PP-OCRv5 compatibility, and process-group cleanup on
+  timeout.
+
+## 1.0.1
+
+- Production hardening release for real-provider environments and acceptance
+  workflows.
+
 - Added process-boundary E2E coverage for the CLI, HTTP API, MCP stdio server,
   isolated workers and optional wheel installation.
 - Added provider-aware readiness and a `doctor --strict` deployment gate.

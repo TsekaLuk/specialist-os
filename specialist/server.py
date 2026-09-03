@@ -71,7 +71,9 @@ class RuntimeRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         route = urlsplit(self.path).path
         if route == "/health":
-            return self._send(200, {"status": "ok", "version": "1.0.0"})
+            from . import __version__
+
+            return self._send(200, {"status": "ok", "version": __version__})
         if not self._authorized():
             return self._send(401, {"error": {"code": "unauthorized", "message": "Bearer token required"}})
         if route in {"/v1/capabilities", "/capabilities"}:
@@ -211,7 +213,9 @@ def serve_mcp(runtime, max_request_bytes=4 * 1024 * 1024):
                     method = request.get("method")
                     is_notification = "id" not in request
                     if method == "initialize":
-                        result = {"protocolVersion": "2024-11-05", "capabilities": {"tools": {}}, "serverInfo": {"name": "specialist-runtime", "version": "1.0.0"}}
+                        from . import __version__
+
+                        result = {"protocolVersion": "2024-11-05", "capabilities": {"tools": {}}, "serverInfo": {"name": "specialist-runtime", "version": __version__}}
                     elif method == "notifications/initialized":
                         continue
                     elif method == "tools/list":

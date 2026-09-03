@@ -39,6 +39,30 @@ downloaders by default. Install a verified artifact first, or make the trust
 decision explicit with `--allow-unverified-models` (or
 `SPECIALIST_ALLOW_UNVERIFIED_MODELS=1`) in a controlled environment.
 
+Use the real backend and isolated environments for a production install:
+
+```bash
+specialist --backend real --with-dependencies install vision
+specialist --backend real --with-dependencies install audio
+specialist --backend auto --with-dependencies doctor --strict --json
+```
+
+The isolated worker prepends its environment's `bin` directory to `PATH`, so
+console entry points such as `mineru` are resolved from the same environment as
+their Python modules. Set `SPECIALIST_WHISPER_BINARY`,
+`SPECIALIST_MINERU_COMMAND`, or `SPECIALIST_OMNIPARSER_COMMAND` when a host
+binary or a reviewed wrapper lives outside the default name. The default
+MinerU command for version 3.4.5 is `mineru`.
+
+MinerU's published wheel is verified and installed into its provider
+environment, but its pipeline model repository is a separate upstream snapshot.
+Provision those models locally and configure MinerU before enabling
+`document.parse` by setting `SPECIALIST_MINERU_MODEL_DIR`; verified Specialist
+workers set `MINERU_MODEL_SOURCE=local` to prevent an accidental remote
+download. OmniParser is similarly exposed as a
+JSON CLI contract and receives the verified bundle path through
+`OMNIPARSER_MODEL_DIR` and `SPECIALIST_MODEL_ARTIFACT`.
+
 Use `specialist models list`, `specialist doctor --json` and
 `specialist doctor --strict --json` in deployment health checks. The strict
 variant exits non-zero when any capability is unavailable, unconfigured or has
