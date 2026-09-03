@@ -29,7 +29,7 @@ jobs:
       - run: python scripts/release_check.py --require-artifacts --tag "$GITHUB_REF_NAME"
       - run: python -m build --wheel --sdist
       - run: python scripts/generate_sbom.py --output dist/sbom.cdx.json
-      - run: sha256sum dist/* > dist/SHA256SUMS
+      - run: (cd dist && sha256sum sbom.cdx.json specialist_runtime-*.whl specialist_runtime-*.tar.gz) > dist/SHA256SUMS
       - uses: actions/attest-build-provenance@v2
         with:
           subject-path: "dist/*"
