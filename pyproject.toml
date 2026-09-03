@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "specialist-runtime"
+version = "0.2.0"
+description = "A local-first specialist capability runtime for any LLM."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Specialist Runtime contributors"}]
+keywords = ["llm", "mcp", "ocr", "computer-vision", "local-ai"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.scripts]
+specialist = "specialist.cli:main"
+
+[project.optional-dependencies]
+rust = ["maturin>=1.7"]
+
+[tool.setuptools.packages.find]
+include = ["specialist*"]
+
+[tool.setuptools.data-files]
+"share/specialist/registry" = ["registry/models.yaml", "registry/models.schema.json"]
+"share/specialist/schemas" = ["schemas/result-envelope.schema.json", "schemas/capability-results.schema.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

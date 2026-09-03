@@ -1,0 +1,23 @@
+[package]
+name = "specialist-core"
+version = "0.1.0"
+edition = "2021"
+description = "Small, deterministic Rust core for Specialist Runtime"
+license = "MIT"
+
+[lib]
+name = "specialist_core"
+crate-type = ["rlib", "cdylib"]
+
+[features]
+default = []
+python = ["dep:pyo3"]
+
+[dependencies]
+sha2 = "0.10"
+serde_json = "1"
+pyo3 = { version = "0.22", optional = true, features = ["extension-module"] }
+
+[[bin]]
+name = "specialist-core"
+path = "src/main.rs"

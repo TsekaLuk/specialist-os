@@ -1,0 +1,14 @@
+{
+  "tools": [
+    {"name": "vision_detect", "capability": "vision.detect"},
+    {"name": "vision_segment", "capability": "vision.segment"},
+    {"name": "vision_ocr", "capability": "vision.ocr"},
+    {"name": "vision_depth", "capability": "vision.depth"},
+    {"name": "screen_parse", "capability": "screen.parse"},
+    {"name": "document_parse", "capability": "document.parse"},
+    {"name": "audio_transcribe", "capability": "audio.transcribe"},
+    {"name": "audio_vad", "capability": "audio.vad"}
+  ],
+  "transport": "mcp-or-http",
+  "result_envelope": "schemas/result-envelope.schema.json"
+}

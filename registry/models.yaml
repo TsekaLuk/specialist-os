@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "code_license": "MIT",
+  "capabilities": [
+    {
+      "name": "vision.detect",
+      "command": "detect",
+      "provider": "yolo",
+      "model": "yolo11n",
+      "modality": "image",
+      "description": "Detect objects and return bounding boxes.",
+      "bundle": "vision",
+      "optional_dependency": "ultralytics",
+      "source_url": "https://github.com/ultralytics/ultralytics",
+      "license": {"weights": "AGPL-3.0", "commercial": false},
+      "models": [
+        {"id": "yolo11n", "recommended": true, "memory_mb": 1024, "disk_mb": 20, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null}},
+        {"id": "yolo11s", "recommended": false, "memory_mb": 2048, "disk_mb": 40, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null}}
+      ]
+    },
+    {
+      "name": "vision.segment",
+      "command": "segment",
+      "provider": "sam",
+      "model": "sam2-small",
+      "modality": "image",
+      "description": "Segment image regions from a prompt.",
+      "bundle": "vision",
+      "optional_dependency": "ultralytics",
+      "source_url": "https://github.com/ultralytics/ultralytics",
+      "license": {"weights": "Apache-2.0", "commercial": true},
+      "models": [
+        {"id": "sam2-small", "recommended": true, "memory_mb": 2048, "disk_mb": 500, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null}}
+      ]
+    },
+    {
+      "name": "vision.ocr",
+      "command": "ocr",
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "modality": "image",
+      "description": "Extract text blocks and bounding boxes.",
+      "bundle": "vision",
+      "optional_dependency": "paddleocr",
+      "source_url": "https://github.com/PaddlePaddle/PaddleOCR",
+      "license": {"weights": "Apache-2.0", "commercial": true},
+      "models": [
+        {"id": "pp-ocrv5-mobile", "recommended": true, "memory_mb": 1024, "disk_mb": 100, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null}}
+      ]
+    },
+    {
+      "name": "vision.depth",
+      "command": "depth",
+      "provider": "depth-anything",
+      "model": "depth-anything-v2-small",
+      "modality": "image",
+      "description": "Estimate relative monocular depth.",
+      "bundle": "vision",
+      "optional_dependency": "transformers",
+      "source_url": "https://github.com/DepthAnything/Depth-Anything-V2",
+      "license": {"weights": "Apache-2.0", "commercial": true},
+      "models": [
+        {"id": "depth-anything-v2-small", "recommended": true, "memory_mb": 1536, "disk_mb": 300, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null}},
+        {"id": "depth-anything-v2-base", "recommended": false, "memory_mb": 4096, "disk_mb": 700, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null}}
+      ]
+    },
+    {
+      "name": "screen.parse",
+      "command": "parse-screen",
+      "provider": "omniparser",
+      "model": "omniparser-v2",
+      "modality": "image",
+      "description": "Locate actionable GUI elements in a screenshot.",
+      "bundle": "vision",
+      "optional_dependency": "omniparser",
+      "source_url": "https://github.com/microsoft/OmniParser",
+      "license": {"weights": "MIT", "commercial": true},
+      "models": [
+        {"id": "omniparser-v2", "recommended": true, "memory_mb": 3072, "disk_mb": 1000, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null}}
+      ]
+    },
+    {
+      "name": "document.parse",
+      "command": "parse-document",
+      "provider": "mineru",
+      "model": "mineru-2",
+      "modality": "document",
+      "description": "Recover document markdown and structure.",
+      "bundle": "document",
+      "optional_dependency": "mineru",
+      "source_url": "https://github.com/opendatalab/MinerU",
+      "license": {"weights": "AGPL-3.0", "commercial": false},
+      "models": [
+        {"id": "mineru-2", "recommended": true, "memory_mb": 4096, "disk_mb": 2000, "platforms": ["macos-arm64", "linux-x64"], "devices": ["cpu", "cuda"], "artifact": {"url": null, "sha256": null}}
+      ]
+    },
+    {
+      "name": "audio.transcribe",
+      "command": "transcribe",
+      "provider": "whisper.cpp",
+      "model": "ggml-base.en",
+      "modality": "audio",
+      "description": "Transcribe spoken audio.",
+      "bundle": "audio",
+      "optional_dependency": "whisper.cpp",
+      "source_url": "https://github.com/ggerganov/whisper.cpp",
+      "license": {"weights": "MIT", "commercial": true},
+      "models": [
+        {"id": "ggml-base.en", "recommended": true, "memory_mb": 1024, "disk_mb": 150, "platforms": ["macos-arm64", "linux-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null}}
+      ]
+    },
+    {
+      "name": "audio.vad",
+      "command": "vad",
+      "provider": "silero-vad",
+      "model": "silero-vad-v5",
+      "modality": "audio",
+      "description": "Find speech activity intervals.",
+      "bundle": "audio",
+      "optional_dependency": "torch",
+      "source_url": "https://github.com/snakers4/silero-vad",
+      "license": {"weights": "MIT", "commercial": true},
+      "models": [
+        {"id": "silero-vad-v5", "recommended": true, "memory_mb": 1024, "disk_mb": 100, "platforms": ["macos-arm64", "linux-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null}}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+include README.md LICENSE CHANGELOG.md
+recursive-include docs *.md
+recursive-include integrations *.md *.json
+recursive-include registry *.yaml *.json
+recursive-include schemas *.json
+recursive-include tests *.py

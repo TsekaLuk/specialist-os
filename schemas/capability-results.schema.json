@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://specialist.runtime/schemas/capability-results.schema.json",
+  "title": "Specialist capability result payloads",
+  "type": "object",
+  "oneOf": [
+    {"properties": {"capability": {"const": "vision.detect"}, "result": {"$ref": "#/$defs/detect"}}, "required": ["capability", "result"]},
+    {"properties": {"capability": {"const": "vision.segment"}, "result": {"$ref": "#/$defs/segment"}}, "required": ["capability", "result"]},
+    {"properties": {"capability": {"const": "vision.ocr"}, "result": {"$ref": "#/$defs/ocr"}}, "required": ["capability", "result"]},
+    {"properties": {"capability": {"const": "vision.depth"}, "result": {"$ref": "#/$defs/depth"}}, "required": ["capability", "result"]},
+    {"properties": {"capability": {"const": "screen.parse"}, "result": {"$ref": "#/$defs/screen"}}, "required": ["capability", "result"]},
+    {"properties": {"capability": {"const": "document.parse"}, "result": {"$ref": "#/$defs/document"}}, "required": ["capability", "result"]},
+    {"properties": {"capability": {"const": "audio.transcribe"}, "result": {"$ref": "#/$defs/transcribe"}}, "required": ["capability", "result"]},
+    {"properties": {"capability": {"const": "audio.vad"}, "result": {"$ref": "#/$defs/vad"}}, "required": ["capability", "result"]}
+  ],
+  "$defs": {
+    "bbox": {
+      "type": "array",
+      "prefixItems": [{"type": "number"}, {"type": "number"}, {"type": "number"}, {"type": "number"}],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "detect": {
+      "type": "object",
+      "required": ["items"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {"type": "object", "required": ["label", "bbox", "confidence"], "properties": {"label": {"type": "string"}, "bbox": {"$ref": "#/$defs/bbox"}, "confidence": {"type": ["number", "null"]}}}
+        }
+      }
+    },
+    "segment": {"type": "object", "required": ["masks"], "properties": {"masks": {"type": "array"}}},
+    "ocr": {
+      "type": "object",
+      "required": ["blocks"],
+      "properties": {
+        "blocks": {
+          "type": "array",
+          "items": {"type": "object", "required": ["text", "bbox", "confidence"], "properties": {"text": {"type": "string"}, "bbox": {"$ref": "#/$defs/bbox"}, "confidence": {"type": ["number", "null"]}}}
+        }
+      }
+    },
+    "depth": {
+      "type": "object",
+      "required": ["width", "height", "depth_map", "preview", "mode"],
+      "properties": {"width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}, "depth_map": {"type": ["string", "null"]}, "preview": {"type": ["string", "null"]}, "mode": {"type": "string"}}
+    },
+    "screen": {"type": "object", "required": ["elements"], "properties": {"elements": {"type": "array"}}},
+    "document": {
+      "type": "object",
+      "required": ["markdown", "pages", "tables", "figures", "formulas", "artifacts_path"],
+      "properties": {"markdown": {"type": "string"}, "pages": {"type": ["integer", "null"], "minimum": 0}, "tables": {"type": "array"}, "figures": {"type": "array"}, "formulas": {"type": "array"}, "artifacts_path": {"type": "string"}}
+    },
+    "transcribe": {"type": "object", "required": ["text", "segments"], "properties": {"text": {"type": "string"}, "segments": {"type": "array"}}},
+    "vad": {
+      "type": "object",
+      "required": ["segments", "duration_seconds"],
+      "properties": {
+        "segments": {"type": "array", "items": {"type": "object", "required": ["start", "end"], "properties": {"start": {"type": "number", "minimum": 0}, "end": {"type": "number", "minimum": 0}}}},
+        "duration_seconds": {"type": "number", "minimum": 0}
+      }
+    }
+  }
+}
