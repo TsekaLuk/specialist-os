@@ -45,6 +45,7 @@ class JsonlProcessProvider:
         self.memory_requirement_mb = 512
         self.disk_requirement_mb = 0
         self.license = "provider terms"
+        self.requires_verified_artifact = False
         self._process = None
         self._responses = queue.Queue()
         self._reader_thread = None

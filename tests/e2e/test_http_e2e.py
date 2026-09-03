@@ -99,6 +99,23 @@ class HttpE2ETests(unittest.TestCase):
                 process.send_signal(signal.SIGTERM)
                 self.assertEqual(process.wait(timeout=5), 0)
 
+    def test_ready_returns_503_when_a_capability_has_a_persisted_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            home = root / "home"
+            metadata = home / "metadata"
+            metadata.mkdir(parents=True)
+            (metadata / "vision__ocr.error.json").write_text(
+                json.dumps({"capability": "vision.ocr", "status": "error", "message": "fixture failure"}),
+                encoding="utf-8",
+            )
+            with HttpService(home) as service:
+                status, _, body = http_request(f"{service.url}/ready")
+                self.assertEqual(status, 503)
+                readiness = json.loads(body)
+                self.assertEqual(readiness["status"], "degraded")
+                self.assertEqual(readiness["error_capabilities"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

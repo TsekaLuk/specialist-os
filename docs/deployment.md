@@ -13,6 +13,11 @@ place. `/health` is a liveness check; `/ready` reports the runtime state;
 `/metrics` exposes local counters. The server starts isolated workers lazily,
 one per capability, and shuts them down on SIGINT.
 
+`/ready` describes whether the running service can accept requests. Use
+`specialist doctor --strict --json` as the stronger release gate: it also
+requires every configured capability to have a ready provider/model rather
+than silently relying on fallback behavior.
+
 For launchd/systemd, run the installed `specialist` executable directly with a
 dedicated `SPECIALIST_HOME`, a restrictive filesystem account, and an explicit
 token in the service manager's secret store. Do not put model or input files in
@@ -30,9 +35,11 @@ downloaders by default. Install a verified artifact first, or make the trust
 decision explicit with `--allow-unverified-models` (or
 `SPECIALIST_ALLOW_UNVERIFIED_MODELS=1`) in a controlled environment.
 
-Use `specialist models list` and `specialist doctor --json` in deployment
-health checks. A tampered artifact is reported as `corrupt` and will not be
-silently replaced.
+Use `specialist models list`, `specialist doctor --json` and
+`specialist doctor --strict --json` in deployment health checks. The strict
+variant exits non-zero when any capability is unavailable, unconfigured or has
+a corrupt/error model state. A tampered artifact is reported as `corrupt` and
+will not be silently replaced.
 
 Before promoting a release, run the process-boundary E2E suite from a clean
 checkout. It uses fallback providers and temporary state, so it does not

@@ -69,6 +69,7 @@ class BuiltinProvider:
     name = "builtin"
     capability = ""
     model = "fallback"
+    requires_verified_artifact = False
     supported_platforms = ("macos-arm64", "linux-x64", "windows-x64")
     supported_devices = ("cpu", "mps", "cuda")
     memory_requirement_mb = 128

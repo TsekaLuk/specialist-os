@@ -79,6 +79,7 @@ def build_parser():
     capabilities.add_argument("--json", action="store_true", dest="as_json")
     doctor = sub.add_parser("doctor", help="Inspect system, dependencies and provider state")
     doctor.add_argument("--fix", action="store_true", help="Install safe local fallback markers")
+    doctor.add_argument("--strict", action="store_true", help="Exit non-zero unless every capability is ready")
     doctor.add_argument("--json", action="store_true", dest="as_json")
     install = sub.add_parser("install", help="Install a capability, bundle or all")
     install.add_argument("target")
@@ -126,7 +127,12 @@ def main(argv=None):
         return 0
     if args.command == "doctor":
         value = runtime.doctor(fix=args.fix)
-        return (_json_dump(value) or 0) if args.as_json else _human_doctor(value)
+        failed = any(item.get("status") != "ready" for item in value.get("capabilities", []))
+        if args.as_json:
+            _json_dump(value)
+            return 1 if args.strict and failed else 0
+        result = _human_doctor(value)
+        return 1 if args.strict and failed else result
     if args.command == "install":
         try:
             _json_dump(runtime.install(args.target, source=args.source, sha256=args.sha256, with_dependencies=args.with_dependencies))

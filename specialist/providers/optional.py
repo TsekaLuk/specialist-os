@@ -23,6 +23,7 @@ def _missing(package):
 
 
 class OptionalProvider:
+    requires_verified_artifact = True
     supported_platforms = ("macos-arm64", "linux-x64", "windows-x64")
     supported_devices = ("cpu", "mps", "cuda")
     memory_requirement_mb = 1024

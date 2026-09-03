@@ -107,6 +107,23 @@ class RuntimeTests(unittest.TestCase):
         state = self.runtime.environments.status("paddleocr")
         self.assertEqual(state["status"], "not installed")
 
+    def test_readiness_reports_provider_failures_instead_of_always_ready(self):
+        class UnreadyProvider:
+            name = "test-provider"
+            requires_verified_artifact = False
+
+            def doctor(self, _hardware):
+                return {"status": "not ready", "error": {"code": "fixture_unavailable", "message": "fixture provider is unavailable"}}
+
+        runtime = SpecialistRuntime(home=self.home / "readiness", backend="fallback", provider_overrides={"vision.ocr": UnreadyProvider()})
+        readiness = runtime.readiness()
+        self.assertEqual(readiness["status"], "degraded")
+        self.assertEqual(readiness["ready_capabilities"], 7)
+        self.assertEqual(readiness["unready_capabilities"], 1)
+        ocr = next(item for item in readiness["details"] if item["capability"] == "vision.ocr")
+        self.assertEqual(ocr["status"], "unavailable")
+        self.assertIn("fixture provider", ocr["reason"])
+
     def test_lru_unloads_unpinned_provider(self):
         runtime = SpecialistRuntime(home=self.home / "lru", max_loaded=1)
         runtime.run("ocr", self.input, {"lru": 1})

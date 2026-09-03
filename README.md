@@ -184,5 +184,8 @@ keeps those external requirements out of CI.
 reports a repairable issue; it never downloads every model, preserving lazy
 installation.
 
+Use `doctor --strict` as a deployment gate. It exits non-zero when any
+capability is unavailable, unconfigured or has a corrupt/error model state.
+
 The project is MIT-licensed. Upstream model licenses are recorded in the
 registry and must be checked before redistribution or commercial use.

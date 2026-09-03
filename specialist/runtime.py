@@ -60,21 +60,83 @@ class SpecialistRuntime:
             return installation["model"]
         return recommended_model(spec, hardware)
 
-    def _worker_provider(self, name, provider, python):
+    def _worker_provider(self, name, provider, python, requires_verified_artifact=None):
         package_root = str(Path(__file__).resolve().parents[1])
         current_pythonpath = os.environ.get("PYTHONPATH", "")
         pythonpath = package_root if not current_pythonpath else package_root + os.pathsep + current_pythonpath
         timeout = self.TIMEOUTS.get(name, 120)
-        return JsonlProcessProvider(provider.name, name, provider.model, [str(python), "-m", "specialist", "_worker", "--capability", name, "--backend", self.backend], timeout_seconds=timeout, cpu_limit_seconds=timeout + 10, env={"SPECIALIST_HOME": str(self.cache.home), "PYTHONPATH": pythonpath, "SPECIALIST_ALLOW_UNVERIFIED_MODELS": "1" if self.allow_unverified_models else "0"}, log_path=self.cache.logs / f"{name.replace('.', '__')}.worker.log")
+        worker = JsonlProcessProvider(provider.name, name, provider.model, [str(python), "-m", "specialist", "_worker", "--capability", name, "--backend", self.backend], timeout_seconds=timeout, cpu_limit_seconds=timeout + 10, env={"SPECIALIST_HOME": str(self.cache.home), "PYTHONPATH": pythonpath, "SPECIALIST_ALLOW_UNVERIFIED_MODELS": "1" if self.allow_unverified_models else "0"}, log_path=self.cache.logs / f"{name.replace('.', '__')}.worker.log")
+        worker.requires_verified_artifact = bool(getattr(provider, "requires_verified_artifact", False) if requires_verified_artifact is None else requires_verified_artifact)
+        return worker
 
     def metrics(self):
         with self._metrics_lock:
             return dict(self._metrics)
 
     def readiness(self):
-        installed = sum(1 for name in CAPABILITIES if self.cache.installation(name))
-        errors = sum(1 for name in CAPABILITIES if self.cache.error_state(name))
-        return {"status": "ready", "installed_capabilities": installed, "capabilities": len(CAPABILITIES), "error_capabilities": errors, "backend": self.backend, "isolate": self.isolate}
+        hardware = detect_hardware()
+        capability_states = []
+        for spec in CAPABILITIES.values():
+            provider = self.providers[spec.name]
+            installation = self.cache.installation(spec.name)
+            error = self.cache.error_state(spec.name)
+            check = {}
+            state = "ready"
+            reason = None
+            if error:
+                state = "error"
+                reason = error.get("message", "capability has a persisted error state")
+            else:
+                try:
+                    check = provider.doctor(hardware) or {}
+                except Exception as exc:
+                    check = {"status": "not ready", "error": {"code": "provider_doctor_failed", "message": str(exc)}}
+                if check.get("status") != "ready":
+                    state = "unavailable"
+                    reason = (check.get("error") or {}).get("message") or check.get("message") or "provider is not ready"
+                elif installation and installation.get("status") in {"corrupt", "error"}:
+                    state = installation["status"]
+                    reason = installation.get("message") or f"model state is {installation['status']}"
+                elif self.backend == "real" or getattr(provider, "requires_verified_artifact", False):
+                    artifact = installation.get("artifact_path") if installation else None
+                    digest = installation.get("sha256") if installation else None
+                    if not artifact or not digest:
+                        state = "unconfigured"
+                        reason = "a verified model artifact is required"
+                    else:
+                        try:
+                            self.models_manager.verify(Path(artifact), digest)
+                        except Exception as exc:
+                            state = "corrupt"
+                            reason = str(exc)
+            capability_states.append({
+                "capability": spec.name,
+                "provider": getattr(provider, "name", spec.provider),
+                "model": self._model_for(spec, installation, hardware),
+                "status": state,
+                "reason": reason,
+                "installation": installation,
+                "check": check,
+            })
+        ready_count = sum(item["status"] == "ready" for item in capability_states)
+        unready = len(capability_states) - ready_count
+        if unready == 0:
+            status = "ready"
+        elif ready_count == 0 or self.backend == "real":
+            status = "not_ready"
+        else:
+            status = "degraded"
+        return {
+            "status": status,
+            "installed_capabilities": sum(item["installation"] is not None for item in capability_states),
+            "ready_capabilities": ready_count,
+            "capabilities": len(capability_states),
+            "error_capabilities": sum(item["status"] in {"error", "corrupt"} for item in capability_states),
+            "unready_capabilities": unready,
+            "backend": self.backend,
+            "isolate": self.isolate,
+            "details": capability_states,
+        }
 
     def install(self, target: str, source: str | None = None, sha256: str | None = None, with_dependencies=None) -> list[dict[str, Any]]:
         names = BUNDLES.get(target.lower())
@@ -102,7 +164,7 @@ class SpecialistRuntime:
                 try:
                     if install_dependencies and self.backend != "fallback" and spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency]:
                         dependency_env = self.environments.ensure(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency])
-                        provider = self._worker_provider(name, provider, dependency_env["python"])
+                        provider = self._worker_provider(name, provider, dependency_env["python"], requires_verified_artifact=True)
                         self.providers[name] = provider
                     details = provider.install(self.cache, spec)
                     if details is None:
@@ -148,7 +210,7 @@ class SpecialistRuntime:
             if fix and self.with_dependencies and self.backend != "fallback" and spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency] and environment and environment.get("status") != "ready":
                 try:
                     environment = self.environments.ensure(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency])
-                    provider = self._worker_provider(spec.name, provider, environment["python"])
+                    provider = self._worker_provider(spec.name, provider, environment["python"], requires_verified_artifact=True)
                     self.providers[spec.name] = provider
                     details = provider.doctor(hardware)
                 except EnvironmentError as exc:

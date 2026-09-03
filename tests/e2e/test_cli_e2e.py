@@ -52,6 +52,11 @@ class CliE2ETests(unittest.TestCase):
             self.assertEqual(len(doctor_payload["capabilities"]), 8)
             self.assertEqual(doctor_payload["home"], str(home))
 
+            strict_doctor = run_cli(["--backend", "fallback", "doctor", "--strict", "--json"], home)
+            self.assertEqual(strict_doctor.returncode, 1)
+            strict_payload = json.loads(strict_doctor.stdout)
+            self.assertTrue(any(item["status"] == "not installed" for item in strict_payload["capabilities"]))
+
     def test_invalid_input_returns_json_error_and_nonzero_exit(self):
         with tempfile.TemporaryDirectory() as temporary:
             home = Path(temporary) / "home"
@@ -59,6 +64,22 @@ class CliE2ETests(unittest.TestCase):
             self.assertNotEqual(completed.returncode, 0)
             payload = json.loads(completed.stdout)
             self.assertEqual(payload["error"]["code"], "input_not_found")
+
+    def test_strict_doctor_blocks_a_persisted_capability_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            home = root / "home"
+            metadata = home / "metadata"
+            metadata.mkdir(parents=True)
+            (metadata / "vision__ocr.error.json").write_text(
+                json.dumps({"capability": "vision.ocr", "status": "error", "message": "fixture failure"}),
+                encoding="utf-8",
+            )
+            completed = run_cli(["--backend", "fallback", "doctor", "--strict", "--json"], home)
+            self.assertEqual(completed.returncode, 1)
+            payload = json.loads(completed.stdout)
+            ocr = next(item for item in payload["capabilities"] if item["capability"] == "vision.ocr")
+            self.assertEqual(ocr["status"], "error")
 
     def test_install_models_list_and_remove_verify_local_artifact(self):
         with tempfile.TemporaryDirectory() as temporary:
