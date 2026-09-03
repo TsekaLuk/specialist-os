@@ -23,11 +23,22 @@ fallback providers use only Python's standard library; optional model providers
 can be installed independently later. A small Rust core is available for stable
 cache-key and input-safety primitives.
 
-## E2E in action
+## E2E evidence
 
-These are representative captures from the dependency-free E2E suite. The
-same result envelope is available through the CLI, HTTP server and MCP
-transport, so an agent can switch interfaces without changing capability code.
+The E2E suite executes the real CLI, HTTP, MCP, worker and remote-node
+boundaries. README artwork is not used as test evidence; inspect the executable
+tests directly:
+
+- [CLI E2E](tests/e2e/test_cli_e2e.py)
+- [HTTP E2E](tests/e2e/test_http_e2e.py)
+- [MCP E2E](tests/e2e/test_mcp_e2e.py)
+- [Remote-node E2E](tests/e2e/test_remote_e2e.py)
+
+Run the dependency-free boundary checks locally:
+
+```bash
+python -m unittest discover -s tests/e2e -v
+```
 
 ## Real provider output
 
@@ -50,25 +61,6 @@ specialist --backend real --isolate install vision.detect \
   --source https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s.pt \
   --sha256 85a76fe86dd8afe384648546b56a7a78580c7cb7b404fc595f97969322d502d5
 specialist --backend real --isolate detect bus.jpg --json
-```
-
-<table>
-  <tr>
-    <td width="33%"><img src="docs/assets/e2e-cli.png" alt="CLI E2E showing capability discovery and OCR result"></td>
-    <td width="33%"><img src="docs/assets/e2e-http.png" alt="HTTP E2E showing health, readiness and metrics"></td>
-    <td width="33%"><img src="docs/assets/e2e-mcp.png" alt="MCP E2E showing initialization, tool discovery and OCR call"></td>
-  </tr>
-  <tr>
-    <td align="center"><sub><b>CLI</b> &nbsp; discover and run</sub></td>
-    <td align="center"><sub><b>HTTP</b> &nbsp; health and metrics</sub></td>
-    <td align="center"><sub><b>MCP</b> &nbsp; tools for any agent</sub></td>
-  </tr>
-</table>
-
-Run the captures' underlying checks locally:
-
-```bash
-python -m unittest discover -s tests/e2e -v
 ```
 
 ## Quick start
@@ -123,6 +115,54 @@ For a controlled environment where the upstream provider's own downloader is
 trusted, opt in explicitly with `--allow-unverified-models` or
 `SPECIALIST_ALLOW_UNVERIFIED_MODELS=1`. This setting should not be used for
 untrusted or reproducible deployments.
+
+## Advanced runtime
+
+The Advanced PRD surfaces are part of the runtime API rather than a separate
+demo layer:
+
+```bash
+# Inspect the deterministic provider decision and rejection reasons
+specialist explain vision.depth --options '{"profile":"quality","max_memory_mb":4096}'
+
+# Validate and install a third-party manifest without importing its code
+specialist provider validate ./manifest.json
+specialist provider install ./manifest.json
+specialist provider list
+
+# Measure a real local call and persist hardware-bound records
+specialist bench vision.ocr invoice.png --runs 5
+
+# Register compute-node metadata for a scheduler or Studio integration
+specialist node register ./node.json
+specialist node list
+```
+
+Python callers can compose registered capabilities as a DAG and consume the
+same result envelope for each node:
+
+```python
+from specialist import Specialist
+
+sp = Specialist()
+graph = sp.graph("document-inspection")
+graph.add("ocr", "vision.ocr")
+graph.add("depth", "vision.depth")
+graph.add("scene", "screen.parse", depends_on=("ocr", "depth"))
+run = sp.runtime.run_graph(graph, "page.png")
+
+session = sp.open_session("audio.vad")
+event = session.push(audio_bytes)
+events = session.poll()
+session.close()
+```
+
+Every successful call includes `observations`, `evidence`, `artifacts`,
+`metrics`, `provenance`, `confidence`, and an execution `trace`. Large provider
+outputs are content-addressed below `~/.specialist/artifacts/`; references are
+SHA256-verifiable and never resolve through symlinks. Routing is deterministic
+and uses only registry facts, measured benchmark records and explicit policy;
+it never delegates provider selection to a language model.
 
 ## Production acceptance
 

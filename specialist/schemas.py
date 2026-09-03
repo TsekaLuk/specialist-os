@@ -62,6 +62,13 @@ class ResultEnvelope:
     performance: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     error: dict[str, Any] | None = None
+    observations: list[dict[str, Any]] = field(default_factory=list)
+    evidence: list[dict[str, Any]] = field(default_factory=list)
+    artifacts: list[dict[str, Any]] = field(default_factory=list)
+    metrics: dict[str, Any] = field(default_factory=dict)
+    provenance: dict[str, Any] = field(default_factory=dict)
+    confidence: float | None = None
+    trace: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return json_safe(asdict(self))
@@ -96,8 +103,22 @@ def validate_envelope(value: dict[str, Any]) -> None:
         error = value["error"]
         if not isinstance(error.get("code"), str) or not error.get("code") or not isinstance(error.get("message"), str):
             raise ValueError("result envelope error requires string code and message")
-        return
-    _validate_capability_result(value["capability"], value["result"])
+    if not isinstance(value.get("observations", []), list) or not isinstance(value.get("evidence", []), list) or not isinstance(value.get("artifacts", []), list) or not isinstance(value.get("trace", []), list):
+        raise ValueError("observation protocol fields must be arrays")
+    if not isinstance(value.get("metrics", {}), dict) or not isinstance(value.get("provenance", {}), dict):
+        raise ValueError("observation protocol metadata must be objects")
+    confidence = value.get("confidence")
+    if confidence is not None and (not isinstance(confidence, (int, float)) or isinstance(confidence, bool) or not math.isfinite(confidence) or not 0 <= confidence <= 1):
+        raise ValueError("confidence must be a finite number between 0 and 1 or null")
+    for index, artifact in enumerate(value.get("artifacts", [])):
+        if not isinstance(artifact, dict) or not isinstance(artifact.get("id"), str) or not isinstance(artifact.get("uri"), str):
+            raise ValueError(f"artifacts[{index}] requires id and uri strings")
+        if not isinstance(artifact.get("sha256"), str) or len(artifact["sha256"]) != 64:
+            raise ValueError(f"artifacts[{index}].sha256 must be a SHA256 digest")
+    # Error envelopes intentionally carry an empty result object. Only a
+    # successful provider response is subject to the capability payload schema.
+    if value["error"] is None:
+        _validate_capability_result(value["capability"], value["result"])
 
 
 def _array(result, key):

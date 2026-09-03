@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import os
 from pathlib import Path
 import subprocess
@@ -8,6 +9,7 @@ import sys
 import tempfile
 import unittest
 import venv
+import shutil
 
 try:
     from .support import ROOT, test_environment
@@ -24,8 +26,16 @@ class PackageE2ETests(unittest.TestCase):
             dist.mkdir()
             build_environment = os.environ.copy()
             build_environment.pop("PYTHONPATH", None)
+            build_module = importlib.util.find_spec("build")
+            has_build_command = bool(build_module and build_module.origin and (Path(build_module.origin).parent / "__main__.py").is_file())
+            if has_build_command:
+                build_command = [sys.executable, "-m", "build", "--no-isolation", "--wheel", "--outdir", str(dist), str(ROOT)]
+            elif shutil.which("uv"):
+                build_command = ["uv", "build", "--wheel", "--out-dir", str(dist), str(ROOT)]
+            else:
+                self.fail("package E2E requires python-build or uv")
             build = subprocess.run(
-                [sys.executable, "-m", "build", "--no-isolation", "--wheel", "--outdir", str(dist), str(ROOT)],
+                build_command,
                 cwd=ROOT.parent,
                 env=build_environment,
                 capture_output=True,

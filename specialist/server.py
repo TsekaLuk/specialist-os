@@ -8,7 +8,10 @@ import os
 import signal
 import sys
 import threading
+import base64
+import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -20,7 +23,7 @@ def _tool_schema(capability):
     return {
         "name": spec.name.replace(".", "_"),
         "description": spec.description,
-        "inputSchema": {"type": "object", "properties": {"path": {"type": "string", "description": "Local input file path"}, "options": {"type": "object"}}, "required": ["path"]},
+        "inputSchema": dict(spec.input_schema) or {"type": "object", "properties": {"path": {"type": "string", "description": "Local input file path"}, "options": {"type": "object"}}, "required": ["path"]},
     }
 
 
@@ -78,6 +81,22 @@ class RuntimeRequestHandler(BaseHTTPRequestHandler):
             return self._send(401, {"error": {"code": "unauthorized", "message": "Bearer token required"}})
         if route in {"/v1/capabilities", "/capabilities"}:
             return self._send(200, {"capabilities": self.runtime.capabilities()})
+        if route in {"/v1/providers", "/providers"}:
+            return self._send(200, {"providers": self.runtime.provider_manifests()})
+        if route in {"/v1/benchmarks", "/benchmarks"}:
+            return self._send(200, {"benchmarks": self.runtime.benchmarks.list()})
+        if route in {"/v1/packs", "/packs"}:
+            return self._send(200, {"packs": self.runtime.packs()})
+        if route in {"/v1/studio", "/studio"}:
+            from .studio import snapshot
+
+            return self._send(200, snapshot(self.runtime))
+        if route.startswith("/v1/routing/"):
+            capability = route.removeprefix("/v1/routing/").replace("/", ".")
+            try:
+                return self._send(200, self.runtime.explain(capability))
+            except (KeyError, ValueError) as exc:
+                return self._send(404, {"error": {"code": "unknown_capability", "message": str(exc)}})
         if route in {"/ready", "/v1/ready"}:
             readiness = self.runtime.readiness()
             return self._send(200 if readiness.get("status") == "ready" else 503, readiness)
@@ -137,9 +156,27 @@ class RuntimeRequestHandler(BaseHTTPRequestHandler):
             if capability not in CAPABILITIES:
                 return self._send(404, {"error": {"code": "unknown_capability", "message": endpoint}})
             path = payload.get("path") or payload.get("input")
+            temporary = None
+            if not isinstance(path, str) and isinstance(payload.get("data_base64"), str):
+                try:
+                    raw = base64.b64decode(payload["data_base64"], validate=True)
+                except (ValueError, TypeError) as exc:
+                    return self._send(400, {"error": {"code": "invalid_input", "message": f"data_base64 is invalid: {exc}"}})
+                if len(raw) > min(getattr(self.server, "max_request_bytes", 1024 * 1024) * 3 // 4, 512 * 1024 * 1024):
+                    return self._send(413, {"error": {"code": "request_too_large", "message": "decoded input exceeds the request limit"}})
+                suffix = Path(str(payload.get("filename") or "input.bin")).suffix
+                self.runtime.cache.ensure_dirs()
+                temporary = tempfile.NamedTemporaryFile(prefix="specialist-remote-", suffix=suffix, dir=self.runtime.cache.home, delete=False)
+                temporary.write(raw)
+                temporary.close()
+                path = temporary.name
             if not isinstance(path, str):
-                return self._send(400, {"error": {"code": "invalid_request", "message": "JSON body requires a string 'path'"}})
-            response = self.runtime.run(capability, path, payload.get("options") or {})
+                return self._send(400, {"error": {"code": "invalid_request", "message": "JSON body requires a string 'path' or data_base64"}})
+            try:
+                response = self.runtime.run(capability, path, payload.get("options") or {})
+            finally:
+                if temporary is not None:
+                    Path(temporary.name).unlink(missing_ok=True)
             return self._send(200 if response.get("error") is None else 422, response)
         except (ValueError, json.JSONDecodeError) as exc:
             self._send(400, {"error": {"code": "invalid_json", "message": str(exc)}})

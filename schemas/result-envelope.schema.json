@@ -3,7 +3,7 @@
   "$id": "https://specialist.runtime/schemas/result-envelope.schema.json",
   "title": "Specialist Result Envelope",
   "type": "object",
-  "required": ["capability", "provider", "model", "input", "result", "performance", "warnings", "error"],
+  "required": ["capability", "provider", "model", "input", "result", "performance", "warnings", "error", "observations", "evidence", "artifacts", "metrics", "provenance", "confidence", "trace"],
   "properties": {
     "capability": {"type": "string", "minLength": 1},
     "provider": {"type": "string", "minLength": 1},
@@ -12,8 +12,41 @@
     "result": {"type": "object"},
     "performance": {"type": "object", "properties": {"latency_ms": {"type": "integer", "minimum": 0}, "device": {"type": "string"}, "cached": {"type": "boolean"}, "cold_start": {"type": "boolean"}}, "additionalProperties": true},
     "warnings": {"type": "array", "items": {"type": "string"}},
-    "error": {"anyOf": [{"type": "null"}, {"type": "object", "required": ["code", "message"], "properties": {"code": {"type": "string"}, "message": {"type": "string"}, "retryable": {"type": "boolean"}, "details": {"type": "object"}}, "additionalProperties": true}]}
+    "error": {"anyOf": [{"type": "null"}, {"type": "object", "required": ["code", "message"], "properties": {"code": {"type": "string"}, "message": {"type": "string"}, "retryable": {"type": "boolean"}, "details": {"type": "object"}}, "additionalProperties": true}]},
+    "observations": {"type": "array", "items": {"$ref": "#/$defs/observation"}},
+    "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+    "artifacts": {"type": "array", "items": {"$ref": "#/$defs/artifact"}},
+    "metrics": {"type": "object", "additionalProperties": true},
+    "provenance": {"type": "object", "additionalProperties": true},
+    "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "trace": {"type": "array", "items": {"type": "object", "additionalProperties": true}}
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": ["id", "mime", "size_bytes", "sha256", "uri"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^artifact_[0-9a-f]{64}$"},
+        "mime": {"type": "string", "minLength": 1},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "uri": {"type": "string", "pattern": "^artifact://[0-9a-f]{64}$"},
+        "metadata": {"type": "object", "additionalProperties": true}
+      },
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["provider", "model"],
+      "properties": {"provider": {"type": "string"}, "model": {"type": "string"}, "confidence": {"type": ["number", "null"]}, "details": {"type": "object"}},
+      "additionalProperties": true
+    },
+    "observation": {
+      "type": "object",
+      "required": ["id", "type", "value"],
+      "properties": {"id": {"type": "string", "pattern": "^obs_[0-9a-f]{16}$"}, "type": {"type": "string"}, "value": {}, "geometry": {"type": ["object", "null"]}, "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1}, "evidence": {"type": "array"}, "provenance": {"type": "object"}},
+      "additionalProperties": true
+    }
+  }
 }
-

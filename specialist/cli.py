@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import atexit
 import json
 import sys
 from pathlib import Path
@@ -14,6 +15,9 @@ from .server import serve_http, serve_mcp
 from .providers.ipc import WorkerError, run_worker
 from .models import ModelArtifactError
 from .environments import EnvironmentError
+from .provider_manifest import ProviderCatalog, ProviderManifest, ProviderManifestError, builtin_manifests
+from .node import ComputeNode, NodeError
+from .hardware import detect_hardware
 
 
 def _json_dump(value):
@@ -98,11 +102,55 @@ def build_parser():
     clean.add_argument("--max-age-hours", type=float)
     clean.add_argument("--max-entries", type=int)
 
+    provider = sub.add_parser("provider", help="Inspect and install provider manifests")
+    provider_sub = provider.add_subparsers(dest="provider_command", required=True)
+    provider_sub.add_parser("list", help="List built-in and installed provider manifests")
+    validate = provider_sub.add_parser("validate", help="Validate a provider manifest without executing it")
+    validate.add_argument("manifest")
+    provider_install = provider_sub.add_parser("install", help="Install a local provider manifest into the catalog")
+    provider_install.add_argument("manifest_or_name")
+
+    explain = sub.add_parser("explain", help="Explain deterministic provider routing")
+    explain.add_argument("capability")
+    explain.add_argument("--options", help="Routing constraints as a JSON object")
+    explain.add_argument("--json", action="store_true", dest="as_json")
+
+    bench = sub.add_parser("bench", help="Measure a real provider on a local input")
+    bench.add_argument("capability")
+    bench.add_argument("input")
+    bench.add_argument("--runs", type=int, default=3)
+    bench.add_argument("--options")
+
+    replay = sub.add_parser("replay", help="Read a previously cached result by its run identifier")
+    replay.add_argument("run_id")
+
+    pack = sub.add_parser("pack", help="List and install capability packs")
+    pack_sub = pack.add_subparsers(dest="pack_command", required=True)
+    pack_sub.add_parser("list")
+    pack_install = pack_sub.add_parser("install")
+    pack_install.add_argument("name")
+
+    studio = sub.add_parser("studio", help="Print a Studio control-plane snapshot")
+    studio_sub = studio.add_subparsers(dest="studio_command", required=True)
+    studio_sub.add_parser("snapshot")
+
+    node = sub.add_parser("node", help="Inspect Compute Fabric node metadata")
+    node_sub = node.add_subparsers(dest="node_command", required=True)
+    node_sub.add_parser("list")
+    start = node_sub.add_parser("start", help="Run an authenticated node HTTP agent")
+    start.add_argument("--host", default="127.0.0.1")
+    start.add_argument("--port", type=int, default=8742)
+    start.add_argument("--token", required=True)
+    start.add_argument("--capabilities", default="all", help="Comma-separated capability names or all")
+    register = node_sub.add_parser("register")
+    register.add_argument("metadata", help="JSON file containing node metadata")
+
     for command in ["detect", "segment", "ocr", "depth", "parse-screen", "parse-document", "transcribe", "vad"]:
         item = sub.add_parser(command)
         item.add_argument("input", help="Local input path")
         if command == "segment":
             item.add_argument("--prompt")
+        item.add_argument("--profile", choices=["fast", "balanced", "quality", "ultra"])
         item.add_argument("--json", action="store_true", dest="as_json")
         item.add_argument("--options", help="Additional options as a JSON object")
 
@@ -122,6 +170,9 @@ def build_parser():
 def main(argv=None):
     args = build_parser().parse_args(argv)
     runtime = SpecialistRuntime(home=args.home, isolate=args.isolate or args.command == "serve", backend=args.backend, with_dependencies=args.with_dependencies, max_loaded=args.max_loaded, allow_unverified_models=args.allow_unverified_models)
+    # Ensure persistent worker threads are joined before interpreter teardown,
+    # including command paths that return early after printing JSON.
+    atexit.register(runtime.close)
     if args.command == "capabilities":
         _json_dump(runtime.capabilities())
         return 0
@@ -159,6 +210,99 @@ def main(argv=None):
             age = args.max_age_hours * 3600 if args.max_age_hours is not None else None
             _json_dump(runtime.clean_cache(max_age_seconds=age, max_entries=args.max_entries))
         return 0
+    if args.command == "provider":
+        catalog = ProviderCatalog(runtime.cache.home / "providers")
+        try:
+            if args.provider_command == "list":
+                values = [item.to_dict() for item in builtin_manifests()]
+                values.extend(item.to_dict() for item in catalog.list())
+                _json_dump(values)
+            elif args.provider_command == "validate":
+                _json_dump(ProviderManifest.load(args.manifest).to_dict())
+            else:
+                target = Path(args.manifest_or_name).expanduser()
+                manifest = catalog.install_path(target) if target.exists() else catalog.get(args.manifest_or_name)
+                if manifest is None:
+                    raise ProviderManifestError("provider install expects a local manifest path; remote marketplace installation is not enabled")
+                _json_dump(manifest.to_dict())
+            return 0
+        except (ProviderManifestError, OSError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    if args.command == "explain":
+        options = {}
+        if args.options:
+            try:
+                options = json.loads(args.options)
+                if not isinstance(options, dict):
+                    raise ValueError("options must be a JSON object")
+            except ValueError as exc:
+                print(f"Invalid --options: {exc}", file=sys.stderr)
+                return 2
+        try:
+            _json_dump(runtime.explain(args.capability, options))
+            return 0
+        except (KeyError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    if args.command == "bench":
+        options = {}
+        if args.options:
+            try:
+                options = json.loads(args.options)
+                if not isinstance(options, dict):
+                    raise ValueError("options must be a JSON object")
+            except ValueError as exc:
+                print(f"Invalid --options: {exc}", file=sys.stderr)
+                return 2
+        try:
+            _json_dump(runtime.benchmark(args.capability, args.input, runs=args.runs, options=options))
+            return 0
+        except (KeyError, ValueError, OSError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    if args.command == "replay":
+        try:
+            _json_dump(runtime.replay(args.run_id))
+            return 0
+        except (KeyError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    if args.command == "pack":
+        try:
+            _json_dump(runtime.packs() if args.pack_command == "list" else runtime.install_pack(args.name, with_dependencies=args.with_dependencies))
+            return 0
+        except (KeyError, ValueError, OSError, WorkerError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    if args.command == "studio":
+        try:
+            from .studio import snapshot
+
+            _json_dump(snapshot(runtime))
+            return 0
+        except (ValueError, OSError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    if args.command == "node":
+        try:
+            if args.node_command == "list":
+                _json_dump([item.to_dict() for item in runtime.nodes.list()])
+            elif args.node_command == "start":
+                capabilities = list(CAPABILITIES) if args.capabilities == "all" else [get_spec(item.strip()).name for item in args.capabilities.split(",") if item.strip()]
+                node = ComputeNode.create("specialist-node", capabilities=tuple(capabilities), metadata={"endpoint": f"http://{args.host}:{args.port}", "token_env": "SPECIALIST_API_TOKEN"}, local=args.host in {"127.0.0.1", "localhost", "::1"})
+                runtime.nodes.register(node)
+                serve_http(runtime, args.host, args.port, token=args.token, max_request_bytes=64 * 1024 * 1024)
+            else:
+                path = Path(args.metadata).expanduser()
+                if path.is_symlink() or not path.is_file():
+                    raise NodeError("node metadata must be a regular file")
+                node = ComputeNode.from_dict(json.loads(path.read_text(encoding="utf-8")))
+                _json_dump(runtime.nodes.register(node).to_dict())
+            return 0
+        except (NodeError, OSError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
     if args.command == "serve":
         try:
             if args.mcp:
@@ -189,6 +333,8 @@ def main(argv=None):
             return 2
     if args.command == "segment" and args.prompt:
         options["prompt"] = args.prompt
+    if getattr(args, "profile", None):
+        options["profile"] = args.profile
     try:
         value = runtime.run(get_spec(args.command).name, args.input, options)
     except KeyError as exc:

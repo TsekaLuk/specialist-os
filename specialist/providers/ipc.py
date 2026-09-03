@@ -165,6 +165,10 @@ class JsonlProcessProvider:
             process.wait(timeout=2)
         except subprocess.TimeoutExpired:
             pass
+        reader = self._reader_thread
+        if reader is not None and reader is not threading.current_thread():
+            reader.join(timeout=2)
+        self._reader_thread = None
         for stream in (process.stdin, process.stdout):
             try:
                 if stream:

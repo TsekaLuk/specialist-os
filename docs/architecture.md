@@ -26,3 +26,30 @@ to `specialist/registry.py`, then pass the provider via
 `SpecialistRuntime(provider_overrides={"capability.name": provider})` while
 integrating. Keep output schemas backward compatible and record upstream model
 license and checksum metadata in `registry/models.yaml`.
+
+## Advanced execution path
+
+`SpecialistRuntime.run()` resolves a capability through
+`DeterministicRouter`. The router scores registered models using profile,
+policy, hardware and measured benchmark latency, and writes candidates,
+rejections and the selected provider into the result trace. It never invokes a
+language model to choose a provider. `specialist explain <capability>` exposes
+the same decision without running inference.
+
+Successful envelopes carry the Observation Protocol fields: normalized
+observations, de-duplicated evidence, content-addressed artifact references,
+metrics, provenance, confidence and trace. `ArtifactStore.resolve()` rejects
+symlink traversal and `Cache` stores runtime state with user-only permissions.
+
+`SpecialistGraph` executes a validated DAG in dependency levels with bounded
+parallelism and per-node fallback. `SpecialistCascade` is the confidence-aware
+sequential form. `SpecialistSession` implements open/push/poll/close for
+streaming inputs; byte frames are stored as immutable artifacts before being
+passed to a provider.
+
+Provider manifests are parsed and persisted by `ProviderCatalog` without
+importing third-party code. This is a metadata trust boundary: an adapter must
+still be explicitly installed and registered before execution. `NodeRegistry`
+and `NodeScheduler` provide the Compute Fabric metadata and deterministic
+locality/latency/cost selection primitives, while `BenchmarkRegistry` records
+real runs bound to hardware fingerprints.

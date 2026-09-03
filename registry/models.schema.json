@@ -20,9 +20,18 @@
           "model": {"type": "string", "minLength": 1},
           "modality": {"type": "string", "enum": ["image", "audio", "document"]},
           "description": {"type": "string", "minLength": 1},
+          "input_schema": {"type": "object"},
+          "output_schema": {"type": "object"},
           "bundle": {"type": "string", "minLength": 1},
           "optional_dependency": {"type": ["string", "null"]},
           "source_url": {"type": ["string", "null"], "pattern": "^https://"},
+          "semantic_guarantees": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "quality_metrics": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "supports": {"type": "object", "additionalProperties": {"type": "boolean"}},
+          "resource_profile": {"type": "object", "additionalProperties": true},
+          "privacy_level": {"type": "string", "enum": ["safe", "sensitive", "restricted"]},
+          "determinism": {"type": "string", "minLength": 1},
+          "providers": {"type": "array", "items": {"type": "string", "minLength": 1}},
           "license": {"type": "object", "required": ["weights", "commercial"], "properties": {"weights": {"type": "string"}, "commercial": {"type": "boolean"}}},
           "models": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/model"}}
         }
@@ -36,6 +45,7 @@
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "recommended": {"type": "boolean"},
+        "quality": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
         "memory_mb": {"type": "integer", "minimum": 0},
         "disk_mb": {"type": "integer", "minimum": 0},
         "platforms": {"type": "array", "minItems": 1, "items": {"type": "string"}},

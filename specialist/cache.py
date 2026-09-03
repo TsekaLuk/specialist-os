@@ -27,14 +27,19 @@ class Cache:
         self.home = specialist_home(home)
         self.models = self.home / "models"
         self.results = self.home / "cache" / "results"
+        self.artifacts = self.home / "artifacts"
         self.environments = self.home / "environments"
         self.logs = self.home / "logs"
         self.metadata = self.home / "metadata"
         self.locks = self.home / "locks"
 
     def ensure_dirs(self):
-        for path in (self.models, self.results, self.environments, self.logs, self.metadata, self.locks):
-            path.mkdir(parents=True, exist_ok=True)
+        for path in (self.models, self.results, self.artifacts, self.environments, self.logs, self.metadata, self.locks):
+            path.mkdir(parents=True, exist_ok=True, mode=0o700)
+            try:
+                path.chmod(0o700)
+            except OSError:
+                pass
 
     def input_hash(self, path: Path) -> str:
         digest = hashlib.sha256()
@@ -91,6 +96,10 @@ class Cache:
                 stream.flush()
                 os.fsync(stream.fileno())
             os.replace(temporary, target)
+            try:
+                target.chmod(0o600)
+            except OSError:
+                pass
             try:
                 directory_fd = os.open(target.parent, os.O_RDONLY)
                 try:

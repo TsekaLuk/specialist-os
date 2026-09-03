@@ -6,7 +6,7 @@ so the core package can validate it without adding PyYAML to every install.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
 from pathlib import Path
 import sys
@@ -38,6 +38,7 @@ class ModelSpec:
     artifact_filename: str | None = None
     artifact_entrypoint: str | None = None
     artifact_files: tuple[ArtifactFileSpec, ...] = ()
+    quality: float | None = None
 
 
 @dataclass(frozen=True)
@@ -54,6 +55,15 @@ class CapabilitySpec:
     commercial: bool = False
     source_url: str | None = None
     models: tuple[ModelSpec, ...] = ()
+    semantic_guarantees: tuple[str, ...] = ()
+    quality_metrics: tuple[str, ...] = ()
+    supports: dict[str, bool] = field(default_factory=dict)
+    resource_profile: dict[str, Any] = field(default_factory=dict)
+    privacy_level: str = "safe"
+    determinism: str = "provider_defined"
+    providers: tuple[str, ...] = ()
+    input_schema: dict[str, Any] = field(default_factory=dict)
+    output_schema: dict[str, Any] = field(default_factory=dict)
 
     def model_spec(self, model_id: str | None = None) -> ModelSpec:
         wanted = model_id or self.model
@@ -149,13 +159,54 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
             devices = model.get("devices")
             if not isinstance(model_id, str) or not model_id or not isinstance(platforms, list) or not platforms or not isinstance(devices, list) or not devices:
                 raise RegistryError(f"{name}: model id, platforms and devices are required")
-            models.append(ModelSpec(model_id, bool(model.get("recommended", False)), int(model.get("memory_mb", 0)), int(model.get("disk_mb", 0)), tuple(platforms), tuple(devices), url, checksum, kind, filename, entrypoint, tuple(artifact_files)))
+            quality = model.get("quality")
+            if quality is not None and (isinstance(quality, bool) or not isinstance(quality, (int, float)) or not 0 <= float(quality) <= 1):
+                raise RegistryError(f"{name}: model quality must be between 0 and 1")
+            models.append(ModelSpec(model_id, bool(model.get("recommended", False)), int(model.get("memory_mb", 0)), int(model.get("disk_mb", 0)), tuple(platforms), tuple(devices), url, checksum, kind, filename, entrypoint, tuple(artifact_files), float(quality) if quality is not None else None))
         if not models or sum(model.recommended for model in models) != 1:
             raise RegistryError(f"{name}: exactly one recommended model is required")
         default_model = item["model"]
         if default_model not in {model.id for model in models}:
             raise RegistryError(f"{name}: default model is not listed in models")
-        result[name] = CapabilitySpec(name, item["command"], item["provider"], default_model, item["modality"], item["description"], item["bundle"], item.get("optional_dependency"), license_info["weights"], bool(license_info.get("commercial", False)), source_url, tuple(models))
+        semantic = item.get("semantic_guarantees") or [item["description"]]
+        if isinstance(semantic, str):
+            semantic = [semantic]
+        quality_metrics = item.get("quality_metrics") or ["quality", "latency_ms", "memory_mb"]
+        if isinstance(quality_metrics, str):
+            quality_metrics = [quality_metrics]
+        default_supports = {"streaming": False, "batch": False, "local": True, "remote": False}
+        supports = item.get("supports") or {}
+        if isinstance(supports, dict):
+            default_supports.update({str(key): bool(value) for key, value in supports.items()})
+        resource_profile = item.get("resource_profile") or {}
+        if not isinstance(resource_profile, dict):
+            raise RegistryError(f"{name}: resource_profile must be an object")
+        providers = item.get("providers") or [item["provider"]]
+        if isinstance(providers, str):
+            providers = [providers]
+        result[name] = CapabilitySpec(
+            name=name,
+            command=item["command"],
+            provider=item["provider"],
+            model=default_model,
+            modality=item["modality"],
+            description=item["description"],
+            bundle=item["bundle"],
+            optional_dependency=item.get("optional_dependency"),
+            license=license_info["weights"],
+            commercial=bool(license_info.get("commercial", False)),
+            source_url=source_url,
+            models=tuple(models),
+            semantic_guarantees=tuple(str(value) for value in semantic if str(value).strip()),
+            quality_metrics=tuple(str(value) for value in quality_metrics if str(value).strip()),
+            supports=default_supports,
+            resource_profile=resource_profile,
+            privacy_level=str(item.get("privacy_level") or "safe"),
+            determinism=str(item.get("determinism") or "provider_defined"),
+            providers=tuple(str(value) for value in providers if str(value).strip()),
+            input_schema=dict(item.get("input_schema") or {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}, "options": {"type": "object"}}}),
+            output_schema=dict(item.get("output_schema") or {"type": "object"}),
+        )
     return result, payload
 
 
@@ -193,12 +244,21 @@ def registry_snapshot() -> list[dict[str, Any]]:
             "model": spec.model,
             "modality": spec.modality,
             "description": spec.description,
+            "input_schema": dict(spec.input_schema),
+            "output_schema": dict(spec.output_schema),
             "bundle": spec.bundle,
             "optional_dependency": spec.optional_dependency,
             "source_url": spec.source_url,
             "license": {"code": REGISTRY_DOCUMENT.get("code_license", "MIT"), "weights": spec.license, "commercial": spec.commercial},
+            "semantic_guarantees": list(spec.semantic_guarantees),
+            "quality_metrics": list(spec.quality_metrics),
+            "supports": dict(spec.supports),
+            "resource_profile": dict(spec.resource_profile),
+            "privacy_level": spec.privacy_level,
+            "determinism": spec.determinism,
+            "providers": list(spec.providers),
             "models": [
-                {"id": model.id, "recommended": model.recommended, "memory_mb": model.memory_mb, "disk_mb": model.disk_mb, "platforms": list(model.platforms), "devices": list(model.devices), "artifact": {"url": model.artifact_url, "sha256": model.artifact_sha256, "kind": model.artifact_kind, "filename": model.artifact_filename, "entrypoint": model.artifact_entrypoint, "files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in model.artifact_files]}}
+                {"id": model.id, "recommended": model.recommended, "quality": model.quality, "memory_mb": model.memory_mb, "disk_mb": model.disk_mb, "platforms": list(model.platforms), "devices": list(model.devices), "artifact": {"url": model.artifact_url, "sha256": model.artifact_sha256, "kind": model.artifact_kind, "filename": model.artifact_filename, "entrypoint": model.artifact_entrypoint, "files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in model.artifact_files]}}
                 for model in spec.models
             ],
         }

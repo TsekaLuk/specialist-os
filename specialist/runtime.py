@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from .cache import Cache
+from .artifacts import ArtifactError, ArtifactStore
 from .hardware import detect_hardware, recommended_model, target_id
 from .models import ModelManager
 from .environments import EnvironmentError, ProviderEnvironmentManager, PROVIDER_REQUIREMENTS
@@ -20,6 +21,15 @@ from .providers.factory import provider_map
 from .registry import BUNDLES, CAPABILITIES, registry_snapshot, resolve_capability
 from .rust_core import rust_validate_input
 from .schemas import ResultEnvelope, validate_envelope
+from .observation import aggregate_confidence, build_observations, evidence_from_observations
+from .policy import Policy, PolicyError
+from .router import DeterministicRouter, RoutingError
+from .streaming import SessionManager
+from .benchmark import BenchmarkRecord, BenchmarkRegistry
+from .node import NodeRegistry
+from .provider_manifest import ProviderCatalog, builtin_manifests
+from .remote import RemoteNodeProvider
+from .packs import get_pack
 
 
 class SpecialistRuntime:
@@ -27,6 +37,8 @@ class SpecialistRuntime:
 
     def __init__(self, home=None, provider_overrides=None, isolate=False, backend="auto", with_dependencies=False, max_loaded=4, allow_unverified_models=None):
         self.cache = Cache(home)
+        self.artifacts = ArtifactStore(self.cache.artifacts)
+        self.policy = Policy.load(self.cache.home, cwd=Path.cwd())
         self.backend = backend
         self.with_dependencies = with_dependencies
         self.allow_unverified_models = bool(os.environ.get("SPECIALIST_ALLOW_UNVERIFIED_MODELS") == "1") if allow_unverified_models is None else bool(allow_unverified_models)
@@ -61,6 +73,11 @@ class SpecialistRuntime:
         self.models_manager = ModelManager(self.cache)
         self.logger = EventLogger(self.cache.home, enabled=True)
         self._metrics = {"requests_total": 0, "errors_total": 0, "cache_hits_total": 0, "latency_ms_total": 0}
+        self.sessions = SessionManager(self)
+        self.benchmarks = BenchmarkRegistry(self.cache.metadata / "benchmarks.json")
+        self.nodes = NodeRegistry(self.cache.home / "nodes")
+        self.provider_catalog = ProviderCatalog(self.cache.home / "providers")
+        self._attach_remote_nodes()
 
         # On a subsequent process start, reuse an already-created provider
         # environment instead of silently wrapping the dependency-free
@@ -80,6 +97,22 @@ class SpecialistRuntime:
 
     def capabilities(self):
         return registry_snapshot()
+
+    def _attach_remote_nodes(self):
+        for node in self.nodes.list():
+            endpoint = (node.metadata or {}).get("endpoint")
+            if not isinstance(endpoint, str) or not endpoint.startswith(("http://", "https://")):
+                continue
+            token = None
+            token_env = (node.metadata or {}).get("token_env")
+            if isinstance(token_env, str) and token_env:
+                token = os.environ.get(token_env)
+            for capability in node.capabilities:
+                if capability in CAPABILITIES:
+                    key = f"{capability}@{node.node_id}"
+                    self.providers.setdefault(key, RemoteNodeProvider(node.node_id, capability, endpoint, token=token, latency_ms=node.latency_ms, memory_mb=node.memory_mb))
+        for key in self.providers:
+            self._locks.setdefault(key, threading.RLock())
 
     @staticmethod
     def _model_for(spec, installation=None, hardware=None):
@@ -150,6 +183,30 @@ class SpecialistRuntime:
     def metrics(self):
         with self._metrics_lock:
             return dict(self._metrics)
+
+    def _router(self) -> DeterministicRouter:
+        installations = {name: self.cache.installation(name) for name in CAPABILITIES}
+        return DeterministicRouter(policy=self.policy, specs=CAPABILITIES, providers=self.providers, installations=installations, benchmarks=self.benchmarks, hardware=detect_hardware())
+
+    def _route_provider(self, capability: str, provider_name: str):
+        for key, provider in self.providers.items():
+            if getattr(provider, "name", None) == provider_name and getattr(provider, "capability", capability) == capability:
+                return provider
+            if key == capability and getattr(provider, "name", None) == provider_name:
+                return provider
+            if key == f"{capability}@{provider_name}" or (key == provider_name and getattr(provider, "capability", capability) == capability):
+                return provider
+        return self.providers[capability]
+
+    def explain(self, capability: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Return the deterministic routing decision without executing input."""
+        canonical = resolve_capability(capability)
+        try:
+            return self._router().route(canonical, options or {})
+        except RoutingError as exc:
+            if exc.explanation:
+                return exc.explanation
+            raise
 
     def readiness(self):
         hardware = detect_hardware()
@@ -223,7 +280,7 @@ class SpecialistRuntime:
             "details": capability_states,
         }
 
-    def install(self, target: str, source: str | None = None, sha256: str | None = None, with_dependencies=None) -> list[dict[str, Any]]:
+    def install(self, target: str, source: str | None = None, sha256: str | None = None, with_dependencies=None, model: str | None = None, provider_override=None) -> list[dict[str, Any]]:
         names = BUNDLES.get(target.lower())
         if names is None:
             names = [resolve_capability(target)]
@@ -240,9 +297,11 @@ class SpecialistRuntime:
                 if existing and not source and not install_dependencies:
                     installed.append({"capability": name, "provider": existing.get("provider", spec.provider), "model": existing.get("model", spec.model), "status": existing.get("status", "ready"), "already_installed": True})
                     continue
-                selected_model = self._model_for(spec, existing)
+                selected_model = model if model and model in {item.id for item in spec.models} else self._model_for(spec, existing)
                 model_spec = spec.model_spec(selected_model)
-                provider = self.providers[name]
+                provider = provider_override if provider_override is not None and len(names) == 1 else self.providers[name]
+                if provider_override is not None and len(names) == 1:
+                    self.providers[name] = provider
                 if hasattr(provider, "model"):
                     provider.model = selected_model
                 dependency_env = None
@@ -297,7 +356,7 @@ class SpecialistRuntime:
                             details["provider_artifact"] = self.environments.install_artifact(spec.provider, artifact_path)
                         self.cache.mark_installed(name, provider.name, selected_model, status="ready", license_name=spec.license, source=auto_source, sha256=artifact["sha256"], artifact_path=artifact_path, commercial=spec.commercial, source_url=spec.source_url, **marker_fields)
                         details.update({"artifact": artifact, "verification": "sha256"})
-                    installed.append({"capability": name, "provider": spec.provider, "model": selected_model, "environment": dependency_env, "registry_model": {"source_url": spec.source_url, "memory_mb": model_spec.memory_mb, "disk_mb": model_spec.disk_mb, "platforms": list(model_spec.platforms), "devices": list(model_spec.devices), "artifact_url": model_spec.artifact_url, "artifact_sha256": model_spec.artifact_sha256, "artifact_kind": model_spec.artifact_kind, "artifact_entrypoint": model_spec.artifact_entrypoint, "artifact_files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in model_spec.artifact_files]}, **details})
+                    installed.append({"capability": name, "provider": getattr(provider, "name", spec.provider), "model": selected_model, "environment": dependency_env, "registry_model": {"source_url": spec.source_url, "memory_mb": model_spec.memory_mb, "disk_mb": model_spec.disk_mb, "platforms": list(model_spec.platforms), "devices": list(model_spec.devices), "artifact_url": model_spec.artifact_url, "artifact_sha256": model_spec.artifact_sha256, "artifact_kind": model_spec.artifact_kind, "artifact_entrypoint": model_spec.artifact_entrypoint, "artifact_files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in model_spec.artifact_files]}, **details})
                 except Exception as exc:
                     self.cache.mark_error(name, provider.name, selected_model, str(exc), source=source)
                     artifact_path = self.cache.models / name.replace(".", "__") / selected_model
@@ -428,7 +487,64 @@ class SpecialistRuntime:
     def clean_cache(self, max_age_seconds=None, max_entries=None):
         return {"removed_results": self.cache.clean_results(max_age_seconds=max_age_seconds, max_entries=max_entries)}
 
+    def replay(self, run_id: str) -> dict[str, Any]:
+        """Replay a cached deterministic result by its cache/run identifier."""
+        if not isinstance(run_id, str) or not run_id or any(char not in "0123456789abcdef" for char in run_id.lower()):
+            raise ValueError("run_id must be a hexadecimal cache identifier")
+        value = self.cache.read_result(run_id)
+        if value is None:
+            raise KeyError(f"run '{run_id}' was not found")
+        validate_envelope(value)
+        value.setdefault("trace", []).append({"stage": "replay", "run_id": run_id})
+        value.setdefault("performance", {})["replayed"] = True
+        return value
+
+    def run_graph(self, graph, input_path, options: dict[str, Any] | None = None) -> dict[str, Any]:
+        return graph.execute(self, input_path, options or {})
+
+    def run_cascade(self, cascade, input_path, options: dict[str, Any] | None = None) -> dict[str, Any]:
+        return cascade.execute(self, input_path, options or {})
+
+    def open_session(self, capability: str, options: dict[str, Any] | None = None):
+        canonical = resolve_capability(capability)
+        return self.sessions.open(canonical, options or {})
+
+    def benchmark(self, capability: str, input_path: str | Path, *, runs: int = 3, options: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+        if isinstance(runs, bool) or int(runs) <= 0 or int(runs) > 100:
+            raise ValueError("runs must be between 1 and 100")
+        canonical = resolve_capability(capability)
+        values = []
+        for index in range(int(runs)):
+            started = time.perf_counter()
+            result = self.run(canonical, input_path, {**(options or {}), "_benchmark_run": index})
+            if result.get("error"):
+                raise ValueError(f"benchmark input failed: {result['error'].get('code')}: {result['error'].get('message')}")
+            measured = (time.perf_counter() - started) * 1000
+            performance = result.get("performance") or {}
+            record = BenchmarkRecord(canonical, result.get("provider", "unknown"), result.get("model", "unknown"), detect_hardware(), measured, float(performance.get("latency_ms") or measured), performance.get("memory_mb"), result.get("confidence"), 1)
+            values.append(self.benchmarks.record(record))
+        return values
+
+    def provider_manifests(self) -> list[dict[str, Any]]:
+        values = [item.to_dict() for item in builtin_manifests()]
+        known = {item["provider"] for item in values}
+        values.extend(item.to_dict() for item in self.provider_catalog.list() if item.provider not in known)
+        return values
+
+    def packs(self):
+        from .packs import PACKS
+
+        return [pack.to_dict() for pack in PACKS]
+
+    def install_pack(self, name: str, *, with_dependencies: bool | None = None) -> list[dict[str, Any]]:
+        pack = get_pack(name)
+        values = []
+        for capability in pack.capabilities:
+            values.extend(self.install(capability, with_dependencies=with_dependencies))
+        return values
+
     def close(self):
+        self.sessions.close_all()
         for name in list(self._loaded):
             try:
                 self.providers[name].unload()
@@ -469,6 +585,15 @@ class SpecialistRuntime:
             return self._run(capability, input_path, options)
 
     def _finish(self, envelope: dict[str, Any]) -> dict[str, Any]:
+        # Older cache entries remain readable while new calls always expose the
+        # complete Observation Protocol shape.
+        envelope.setdefault("observations", [])
+        envelope.setdefault("evidence", [])
+        envelope.setdefault("artifacts", [])
+        envelope.setdefault("metrics", envelope.get("performance") or {})
+        envelope.setdefault("provenance", {})
+        envelope.setdefault("confidence", None)
+        envelope.setdefault("trace", [])
         try:
             validate_envelope(envelope)
         except (TypeError, ValueError, KeyError) as exc:
@@ -483,6 +608,28 @@ class SpecialistRuntime:
                 self._metrics["errors_total"] += 1
         self.logger.emit("capability.run", capability=envelope.get("capability"), provider=envelope.get("provider"), model=envelope.get("model"), input_sha256=(envelope.get("input") or {}).get("sha256"), input_size_bytes=(envelope.get("input") or {}).get("size_bytes"), latency_ms=performance.get("latency_ms"), cached=performance.get("cached", False), success=envelope.get("error") is None, error_code=(envelope.get("error") or {}).get("code"))
         return envelope
+
+    def _collect_artifacts(self, capability: str, result: dict[str, Any]) -> list[dict[str, Any]]:
+        """Promote provider-created files to the content-addressed artifact store."""
+        references: list[dict[str, Any]] = []
+        existing = result.get("artifacts")
+        if isinstance(existing, list):
+            references.extend(item for item in existing if isinstance(item, dict) and item.get("id"))
+        for key in ("preview", "artifact_path"):
+            value = result.get(key)
+            if not isinstance(value, str) or value.startswith("artifact://"):
+                continue
+            path = Path(value).expanduser()
+            try:
+                if path.is_file():
+                    reference = self.artifacts.put_file(path, metadata={"capability": capability, "result_key": key})
+                    if reference.to_dict() not in references:
+                        references.append(reference.to_dict())
+            except (ArtifactError, OSError):
+                # A provider result remains useful when an optional preview
+                # cannot be copied; the original result path is preserved.
+                continue
+        return references
 
     @staticmethod
     def _memory_mb():
@@ -510,6 +657,10 @@ class SpecialistRuntime:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, {"type": CAPABILITIES[canonical].modality, "path": str(input_path)}, "invalid_options", "options must be an object").to_dict())
         options = dict(raw_options)
         try:
+            policy_rule = self.policy.resolve(canonical, options)
+        except PolicyError as exc:
+            return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_policy", str(exc)).to_dict())
+        try:
             json.dumps(options, sort_keys=True, separators=(",", ":"), allow_nan=False)
         except (TypeError, ValueError) as exc:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", str(exc)).to_dict())
@@ -521,12 +672,24 @@ class SpecialistRuntime:
             if timeout <= 0 or timeout > self.TIMEOUTS[canonical]:
                 return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", f"timeout_seconds must be between 0 and {self.TIMEOUTS[canonical]}").to_dict())
             options["timeout_seconds"] = timeout
+        try:
+            route = self._router().route(canonical, options)
+        except RoutingError as exc:
+            return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "routing_unavailable", str(exc), retryable=False, routing=exc.explanation).to_dict())
+        selected = route["selected"] or {}
+        selected_model = str(selected.get("model") or spec.model)
+        route_latency = selected.get("estimated_latency_ms")
+        provider = self._route_provider(canonical, str(selected.get("provider") or spec.provider))
         requested_device = options.get("device", "cpu")
         if requested_device not in getattr(provider, "supported_devices", ("cpu",)):
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", f"device must be one of {list(getattr(provider, 'supported_devices', ('cpu',)))}").to_dict())
         installation = self.cache.installation(canonical)
-        selected_model = self._model_for(spec, installation)
+        if installation and installation.get("model"):
+            selected_model = self._model_for(spec, installation)
         requested_model_spec = spec.model_spec(selected_model)
+        policy_decision = self.policy.evaluate(capability=canonical, provider=provider, model=requested_model_spec, options=options, estimated_latency_ms=route_latency)
+        if not policy_decision.allowed:
+            return self._finish(ResultEnvelope.failure(canonical, provider.name, selected_model, input_info, "policy_rejected", "; ".join(policy_decision.reasons), retryable=False).to_dict())
         if requested_device not in requested_model_spec.devices:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "unsupported_device", f"model {requested_model_spec.id} does not support device {requested_device}").to_dict())
         hardware = detect_hardware()
@@ -563,13 +726,13 @@ class SpecialistRuntime:
         if self.cache.installation(canonical) is None:
             try:
                 if self.with_dependencies:
-                    self.install(canonical, with_dependencies=True)
-                    provider = self.providers[canonical]
+                    self.install(canonical, with_dependencies=True, model=selected_model, provider_override=provider)
+                    provider = self.providers.get(canonical, provider)
                     installation = self.cache.installation(canonical)
                     selected_model = self._model_for(spec, installation)
                 else:
-                    self.install(canonical, with_dependencies=False)
-                    provider = self.providers[canonical]
+                    self.install(canonical, with_dependencies=False, model=selected_model, provider_override=provider)
+                    provider = self.providers.get(canonical, provider)
                     installation = self.cache.installation(canonical)
                     selected_model = self._model_for(spec, installation)
                 if hasattr(provider, "model"):
@@ -592,13 +755,42 @@ class SpecialistRuntime:
             self._last_used[canonical] = time.monotonic()
             self.cache.update_state(canonical, "running")
             result, warnings = provider.infer(path, options, self.cache)
-            envelope = ResultEnvelope(canonical, provider.name, selected_model, input_info, result=result, performance={"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}, warnings=warnings).to_dict()
+            performance = {"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}
+            from . import __version__
+
+            observations = build_observations(canonical, result, provider=provider.name, model=selected_model, source=input_info, runtime_version=__version__)
+            artifacts = self._collect_artifacts(canonical, result)
+            envelope = ResultEnvelope(
+                canonical,
+                provider.name,
+                selected_model,
+                input_info,
+                result=result,
+                performance=performance,
+                warnings=warnings,
+                observations=observations,
+                evidence=evidence_from_observations(observations),
+                artifacts=artifacts,
+                metrics={**performance, "observation_count": len(observations), "artifact_count": len(artifacts)},
+                provenance={"source": input_info, "provider": provider.name, "model_version": selected_model, "runtime_version": __version__, "transformations": []},
+                confidence=aggregate_confidence(observations),
+                trace=[{"stage": "routing", **route}, {"stage": "policy", "profile": policy_rule.get("profile"), "constraints": policy_rule, "decision": policy_decision.to_dict()}],
+            ).to_dict()
+            minimum_confidence = policy_rule.get("min_confidence")
+            if minimum_confidence is not None and envelope.get("confidence") is not None and float(envelope["confidence"]) < float(minimum_confidence):
+                envelope["error"] = {"code": "low_confidence", "message": f"confidence {envelope['confidence']:.3f} is below required threshold {float(minimum_confidence):.3f}", "retryable": False, "details": {"threshold": float(minimum_confidence), "verification": options.get("verification", "none")}}
+                envelope["trace"].append({"stage": "verification", "mode": options.get("verification", "none"), "status": "rejected", "confidence": envelope["confidence"], "threshold": float(minimum_confidence)})
+            elif minimum_confidence is not None and envelope.get("confidence") is None:
+                envelope["warnings"].append("confidence threshold could not be evaluated because the provider returned no confidence")
+                envelope["trace"].append({"stage": "verification", "mode": options.get("verification", "none"), "status": "unavailable", "threshold": float(minimum_confidence)})
         except WorkerError as exc:
             envelope = ResultEnvelope.failure(canonical, provider.name, selected_model, input_info, exc.code, str(exc), retryable=exc.retryable, backend=provider.name).to_dict()
             envelope["performance"] = {"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}
+            envelope["trace"] = [{"stage": "routing", **route}, {"stage": "provider", "status": "error", "code": exc.code}]
         except Exception as exc:  # provider isolation: one broken provider never crashes the core
             envelope = ResultEnvelope.failure(canonical, provider.name, selected_model, input_info, "provider_error", str(exc), backend=provider.name).to_dict()
             envelope["performance"] = {"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}
+            envelope["trace"] = [{"stage": "routing", **route}, {"stage": "provider", "status": "error", "code": "provider_error"}]
         finally:
             self.cache.update_state(canonical, "ready")
         envelope = self._finish(envelope)

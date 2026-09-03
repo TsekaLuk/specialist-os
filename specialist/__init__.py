@@ -1,6 +1,10 @@
 """Public Python SDK for Specialist Runtime."""
 
 from .runtime import SpecialistRuntime
+from .graph import SpecialistGraph
+from .cascade import SpecialistCascade
+from .node import ComputeNode, NodeScheduler
+from .provider_sdk import ProviderAdapter, ProviderResult
 
 
 class Specialist:
@@ -42,6 +46,15 @@ class Specialist:
     def vad(self, input_path, **options):
         return self.run("audio.vad", input_path, options)
 
+    def graph(self, name="specialist-graph"):
+        return SpecialistGraph(name)
 
-__all__ = ["Specialist", "SpecialistRuntime"]
+    def cascade(self, name="specialist-cascade"):
+        return SpecialistCascade(name=name)
+
+    def open_session(self, capability, **options):
+        return self.runtime.open_session(capability, options)
+
+
+__all__ = ["Specialist", "SpecialistRuntime", "SpecialistGraph", "SpecialistCascade", "ComputeNode", "NodeScheduler", "ProviderAdapter", "ProviderResult"]
 __version__ = "1.0.4"
