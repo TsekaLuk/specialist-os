@@ -31,10 +31,10 @@ transport, so an agent can switch interfaces without changing capability code.
 
 ## Real provider output
 
-This is an actual model output captured through Specialist Runtime, not a mock
-or an illustration. The runtime selected the pinned Ultralytics YOLO11s
-artifact, verified its SHA256, and returned one bus plus four people with
-confidence scores in the normalized result envelope.
+This is an actual model output from the pinned provider used by Specialist
+Runtime, not a mock or an illustration. The runtime verified the Ultralytics
+YOLO11s artifact by SHA256 and returned one bus plus four people with confidence
+scores in the normalized result envelope.
 
 <p align="center">
   <img src="docs/assets/real-yolo-bus.jpg" alt="Real Specialist Runtime YOLO11s output showing one bus and four people detected in a street photo" width="810">
