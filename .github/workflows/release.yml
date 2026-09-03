@@ -22,7 +22,7 @@ jobs:
       - run: python -m unittest discover -s tests/e2e -p test_package_e2e.py -v
         env:
           SPECIALIST_RUN_PACKAGE_E2E: "1"
-      - run: python scripts/release_check.py --require-artifacts
+      - run: python scripts/release_check.py --require-artifacts --tag "$GITHUB_REF_NAME"
       - run: python -m build --wheel --sdist
       - run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes
         env:

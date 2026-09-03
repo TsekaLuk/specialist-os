@@ -57,10 +57,11 @@ python -m pip install build setuptools
 SPECIALIST_RUN_PACKAGE_E2E=1 python -m unittest discover -s tests/e2e -p test_package_e2e.py -v
 ```
 
-Release tags are guarded by `.github/workflows/release.yml`. Before a tag can
-publish, `scripts/release_check.py --require-artifacts` requires every model
-entry to carry a paired URL and SHA256. The current registry intentionally has
-no unverified production artifacts, so adding real provider weights and their
+Release tags are guarded by `.github/workflows/release.yml`. The tag must match
+the project version (`v<version>`), and
+`scripts/release_check.py --require-artifacts` requires every model entry to
+carry a paired URL and SHA256. The current registry intentionally has no
+unverified production artifacts, so adding real provider weights and their
 license/provenance records is a prerequisite for a publishable release.
 
 Reference service-manager templates are provided at

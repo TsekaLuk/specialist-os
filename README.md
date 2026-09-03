@@ -183,7 +183,7 @@ keeps those external requirements out of CI.
 Release tags run an additional artifact gate. Every model must have an audited
 URL and SHA256 before the release workflow can publish a package; the checked-in
 registry intentionally blocks releases until those production artifacts are
-provided.
+provided. Tags must also match the project version (`v<version>`).
 
 `doctor --fix` only changes local provider metadata when a provider explicitly
 reports a repairable issue; it never downloads every model, preserving lazy

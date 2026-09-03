@@ -17,6 +17,14 @@ def load_registry():
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def project_version():
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    match = re.search(r"^version\s*=\s*['\"]([^'\"]+)['\"]\s*$", pyproject, re.MULTILINE)
+    if not match:
+        raise ValueError("pyproject.toml does not declare project.version")
+    return match.group(1)
+
+
 def check_registry(require_artifacts: bool) -> list[str]:
     payload = load_registry()
     failures = []
@@ -50,9 +58,14 @@ def check_registry(require_artifacts: bool) -> list[str]:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Validate Specialist Runtime release metadata")
     parser.add_argument("--require-artifacts", action="store_true", help="require every registered model to have a pinned URL and SHA256")
+    parser.add_argument("--tag", help="verify a release tag matches project.version")
     args = parser.parse_args(argv)
     try:
         failures = check_registry(args.require_artifacts)
+        if args.tag:
+            expected_tag = f"v{project_version()}"
+            if args.tag != expected_tag:
+                failures.append(f"release tag {args.tag!r} does not match project version {expected_tag!r}")
     except (OSError, ValueError, TypeError) as exc:
         print(f"release check failed: {exc}", file=sys.stderr)
         return 2
