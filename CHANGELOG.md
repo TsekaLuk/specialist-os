@@ -7,6 +7,11 @@
   handling, PaddleOCR PP-OCRv5 compatibility, and process-group cleanup on
   timeout.
 
+## 1.0.4
+
+- Fixed the heavy-provider acceptance workflow so `run_heavy=true` executes
+  the Depth Anything inference test instead of silently skipping it.
+
 ## 1.0.3
 
 - Disable the PaddleOCR oneDNN executor for the pinned PP-OCRv5 CPU bundle.

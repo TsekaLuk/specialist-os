@@ -123,7 +123,7 @@ class RealProviderE2ETests(unittest.TestCase):
 
     def test_depth_pinned_bundle_is_loaded_without_network_downloads(self):
         self._enabled("depth")
-        if os.environ.get("SPECIALIST_RUN_HEAVY_REAL") != "1":
+        if os.environ.get("SPECIALIST_RUN_HEAVY_REAL", "").strip().lower() not in {"1", "true", "yes", "on"}:
             self.skipTest("set SPECIALIST_RUN_HEAVY_REAL=1 on a host with at least 2 GiB available for Depth Anything")
         with tempfile.TemporaryDirectory() as temp:
             fixture = self._image_fixture(Path(temp))
