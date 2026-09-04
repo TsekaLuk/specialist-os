@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/assets/brand/specialist-os-logo-b.png" alt="Specialist OS" width="128">
+
 # Specialist OS
 
 **Turn specialist intelligence into product capabilities.**
@@ -16,6 +18,10 @@ The capability layer between AI applications and specialist intelligence.
 `CLI` · `Python SDK` · `HTTP` · `MCP` · `Rust core`
 
 </div>
+
+<p align="center">
+  <img src="docs/assets/brand/specialist-os-hero-a.png" alt="Specialist OS visual analysis workflow" width="100%">
+</p>
 
 Specialist OS is the capability layer for AI products that need to see, hear,
 read and speak. It turns specialist intelligence into product primitives for

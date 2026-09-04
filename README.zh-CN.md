@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/assets/brand/specialist-os-logo-b.png" alt="Specialist OS" width="128">
+
 # Specialist OS
 
 **把专业智能变成产品能力。**
@@ -16,6 +18,10 @@
 `CLI` · `Python SDK` · `HTTP` · `MCP` · `Rust Core`
 
 </div>
+
+<p align="center">
+  <img src="docs/assets/brand/specialist-os-hero-a.png" alt="Specialist OS 视觉分析工作流" width="100%">
+</p>
 
 Specialist OS 是面向 AI 产品的能力层，让应用直接获得看、听、读、说的能力。
 它把目标检测、分割、OCR、深度、界面理解、文档解析、转写和语音等专业智能封装
