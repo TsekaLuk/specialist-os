@@ -73,3 +73,36 @@ Regenerated uv.lock from the official PyPI index, upgraded GitHub actions to Nod
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: Release attestation v3 cleanup
+
+**Date**: 2026-09-05
+**Task**: Release attestation v3 cleanup
+**Branch**: `main`
+
+### Summary
+
+Upgraded the release provenance attestation action to v3, removing the remaining Node 20 deprecation path for future releases; validated the workflow with actionlint, the official-source uv lock check, release metadata checks, and the 111-test Python suite.
+
+### Main Changes
+
+- Detailed change bullets were not supplied; see the summary above.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a84b572` | (see git log) |
+
+### Testing
+
+- Validation was not recorded for this session.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

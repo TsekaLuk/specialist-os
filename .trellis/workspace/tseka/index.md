@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 2
+- **Total Sessions**: 3
 - **Last Active**: 2026-09-05
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~75 | Active |
+| `journal-1.md` | ~108 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 3 | 2026-09-05 | Release attestation v3 cleanup | `a84b572` | `main` |
 | 2 | 2026-09-05 | Release supply-chain convergence | `aa098cb` | `main` |
 | 1 | 2026-09-04 | Specialist OS capability expansion 1.1.0 | `aa30412`, `1a0db0c`, `b046258` | `main` |
 <!-- @@@/auto:session-history -->
