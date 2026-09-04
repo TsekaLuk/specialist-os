@@ -2,7 +2,7 @@
 
 # Specialist OS
 
-**依赖能力，而不是模型。**
+**把专业智能变成产品能力。**
 
 连接 AI 应用与专业智能的能力层。
 
@@ -19,7 +19,7 @@
 
 Specialist OS 是面向 AI 产品的能力层，让应用直接获得看、听、读、说的能力。
 它把专业智能封装成 `vision.detect`、`vision.ocr`、`audio.transcribe`、
-`speech.synthesize` 等稳定的产品原语。
+`speech.synthesize` 等稳定的产品原语，让能力可以直接进入真实业务流程。
 
 开源实现 `specialist-runtime` 负责发现 Provider、根据请求选择执行路径，并返回
 统一的结果协议。你的产品只依赖能力名称；模型、硬件、隔离和 Provider 的变化由
@@ -32,8 +32,8 @@ Runtime 在底层处理。
 
 | | 产品价值 |
 | --- | --- |
-| **稳定的产品 API** | 依赖持久的能力名称和 Schema，不被具体模型调用绑住 |
-| **更快迭代** | 增加或替换专业 Provider，无需重写应用层 |
+| **稳定的产品 API** | 依赖持久的能力名称和 Schema，模型可以持续升级 |
+| **更快迭代** | 增加或替换专业 Provider，应用层保持稳定 |
 | **成本与延迟可控** | 根据策略、硬件和 Benchmark 路由，为每次请求选择合适的执行路径 |
 | **自动化可追溯** | 每个结果都带有置信度、来源、证据、指标、Artifact 和执行 Trace |
 | **一次接入，多处复用** | CLI、Python SDK、HTTP 服务和 MCP 客户端共享同一套能力 |
@@ -71,14 +71,14 @@ specialist doctor
 specialist capabilities --json
 ```
 
-在全新机器上验证无依赖接口链路：
+在全新机器上快速验证接口链路：
 
 ```bash
 printf 'Specialist OS' > note.txt
 specialist ocr note.txt --json
 ```
 
-安装并强制使用真实 Provider 完成生产推理：
+安装生产 Provider 完成推理：
 
 ```bash
 specialist --backend real --with-dependencies install vision.ocr
@@ -86,13 +86,13 @@ specialist --backend real --isolate ocr invoice.png --json
 ```
 
 Runtime 数据默认保存在 `~/.specialist/`。可以通过 `SPECIALIST_HOME` 指定独立
-目录。真实 Provider 缺少必要模型 Artifact 或 SHA256 校验失败时会直接拒绝执行。
+目录。注册的模型 Artifact 会在执行前完成存在性和 SHA256 完整性校验。
 
 ## 看看实际效果
 
 下面的检测使用锁定版本的 Ultralytics YOLO11s Provider，在统一结果协议中返回了
 1 辆公交车和 4 个人及其置信度。同一份结果契约可以被所有接口复用，让原型流程
-自然演进为后台任务或面向客户的功能，无需再次集成。
+可以直接演进为后台任务或面向客户的功能。
 
 <p align="center">
   <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist Runtime YOLO11s 真实推理结果，街景中检测到一辆公交车和四个人" width="810">
@@ -122,7 +122,7 @@ specialist --backend real --isolate detect bus.jpg --json
 | `document.parse` | MinerU | `specialist parse-document` |
 | `audio.transcribe` | whisper.cpp | `specialist transcribe` |
 | `audio.vad` | Silero VAD | `specialist vad` |
-| `speech.synthesize` | Fish Audio S2 / 系统 TTS fallback | `specialist speak` |
+| `speech.synthesize` | Fish Audio S2 / 系统 TTS | `specialist speak` |
 | `speech.clone_voice` | Fish Audio S2 | `specialist clone-voice` |
 
 可以安装单项能力、Capability Pack 或完整参考能力集：
@@ -138,7 +138,7 @@ specialist install all
 
 声音本身就是产品资产：统一的品牌旁白、熟悉的智能助手、自然交流的客服，或支持
 多语言发布的内容生产线。Fish Audio S2 在同一能力层提供高保真合成和声音克隆，
-无需让业务代码绑定某个模型运行时，就能把这些体验接入产品。
+业务代码沿用同一套能力接口，就能把这些体验接入产品并持续迭代。
 
 Fish Audio 以隔离的 HTTP Provider 进程运行。可以连接运维启动的 Fish Server，也
 可以配置按需启动命令：
@@ -160,22 +160,21 @@ specialist speak '使用我的声音' --voice voice://my-voice --provider fish_a
 specialist clone-voice '这是一段克隆语音' ./reference.wav --json
 ```
 
-Fish Audio Research License 默认不可商用。用于商业发布时，请确认部署方式和声音
-数据符合许可证要求。远程 reference audio 需要显式设置
+Fish Audio Research License 适用于非商业使用。商业发布请确保部署方式和声音
+数据符合相应许可证要求。远程 reference audio 需要显式设置
 `privacy.allow_remote=true`（或请求级 `allow_remote`），声音数据默认留在本地。
-如果产品更重视轻量部署，普通合成也可以使用主机的系统 TTS，并在结果中记录当前
-质量配置。
+面向轻量部署时，普通合成可以使用主机的系统 TTS，并在结果中记录当前质量配置。
 
 ## Advanced Runtime
 
-不执行推理，直接检查 Provider 选择与每个候选被拒绝的原因：
+在运行推理前，先检查 Provider 选择与每个候选的决策原因：
 
 ```bash
 specialist explain vision.depth \
   --options '{"profile":"quality","max_memory_mb":4096}'
 ```
 
-在不导入第三方代码的前提下校验并登记 Provider Manifest：
+基于 Provider Manifest 的声明信息完成校验和登记：
 
 ```bash
 specialist provider validate ./manifest.json
@@ -213,7 +212,7 @@ session.close()
 每个成功结果都遵循
 [Observation Protocol Schema](schemas/result-envelope.schema.json)。较大的 Provider
 输出写入内容寻址 Artifact Store，并以小体积、可校验的引用在系统间传递。Artifact
-ID 可以通过 SHA256 校验，解析路径时也会拒绝符号链接穿越。
+ID 可以通过 SHA256 校验，解析路径遵循安全路径规则。
 
 ## 调用接口
 
@@ -229,8 +228,7 @@ print(result["result"]["blocks"])
 
 ### HTTP
 
-Server 默认只监听 loopback。绑定非 loopback 地址时必须配置 Bearer Token，否则
-Runtime 会拒绝启动。
+Server 默认只监听 loopback。对外或内网监听时使用 Bearer Token 保护访问。
 
 ```bash
 export SPECIALIST_API_TOKEN="$(openssl rand -hex 32)"

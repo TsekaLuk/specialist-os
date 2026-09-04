@@ -2,7 +2,7 @@
 
 # Specialist OS
 
-**Capabilities, not models.**
+**Turn specialist intelligence into product capabilities.**
 
 The capability layer between AI applications and specialist intelligence.
 
@@ -19,7 +19,8 @@ The capability layer between AI applications and specialist intelligence.
 
 Specialist OS is the capability layer for AI products that need to see, hear,
 read and speak. It turns specialist intelligence into product primitives such as
-`vision.detect`, `vision.ocr`, `audio.transcribe` and `speech.synthesize`.
+`vision.detect`, `vision.ocr`, `audio.transcribe` and `speech.synthesize`, ready
+to flow into real product workflows.
 
 The open-source `specialist-runtime` implementation discovers providers, chooses
 the right execution path for the request, and returns one result contract that
@@ -35,8 +36,8 @@ improving.
 
 | | Product value |
 | --- | --- |
-| **Stable product APIs** | Ship against durable capability names and schemas instead of model-specific calls |
-| **Faster iteration** | Add or replace specialist providers without rewriting the application layer |
+| **Stable product APIs** | Ship against durable capability names and schemas while models evolve |
+| **Faster iteration** | Add or replace specialist providers while keeping the application layer stable |
 | **Cost and latency control** | Route by policy, hardware and benchmark data so each request gets the right execution path |
 | **Trustworthy automation** | Return confidence, provenance, evidence, metrics, artifacts and an execution trace with every result |
 | **One system, many surfaces** | Reuse the same capabilities from a CLI, Python SDK, HTTP service or MCP client |
@@ -75,14 +76,14 @@ specialist doctor
 specialist capabilities --json
 ```
 
-Exercise the dependency-free interface path on a fresh machine:
+Quickly verify the interface path on a fresh machine:
 
 ```bash
 printf 'Specialist OS' > note.txt
 specialist ocr note.txt --json
 ```
 
-Install and require a real provider for production inference:
+Install a production provider for inference:
 
 ```bash
 specialist --backend real --with-dependencies install vision.ocr
@@ -90,16 +91,15 @@ specialist --backend real --isolate ocr invoice.png --json
 ```
 
 Runtime data is stored under `~/.specialist/` by default. Set
-`SPECIALIST_HOME` to use a dedicated location. Real providers fail closed when
-a required model artifact is missing or does not match its registered SHA256.
+`SPECIALIST_HOME` to use a dedicated location. Registered model artifacts are
+checked for availability and SHA256 integrity before execution.
 
 ## See it in action
 
 This detection run uses the pinned Ultralytics YOLO11s provider and returns one
 bus and four people with confidence scores in the normalized result envelope.
 The same contract is available to every interface, so a prototype workflow can
-become a background job or a customer-facing feature without a second
-integration.
+flow directly into a background job or a customer-facing feature.
 
 <p align="center">
   <img src="docs/assets/real-yolo-bus.jpg" alt="Real Specialist Runtime YOLO11s output showing one bus and four people detected in a street photo" width="810">
@@ -129,7 +129,7 @@ specialist --backend real --isolate detect bus.jpg --json
 | `document.parse` | MinerU | `specialist parse-document` |
 | `audio.transcribe` | whisper.cpp | `specialist transcribe` |
 | `audio.vad` | Silero VAD | `specialist vad` |
-| `speech.synthesize` | Fish Audio S2 / system TTS fallback | `specialist speak` |
+| `speech.synthesize` | Fish Audio S2 / system TTS | `specialist speak` |
 | `speech.clone_voice` | Fish Audio S2 | `specialist clone-voice` |
 
 Install a capability, a pack or the complete reference set:
@@ -146,8 +146,8 @@ specialist install all
 Voice is a product asset: a consistent brand narrator, a familiar assistant, a
 support agent that can speak naturally, or a content pipeline that can publish
 in many languages. Fish Audio S2 adds high-fidelity synthesis and voice cloning
-to the same capability layer, so teams can add these experiences without
-coupling the rest of the product to a model runtime.
+to the same capability layer, so teams can add these experiences while the rest
+of the product stays independent of the model runtime.
 
 Fish Audio runs as an isolated HTTP provider process. Point the adapter at an
 operator-managed Fish server, or configure a start command for on-demand
@@ -171,25 +171,24 @@ specialist speak 'A familiar voice' --voice voice://my-voice --provider fish_aud
 specialist clone-voice 'This is a clone' ./reference.wav --json
 ```
 
-The Fish Audio Research License is non-commercial by default. For commercial
-launches, confirm the license terms for your deployment and voice data. Remote
+The Fish Audio Research License covers non-commercial use. Commercial launches
+require license terms that match your deployment and voice data. Remote
 reference audio requires the explicit `privacy.allow_remote=true` policy (or a
 request-level `allow_remote` setting), keeping voice data local by default.
-Standard synthesis can also use the host OS TTS executable when a lightweight
-fallback is the right product choice; the result records the active quality
-profile.
+Standard synthesis can use the host OS TTS executable when a lightweight
+deployment fits the product; the result records the active quality profile.
 
 ## Advanced runtime
 
-Inspect the provider decision and every rejected candidate without running
-inference:
+Inspect the provider decision and each candidate's selection reason before
+running inference:
 
 ```bash
 specialist explain vision.depth \
   --options '{"profile":"quality","max_memory_mb":4096}'
 ```
 
-Validate and catalog a third-party manifest without importing its code:
+Validate and catalog a third-party manifest from its declared metadata:
 
 ```bash
 specialist provider validate ./manifest.json
@@ -229,7 +228,7 @@ Every successful result implements the
 [Observation Protocol schema](schemas/result-envelope.schema.json). Large
 provider outputs live in the content-addressed artifact store and travel as
 small, verifiable references. Artifact IDs are SHA256-verifiable, and artifact
-resolution rejects symlink traversal.
+resolution follows safe path rules.
 
 ## Interfaces
 
@@ -245,8 +244,8 @@ print(result["result"]["blocks"])
 
 ### HTTP
 
-The server binds to loopback by default. Non-loopback binds are refused unless
-a bearer token is configured.
+The server binds to loopback by default. Public or private-network binds use
+bearer-token protection.
 
 ```bash
 export SPECIALIST_API_TOKEN="$(openssl rand -hex 32)"
@@ -313,8 +312,8 @@ PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 \
   maturin develop --manifest-path rust-core/Cargo.toml --features python
 ```
 
-Without the extension, Python selects an equivalent implementation
-automatically.
+Python selects an equivalent implementation automatically when the extension is
+unavailable.
 
 ## Development
 
