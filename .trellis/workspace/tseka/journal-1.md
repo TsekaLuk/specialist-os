@@ -106,3 +106,36 @@ Upgraded the release provenance attestation action to v3, removing the remaining
 ### Next Steps
 
 - None - task complete
+
+
+## Session 4: GitHub Actions Node 24 completion
+
+**Date**: 2026-09-05
+**Task**: GitHub Actions Node 24 completion
+**Branch**: `main`
+
+### Summary
+
+Upgraded the SBOM artifact upload action from v4 to v7 after the final CI exposed its Node 20 deprecation warning; verified every directly referenced JavaScript action uses Node 24 and all workflows pass actionlint.
+
+### Main Changes
+
+- Detailed change bullets were not supplied; see the summary above.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b94e7f0` | (see git log) |
+
+### Testing
+
+- Validation was not recorded for this session.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
