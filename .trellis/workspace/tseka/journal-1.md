@@ -40,3 +40,36 @@ Expanded Specialist OS to 56 production capabilities, validated real isolated CL
 ### Next Steps
 
 - None - task complete
+
+
+## Session 2: Release supply-chain convergence
+
+**Date**: 2026-09-05
+**Task**: Release supply-chain convergence
+**Branch**: `main`
+
+### Summary
+
+Regenerated uv.lock from the official PyPI index, upgraded GitHub actions to Node 24-compatible major versions, and documented the reproducible lock contract after the first remote CI run exposed local mirror drift.
+
+### Main Changes
+
+- Detailed change bullets were not supplied; see the summary above.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `aa098cb` | (see git log) |
+
+### Testing
+
+- Validation was not recorded for this session.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
