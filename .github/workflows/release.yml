@@ -32,7 +32,7 @@ jobs:
       - run: python -m build --wheel --sdist
       - run: python scripts/generate_sbom.py --output dist/sbom.cdx.json
       - run: (cd dist && sha256sum sbom.cdx.json specialist_os-*.whl specialist_os-*.tar.gz) > dist/SHA256SUMS
-      - uses: actions/attest-build-provenance@v2
+      - uses: actions/attest-build-provenance@v3
         with:
           subject-path: "dist/*"
       - run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes
