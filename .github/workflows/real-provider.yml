@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        provider: [yolo, sam, paddleocr, silero, whisper, depth]
+        provider: [yolo, sam, paddleocr, silero, whisper, depth, opencv]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -36,6 +36,7 @@ jobs:
             paddleocr) python -m pip install "paddleocr==3.7.0" "paddlepaddle==3.3.1" ;;
             silero) python -m pip install "silero-vad==6.2.1" "torch==2.14.0" ;;
             depth) python -m pip install "transformers==4.57.3" "Pillow==12.3.0" "torch==2.14.0" ;;
+            opencv) python -m pip install "opencv-python-headless==4.10.0.84" ;;
             whisper)
               sudo apt-get update
               sudo apt-get install -y cmake build-essential

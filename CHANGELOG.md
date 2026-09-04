@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 1.1.0
+
+- Expanded Specialist OS to 56 local-first capabilities spanning human pose,
+  landmarks, gestures, diarization, denoising, embeddings, face verification,
+  deterministic geometry, media transforms, depth, and composed workflows.
+- Added MediaPipe, pyannote.audio, DeepFilterNet, OpenCLIP, InsightFace,
+  OpenCV, FFmpeg, and Fish Audio integrations behind isolated provider
+  environments and the shared result envelope.
+- Added content-addressed outputs for audio, video, images, embeddings,
+  landmarks, and timelines, with sensitive face-identity caching disabled by
+  default.
+- Added a bilingual product guide and a real CLI-generated capability gallery
+  with playable audio results and provider/model provenance.
+- Added typed Python, CLI, HTTP, MCP, and Compute Node discovery surfaces for
+  the expanded registry while preserving the existing SDK and protocol names.
+- Hardened verified model downloads with bounded retries, resumable transfers,
+  content-length checks, and mandatory SHA256 verification.
 - Completed the Fish Audio S2 provider contract: official Server request fields,
   style controls, reference artifacts, remote-node resource routing, audio
   validation, speech performance metrics and live-server E2E coverage.

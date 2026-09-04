@@ -133,6 +133,28 @@ def _bbox(value, field):
         raise ValueError(f"{field} must contain four finite numbers")
 
 
+def _timeline(result, key="segments"):
+    for index, item in enumerate(_array(result, key)):
+        if not isinstance(item, dict):
+            raise ValueError(f"result.{key}[{index}] must be an object")
+        start, end = item.get("start"), item.get("end")
+        if isinstance(start, bool) or isinstance(end, bool) or not isinstance(start, (int, float)) or not isinstance(end, (int, float)) or not math.isfinite(float(start)) or not math.isfinite(float(end)) or start < 0 or end < start:
+            raise ValueError(f"result.{key}[{index}] has an invalid time range")
+
+
+def _embedding(value, field="result.embedding", nullable=False):
+    if value is None and nullable:
+        return
+    if not isinstance(value, dict):
+        raise ValueError(f"{field} must be an object" )
+    artifact = value.get("artifact")
+    if not isinstance(artifact, str) or not artifact.startswith("artifact://"):
+        raise ValueError(f"{field}.artifact must be an artifact:// URI")
+    dimension = value.get("dimension")
+    if not isinstance(dimension, int) or isinstance(dimension, bool) or dimension <= 0:
+        raise ValueError(f"{field}.dimension must be a positive integer")
+
+
 def _validate_capability_result(capability: str, result: dict[str, Any]) -> None:
     if capability == "vision.detect":
         for index, item in enumerate(_array(result, "items")):
@@ -159,6 +181,16 @@ def _validate_capability_result(capability: str, result: dict[str, Any]) -> None
             raise ValueError("result.width and result.height must be positive integers")
         if not isinstance(result.get("mode"), str):
             raise ValueError("result.mode must be a string")
+        mode = result["mode"].lower()
+        if mode not in {"relative", "metric"}:
+            raise ValueError("result.mode must be relative or metric")
+        unit = result.get("unit")
+        if mode == "relative" and unit is not None:
+            raise ValueError("relative depth must not declare a distance unit")
+        if mode == "metric" and unit != "meter":
+            raise ValueError("metric depth must declare unit=meter")
+        if mode == "metric" and result.get("estimated") is not True:
+            raise ValueError("metric depth must declare estimated=true")
     elif capability == "screen.parse":
         _array(result, "elements")
     elif capability == "document.parse":
@@ -181,6 +213,47 @@ def _validate_capability_result(capability: str, result: dict[str, Any]) -> None
         duration = result.get("duration_seconds")
         if not isinstance(duration, (int, float)) or isinstance(duration, bool) or not math.isfinite(duration) or duration < 0:
             raise ValueError("result.duration_seconds must be a non-negative finite number")
+    elif capability in {"human.pose", "human.hand_landmarks", "human.face_landmarks", "human.gesture"}:
+        key = {"human.pose": "persons", "human.hand_landmarks": "hands", "human.face_landmarks": "faces"}.get(capability)
+        if key:
+            _array(result, key)
+        elif "gesture" not in result:
+            raise ValueError("result.gesture is required")
+    elif capability in {"speech.diarize", "speech.align_transcript", "speech.meeting"}:
+        _timeline(result)
+    elif capability == "audio.denoise":
+        audio = result.get("audio")
+        if not isinstance(audio, dict) or not isinstance(audio.get("artifact"), str) or not audio["artifact"].startswith("artifact://"):
+            raise ValueError("result.audio.artifact is required")
+        if result.get("profile") not in {"light", "balanced", "strong"}:
+            raise ValueError("result.profile must be light, balanced, or strong")
+    elif capability in {"vision.embed", "vision.embed_text"}:
+        _embedding(result.get("embedding"))
+    elif capability == "vision.similarity":
+        score = result.get("score")
+        if score is not None and (not isinstance(score, (int, float)) or isinstance(score, bool) or not math.isfinite(score)):
+            raise ValueError("result.score must be a finite number or null")
+    elif capability in {"vision.search", "vision.find_similar"}:
+        _array(result, "results")
+    elif capability == "identity.face.detect":
+        _array(result, "faces")
+    elif capability == "identity.face.embed":
+        _embedding(result.get("embedding"), nullable=True)
+    elif capability in {"identity.face.verify", "vision.face_compare"}:
+        if result.get("match") is not None and not isinstance(result.get("match"), bool):
+            raise ValueError("result.match must be boolean or null")
+        threshold = result.get("threshold")
+        if not isinstance(threshold, (int, float)) or isinstance(threshold, bool) or not 0 <= threshold <= 1:
+            raise ValueError("result.threshold must be between 0 and 1")
+        if not isinstance(result.get("profile"), str):
+            raise ValueError("result.profile is required")
+    elif capability in {"vision.geometry.distance", "vision.geometry.angle", "vision.geometry.area", "vision.geometry.contour", "vision.geometry.homography", "vision.geometry.match_features", "vision.geometry.perspective_transform", "vision.geometry.calibrate_camera", "vision.geometry.solve_pnp", "vision.transform.crop", "vision.transform.resize", "vision.transform.rotate", "vision.transform.warp", "vision.transform.colorspace", "vision.transform.blur", "vision.transform.threshold", "media.probe", "media.video.extract_frames", "media.video.trim", "media.video.transcode", "media.video.concat", "media.audio.extract", "media.audio.trim", "media.audio.resample", "media.audio.convert", "media.audio.normalize", "media.transcribe_video", "vision.human_state", "vision.measure"}:
+        if not isinstance(result, dict):
+            raise ValueError("expanded capability result must be an object")
+        if capability == "media.transcribe_video":
+            if not isinstance(result.get("text"), str):
+                raise ValueError("result.text must be a string")
+            _timeline(result)
     elif capability in {"speech.synthesize", "speech.clone_voice"}:
         audio = result.get("audio")
         if not isinstance(audio, dict):

@@ -2,7 +2,7 @@
 name = "specialist-core"
 version = "0.1.0"
 edition = "2021"
-description = "Small, deterministic Rust core for Specialist Runtime"
+description = "Small, deterministic Rust core for Specialist OS"
 license = "MIT"
 
 [lib]

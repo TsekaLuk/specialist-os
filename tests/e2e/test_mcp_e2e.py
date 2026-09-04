@@ -23,7 +23,7 @@ class McpE2ETests(unittest.TestCase):
                 server.send({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}})
                 initialized = server.response()
                 self.assertEqual(initialized["id"], 1)
-                self.assertEqual(initialized["result"]["serverInfo"]["name"], "specialist-runtime")
+                self.assertEqual(initialized["result"]["serverInfo"]["name"], "specialist-os")
 
                 server.send({"jsonrpc": "2.0", "method": "notifications/initialized"})
                 with self.assertRaises(queue.Empty):
@@ -31,8 +31,9 @@ class McpE2ETests(unittest.TestCase):
 
                 server.send({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
                 tools = server.response()
-                self.assertEqual(len(tools["result"]["tools"]), 10)
-                self.assertIn("vision_ocr", {tool["name"] for tool in tools["result"]["tools"]})
+                tool_names = {tool["name"] for tool in tools["result"]["tools"]}
+                self.assertGreaterEqual(len(tool_names), 56)
+                self.assertTrue({"vision_ocr", "vision_geometry_distance", "media_probe"}.issubset(tool_names))
 
                 server.send({
                     "jsonrpc": "2.0",

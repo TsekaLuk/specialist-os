@@ -46,14 +46,14 @@
       "license": {"weights": "Apache-2.0", "commercial": true},
       "models": [
         {"id": "pp-ocrv5-mobile", "recommended": true, "memory_mb": 1024, "disk_mb": 100, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null, "kind": "bundle", "files": [
-          {"path": "rec/inference.pdiparams", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/main/inference.pdiparams", "sha256": "2460da90875937c94db97eba74ae3d9e5d4c4c57c42f1f41531c09a26bcc771a"},
-          {"path": "rec/inference.yml", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/main/inference.yml", "sha256": "5dfeb2777f6d0db8177d8128a8acfcf6e6276dc4ac73ea3bf0dc06d6a5e85d8e"},
-          {"path": "rec/inference.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/main/inference.json", "sha256": "24587345250c7332d0fc6f9a44e794d078cdaeb64c302fef906f325619de2569"},
-          {"path": "rec/config.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/main/config.json", "sha256": "6df1587ae056f0b987125fc894b17f62ae3a12644fa2488d108f19377da9c1a8"},
-          {"path": "det/inference.pdiparams", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/main/inference.pdiparams", "sha256": "afa1820cb16c1fd0dad589d0f8b389139061c1ef6d68019685fd07be997dda5b"},
-          {"path": "det/inference.yml", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/main/inference.yml", "sha256": "98069072e1b6b37d727fd9d9f11725faa46d6ea0de012f2ed26caea011c37699"},
-          {"path": "det/inference.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/main/inference.json", "sha256": "05feef1acb00aa4cd7362b15f7f501fc4f99d7b1fa73c1c871e0c7b1504b0f5c"},
-          {"path": "det/config.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/main/config.json", "sha256": "7ac1c33f377ba58561f4b89d3180b6add2b7c5c60a4edac90fa4e0ceccdc6665"}
+          {"path": "rec/inference.pdiparams", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/682f20538d8c086cb2128e5cfac775e6c4904e85/inference.pdiparams", "sha256": "2460da90875937c94db97eba74ae3d9e5d4c4c57c42f1f41531c09a26bcc771a"},
+          {"path": "rec/inference.yml", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/682f20538d8c086cb2128e5cfac775e6c4904e85/inference.yml", "sha256": "5dfeb2777f6d0db8177d8128a8acfcf6e6276dc4ac73ea3bf0dc06d6a5e85d8e"},
+          {"path": "rec/inference.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/682f20538d8c086cb2128e5cfac775e6c4904e85/inference.json", "sha256": "24587345250c7332d0fc6f9a44e794d078cdaeb64c302fef906f325619de2569"},
+          {"path": "rec/config.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/682f20538d8c086cb2128e5cfac775e6c4904e85/config.json", "sha256": "6df1587ae056f0b987125fc894b17f62ae3a12644fa2488d108f19377da9c1a8"},
+          {"path": "det/inference.pdiparams", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/0d63e78e2b680928f6b1747d76a08db6e645efb7/inference.pdiparams", "sha256": "afa1820cb16c1fd0dad589d0f8b389139061c1ef6d68019685fd07be997dda5b"},
+          {"path": "det/inference.yml", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/0d63e78e2b680928f6b1747d76a08db6e645efb7/inference.yml", "sha256": "98069072e1b6b37d727fd9d9f11725faa46d6ea0de012f2ed26caea011c37699"},
+          {"path": "det/inference.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/0d63e78e2b680928f6b1747d76a08db6e645efb7/inference.json", "sha256": "05feef1acb00aa4cd7362b15f7f501fc4f99d7b1fa73c1c871e0c7b1504b0f5c"},
+          {"path": "det/config.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/0d63e78e2b680928f6b1747d76a08db6e645efb7/config.json", "sha256": "7ac1c33f377ba58561f4b89d3180b6add2b7c5c60a4edac90fa4e0ceccdc6665"}
         ]}}
       ]
     },
@@ -70,14 +70,14 @@
       "license": {"weights": "Apache-2.0", "commercial": true},
       "models": [
         {"id": "depth-anything-v2-small", "recommended": true, "memory_mb": 1536, "disk_mb": 300, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null, "kind": "bundle", "files": [
-          {"path": "model.safetensors", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf/resolve/main/model.safetensors", "sha256": "3152477ce0d8d6978d76b995120de97cb5b928701fd0f817769f59e249a16b70"},
-          {"path": "config.json", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf/resolve/main/config.json", "sha256": "c56698d3643dde1f83ea2212759e6b31a22b8f827246a36dd007ee8a22b3ff75"},
-          {"path": "preprocessor_config.json", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf/resolve/main/preprocessor_config.json", "sha256": "d41175c0d889477ca8fc67191e540faef14baf6275157b3fdecf78469e6bbf84"}
+          {"path": "model.safetensors", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf/resolve/5426e4f0f36572d16453bbda7a8389317b1bef99/model.safetensors", "sha256": "3152477ce0d8d6978d76b995120de97cb5b928701fd0f817769f59e249a16b70"},
+          {"path": "config.json", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf/resolve/5426e4f0f36572d16453bbda7a8389317b1bef99/config.json", "sha256": "c56698d3643dde1f83ea2212759e6b31a22b8f827246a36dd007ee8a22b3ff75"},
+          {"path": "preprocessor_config.json", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Small-hf/resolve/5426e4f0f36572d16453bbda7a8389317b1bef99/preprocessor_config.json", "sha256": "d41175c0d889477ca8fc67191e540faef14baf6275157b3fdecf78469e6bbf84"}
         ]}},
         {"id": "depth-anything-v2-base", "recommended": false, "memory_mb": 4096, "disk_mb": 700, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null, "kind": "bundle", "files": [
-          {"path": "model.safetensors", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Base-hf/resolve/main/model.safetensors", "sha256": "9996d15c334d264cfcc29f4318d7d3789a006ecc444782c2fb82f7eaa1acb8bf"},
-          {"path": "config.json", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Base-hf/resolve/main/config.json", "sha256": "1f616484953fbbddcc14da69ab81ef834fd58c11be04fa2f2eecf5696b2f7389"},
-          {"path": "preprocessor_config.json", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Base-hf/resolve/main/preprocessor_config.json", "sha256": "d41175c0d889477ca8fc67191e540faef14baf6275157b3fdecf78469e6bbf84"}
+          {"path": "model.safetensors", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Base-hf/resolve/b1958afc87fb45a9e3746cb387596094de553ed8/model.safetensors", "sha256": "9996d15c334d264cfcc29f4318d7d3789a006ecc444782c2fb82f7eaa1acb8bf"},
+          {"path": "config.json", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Base-hf/resolve/b1958afc87fb45a9e3746cb387596094de553ed8/config.json", "sha256": "1f616484953fbbddcc14da69ab81ef834fd58c11be04fa2f2eecf5696b2f7389"},
+          {"path": "preprocessor_config.json", "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Base-hf/resolve/b1958afc87fb45a9e3746cb387596094de553ed8/preprocessor_config.json", "sha256": "d41175c0d889477ca8fc67191e540faef14baf6275157b3fdecf78469e6bbf84"}
         ]}}
       ]
     },
@@ -91,15 +91,31 @@
       "bundle": "vision",
       "optional_dependency": "omniparser",
       "source_url": "https://github.com/microsoft/OmniParser",
-      "license": {"weights": "MIT", "commercial": true},
+      "license": {"weights": "AGPL-3.0 detector / MIT caption", "commercial": true},
       "models": [
-        {"id": "omniparser-v2", "recommended": true, "memory_mb": 3072, "disk_mb": 1200, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null, "kind": "bundle", "files": [
-          {"path": "icon_caption/model.safetensors", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/main/icon_caption/model.safetensors", "sha256": "01b934b0fe2d07b181e2d07752f16ae27c9d0ea88ddffe13a9a003aa9680f233"},
-          {"path": "icon_caption/config.json", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/main/icon_caption/config.json", "sha256": "1c3c63bb16910b8fa7f3b74fb7ae4c8ffefbe7b008847e2e0b21be6aa807593b"},
-          {"path": "icon_caption/generation_config.json", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/main/icon_caption/generation_config.json", "sha256": "a2ef03e814a7ecbf6fcfe7479afd3e7385c6800202fcede1dc1bc01849375464"},
-          {"path": "icon_detect/model.pt", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/main/icon_detect/model.pt", "sha256": "dab3d4351ad00b035db829909a4db98354d5a90f6990e4ac00222a9a95d4bf57"},
-          {"path": "icon_detect/model.yaml", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/main/icon_detect/model.yaml", "sha256": "0edced8dfb9c619ca187cf0f84139d63b4cff9011890a9bc1e9bd6bb08f43b8a"},
-          {"path": "icon_detect/train_args.yaml", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/main/icon_detect/train_args.yaml", "sha256": "6acc8dcdc8a38ccfafc47ccfdb0087b8545eab6f9d9a373c0504bbb5a45a0277"}
+        {"id": "omniparser-v2", "recommended": true, "memory_mb": 6144, "disk_mb": 2500, "platforms": ["macos-arm64", "linux-x64"], "devices": ["mps", "cuda", "cpu"], "artifact": {"url": null, "sha256": null, "kind": "bundle", "files": [
+          {"path": "icon_caption/model.safetensors", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/6600256cb0f1b07651e3bc86166196307bad7e2d/icon_caption/model.safetensors", "sha256": "01b934b0fe2d07b181e2d07752f16ae27c9d0ea88ddffe13a9a003aa9680f233"},
+          {"path": "icon_caption/config.json", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/6600256cb0f1b07651e3bc86166196307bad7e2d/icon_caption/config.json", "sha256": "1c3c63bb16910b8fa7f3b74fb7ae4c8ffefbe7b008847e2e0b21be6aa807593b"},
+          {"path": "icon_caption/generation_config.json", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/6600256cb0f1b07651e3bc86166196307bad7e2d/icon_caption/generation_config.json", "sha256": "a2ef03e814a7ecbf6fcfe7479afd3e7385c6800202fcede1dc1bc01849375464"},
+          {"path": "icon_caption/configuration_florence2.py", "url": "https://huggingface.co/microsoft/Florence-2-base-ft/resolve/f6c1a25888ffc1d945ee8a1a77ac833c7303d46e/configuration_florence2.py", "sha256": "653bafddc9651eaff1583a16db4a2bb27d33ec7d541dfab7201aaa4ecaa1cfbf"},
+          {"path": "icon_caption/modeling_florence2.py", "url": "https://huggingface.co/microsoft/Florence-2-base-ft/resolve/f6c1a25888ffc1d945ee8a1a77ac833c7303d46e/modeling_florence2.py", "sha256": "5bb7aa72c6ba62e96e1bbae6bc1aaf7b4e8e28cdfc62e670de3d5b67eeab1fdf"},
+          {"path": "icon_detect/model.pt", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/6600256cb0f1b07651e3bc86166196307bad7e2d/icon_detect/model.pt", "sha256": "dab3d4351ad00b035db829909a4db98354d5a90f6990e4ac00222a9a95d4bf57"},
+          {"path": "icon_detect/model.yaml", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/6600256cb0f1b07651e3bc86166196307bad7e2d/icon_detect/model.yaml", "sha256": "0edced8dfb9c619ca187cf0f84139d63b4cff9011890a9bc1e9bd6bb08f43b8a"},
+          {"path": "icon_detect/train_args.yaml", "url": "https://huggingface.co/microsoft/OmniParser-v2.0/resolve/6600256cb0f1b07651e3bc86166196307bad7e2d/icon_detect/train_args.yaml", "sha256": "6acc8dcdc8a38ccfafc47ccfdb0087b8545eab6f9d9a373c0504bbb5a45a0277"},
+          {"path": "processor/config.json", "url": "https://huggingface.co/microsoft/Florence-2-base/resolve/5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac/config.json", "sha256": "c666d0fe0172d46e115e8fba6cd93cd83714575b33a73005cab8d24ce2a3aa8f"},
+          {"path": "processor/preprocessor_config.json", "url": "https://huggingface.co/microsoft/Florence-2-base/resolve/5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac/preprocessor_config.json", "sha256": "2f5921bbc53c7cc04251e1027b45b1cec726276be6db23d1bb40641bfbe2cf29"},
+          {"path": "processor/tokenizer.json", "url": "https://huggingface.co/microsoft/Florence-2-base/resolve/5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac/tokenizer.json", "sha256": "847bbeab6174d66a88898f729d52fa8d355fafe1bea101cf960dd404581df70e"},
+          {"path": "processor/tokenizer_config.json", "url": "https://huggingface.co/microsoft/Florence-2-base/resolve/5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac/tokenizer_config.json", "sha256": "79ffcf43af8ebda99d165f61d243180da2e2639952e41e71e11611c18770489c"},
+          {"path": "processor/vocab.json", "url": "https://huggingface.co/microsoft/Florence-2-base/resolve/5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac/vocab.json", "sha256": "394fdc63c71aabe0a9b97117f5d62fb5fcc4d59b2b3ea929a3929e6a53217b3c"},
+          {"path": "processor/processing_florence2.py", "url": "https://huggingface.co/microsoft/Florence-2-base/resolve/5ca5edf5bd017b9919c05d08aebef5e4c7ac3bac/processing_florence2.py", "sha256": "f146023a507c009f425a49ee39aa037f4f25c64e14336e3e4f3f1d7377a68e98"},
+          {"path": "ocr/rec/inference.pdiparams", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/682f20538d8c086cb2128e5cfac775e6c4904e85/inference.pdiparams", "sha256": "2460da90875937c94db97eba74ae3d9e5d4c4c57c42f1f41531c09a26bcc771a"},
+          {"path": "ocr/rec/inference.yml", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/682f20538d8c086cb2128e5cfac775e6c4904e85/inference.yml", "sha256": "5dfeb2777f6d0db8177d8128a8acfcf6e6276dc4ac73ea3bf0dc06d6a5e85d8e"},
+          {"path": "ocr/rec/inference.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/682f20538d8c086cb2128e5cfac775e6c4904e85/inference.json", "sha256": "24587345250c7332d0fc6f9a44e794d078cdaeb64c302fef906f325619de2569"},
+          {"path": "ocr/rec/config.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_rec/resolve/682f20538d8c086cb2128e5cfac775e6c4904e85/config.json", "sha256": "6df1587ae056f0b987125fc894b17f62ae3a12644fa2488d108f19377da9c1a8"},
+          {"path": "ocr/det/inference.pdiparams", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/0d63e78e2b680928f6b1747d76a08db6e645efb7/inference.pdiparams", "sha256": "afa1820cb16c1fd0dad589d0f8b389139061c1ef6d68019685fd07be997dda5b"},
+          {"path": "ocr/det/inference.yml", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/0d63e78e2b680928f6b1747d76a08db6e645efb7/inference.yml", "sha256": "98069072e1b6b37d727fd9d9f11725faa46d6ea0de012f2ed26caea011c37699"},
+          {"path": "ocr/det/inference.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/0d63e78e2b680928f6b1747d76a08db6e645efb7/inference.json", "sha256": "05feef1acb00aa4cd7362b15f7f501fc4f99d7b1fa73c1c871e0c7b1504b0f5c"},
+          {"path": "ocr/det/config.json", "url": "https://huggingface.co/PaddlePaddle/PP-OCRv5_mobile_det/resolve/0d63e78e2b680928f6b1747d76a08db6e645efb7/config.json", "sha256": "7ac1c33f377ba58561f4b89d3180b6add2b7c5c60a4edac90fa4e0ceccdc6665"}
         ]}}
       ]
     },
@@ -130,7 +146,7 @@
       "source_url": "https://github.com/ggerganov/whisper.cpp",
       "license": {"weights": "MIT", "commercial": true},
       "models": [
-        {"id": "ggml-base.en", "recommended": true, "memory_mb": 1024, "disk_mb": 150, "platforms": ["macos-arm64", "linux-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin", "sha256": "a03779c86df3323075f5e796cb2ce5029f00ec8869eee3fdfb897afe36c6d002", "filename": "ggml-base.en.bin"}}
+        {"id": "ggml-base.en", "recommended": true, "memory_mb": 1024, "disk_mb": 150, "platforms": ["macos-arm64", "linux-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-base.en.bin", "sha256": "a03779c86df3323075f5e796cb2ce5029f00ec8869eee3fdfb897afe36c6d002", "filename": "ggml-base.en.bin"}}
       ]
     },
     {
@@ -196,6 +212,219 @@
       "models": [
         {"id": "s2-pro", "recommended": true, "quality": 0.98, "memory_mb": 24576, "disk_mb": 0, "platforms": ["linux-x64", "windows-x64", "macos-arm64"], "devices": ["cuda", "cpu", "mps"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}
       ]
+    },
+    {
+      "name": "human.pose", "command": "pose", "provider": "mediapipe", "model": "mediapipe-tasks", "modality": "image",
+      "description": "Estimate human body landmarks.", "bundle": "human", "optional_dependency": "mediapipe", "source_url": "https://github.com/google-ai-edge/mediapipe",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "supports": {"streaming": true, "stateful": true, "batch": true}, "privacy_level": "sensitive", "determinism": "provider_defined",
+      "models": [{"id": "mediapipe-tasks", "recommended": true, "memory_mb": 512, "disk_mb": 100, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "human.hand_landmarks", "command": "hand-landmarks", "provider": "mediapipe", "model": "mediapipe-tasks", "modality": "image",
+      "description": "Estimate hand handedness and 21-point landmarks.", "bundle": "human", "optional_dependency": "mediapipe", "source_url": "https://github.com/google-ai-edge/mediapipe",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "supports": {"streaming": true, "stateful": true, "batch": true}, "privacy_level": "sensitive", "determinism": "provider_defined",
+      "models": [{"id": "mediapipe-tasks", "recommended": true, "memory_mb": 512, "disk_mb": 100, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "human.face_landmarks", "command": "face-landmarks", "provider": "mediapipe", "model": "mediapipe-tasks", "modality": "image",
+      "description": "Estimate facial geometry landmarks without identity recognition.", "bundle": "human", "optional_dependency": "mediapipe", "source_url": "https://github.com/google-ai-edge/mediapipe",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "supports": {"streaming": true, "stateful": true, "batch": true}, "privacy_level": "sensitive", "determinism": "provider_defined",
+      "models": [{"id": "mediapipe-tasks", "recommended": true, "memory_mb": 512, "disk_mb": 100, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "human.gesture", "command": "gesture", "provider": "mediapipe", "model": "mediapipe-tasks", "modality": "image",
+      "description": "Classify a hand gesture using the provider vocabulary.", "bundle": "human", "optional_dependency": "mediapipe", "source_url": "https://github.com/google-ai-edge/mediapipe",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "supports": {"streaming": true, "stateful": true, "batch": true}, "privacy_level": "sensitive", "determinism": "provider_defined",
+      "models": [{"id": "mediapipe-tasks", "recommended": true, "memory_mb": 512, "disk_mb": 100, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "speech.diarize", "command": "diarize", "provider": "pyannote", "model": "pyannote-community-1", "modality": "audio",
+      "description": "Separate an audio timeline by speaker.", "bundle": "audio-plus", "optional_dependency": "pyannote.audio", "source_url": "https://github.com/pyannote/pyannote-audio",
+      "license": {"weights": "CC-BY-4.0", "commercial": true, "commercial_allowed_by_default": true}, "supports": {"streaming": false, "stateful": false, "batch": true}, "privacy_level": "sensitive", "determinism": "provider_defined",
+      "models": [{"id": "pyannote-community-1", "recommended": true, "memory_mb": 4096, "disk_mb": 2000, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "audio.denoise", "command": "denoise", "provider": "deepfilternet", "model": "deepfilternet-2", "modality": "audio",
+      "description": "Reduce background noise while preserving speech audio.", "bundle": "audio-plus", "optional_dependency": "deepfilternet", "source_url": "https://github.com/Rikorose/DeepFilterNet",
+      "license": {"weights": "MIT", "commercial": true}, "supports": {"streaming": true, "stateful": true, "batch": true}, "determinism": "provider_defined",
+      "models": [{"id": "deepfilternet-2", "recommended": true, "memory_mb": 1024, "disk_mb": 300, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "vision.embed", "command": "embed", "provider": "openclip", "model": "siglip2-balanced", "modality": "image",
+      "description": "Create a normalized visual embedding artifact.", "bundle": "retrieval", "optional_dependency": "open_clip", "source_url": "https://github.com/mlfoundations/open_clip",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "supports": {"batch": true}, "quality_metrics": ["recall_at_k", "latency_ms", "memory_mb", "embedding_dimension"], "determinism": "provider_defined",
+      "models": [{"id": "siglip2-balanced", "recommended": true, "memory_mb": 4096, "disk_mb": 1500, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}, {"id": "mobileclip2-fast", "recommended": false, "memory_mb": 1024, "disk_mb": 300, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "vision.embed_text", "command": "embed-text", "provider": "openclip", "model": "siglip2-balanced", "modality": "text",
+      "description": "Create a text embedding in the visual model space.", "bundle": "retrieval", "optional_dependency": "open_clip", "source_url": "https://github.com/mlfoundations/open_clip",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "supports": {"batch": true}, "quality_metrics": ["recall_at_k", "latency_ms", "memory_mb", "embedding_dimension"], "determinism": "provider_defined",
+      "models": [{"id": "siglip2-balanced", "recommended": true, "memory_mb": 4096, "disk_mb": 1500, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "vision.similarity", "command": "similarity", "provider": "openclip", "model": "siglip2-balanced", "modality": "image",
+      "description": "Compare image-image or image-text semantic similarity.", "bundle": "retrieval", "optional_dependency": "open_clip", "source_url": "https://github.com/mlfoundations/open_clip",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "supports": {"batch": true}, "quality_metrics": ["recall_at_k", "latency_ms"], "determinism": "provider_defined",
+      "models": [{"id": "siglip2-balanced", "recommended": true, "memory_mb": 4096, "disk_mb": 1500, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "vision.search", "command": "search", "provider": "openclip", "model": "siglip2-balanced", "modality": "image",
+      "description": "Rank a local image corpus by visual or text query.", "bundle": "retrieval", "optional_dependency": "open_clip", "source_url": "https://github.com/mlfoundations/open_clip",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "supports": {"batch": true}, "quality_metrics": ["recall_at_k", "latency_ms"], "determinism": "provider_defined",
+      "models": [{"id": "siglip2-balanced", "recommended": true, "memory_mb": 4096, "disk_mb": 1500, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "identity.face.detect", "command": "face-detect", "provider": "insightface", "model": "buffalo_l", "modality": "image",
+      "description": "Detect faces for an identity pipeline without naming people.", "bundle": "identity", "optional_dependency": "insightface", "source_url": "https://github.com/deepinsight/insightface",
+      "license": {"weights": "Non-commercial research", "commercial": false, "commercial_allowed_by_default": false}, "privacy_level": "restricted", "determinism": "provider_defined",
+      "models": [{"id": "buffalo_l", "recommended": true, "memory_mb": 2048, "disk_mb": 800, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "identity.face.embed", "command": "face-embed", "provider": "insightface", "model": "buffalo_l", "modality": "image",
+      "description": "Create a local face embedding with quality metadata.", "bundle": "identity", "optional_dependency": "insightface", "source_url": "https://github.com/deepinsight/insightface",
+      "license": {"weights": "Non-commercial research", "commercial": false, "commercial_allowed_by_default": false}, "privacy_level": "restricted", "determinism": "provider_defined",
+      "models": [{"id": "buffalo_l", "recommended": true, "memory_mb": 2048, "disk_mb": 800, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "identity.face.verify", "command": "face-verify", "provider": "insightface", "model": "buffalo_l", "modality": "image",
+      "description": "Verify whether two face images meet a calibrated threshold.", "bundle": "identity", "optional_dependency": "insightface", "source_url": "https://github.com/deepinsight/insightface",
+      "license": {"weights": "Non-commercial research", "commercial": false, "commercial_allowed_by_default": false}, "privacy_level": "restricted", "determinism": "provider_defined",
+      "models": [{"id": "buffalo_l", "recommended": true, "memory_mb": 2048, "disk_mb": 800, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}]
+    },
+    {
+      "name": "vision.geometry.distance", "command": "geometry-distance", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
+      "description": "Calculate Euclidean distance between points.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.geometry.angle", "command": "geometry-angle", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
+      "description": "Calculate the angle formed by three points.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.geometry.area", "command": "geometry-area", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
+      "description": "Calculate a polygon area.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.geometry.contour", "command": "geometry-contour", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
+      "description": "Measure a contour perimeter and area.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.geometry.homography", "command": "geometry-homography", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
+      "description": "Solve a projective homography from corresponding points.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.geometry.match_features", "command": "geometry-match-features", "provider": "opencv", "model": "opencv-5", "modality": "image",
+      "description": "Match local image features with OpenCV descriptors.", "bundle": "vision-operators", "optional_dependency": "opencv", "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.geometry.perspective_transform", "command": "geometry-perspective-transform", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
+      "description": "Apply a 3x3 perspective transform to points.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.geometry.calibrate_camera", "command": "geometry-calibrate-camera", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
+      "description": "Estimate camera intrinsics from image dimensions and calibration points.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.geometry.solve_pnp", "command": "geometry-solve-pnp", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
+      "description": "Solve camera pose from 3D and 2D correspondences.", "bundle": "vision-operators", "optional_dependency": "opencv", "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.transform.crop", "command": "transform-crop", "provider": "opencv", "model": "opencv-5", "modality": "image",
+      "description": "Crop an image with validated pixel bounds.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.transform.resize", "command": "transform-resize", "provider": "opencv", "model": "opencv-5", "modality": "image",
+      "description": "Resize an image to validated dimensions.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.transform.rotate", "command": "transform-rotate", "provider": "opencv", "model": "opencv-5", "modality": "image",
+      "description": "Rotate an image by a bounded angle.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.transform.warp", "command": "transform-warp", "provider": "opencv", "model": "opencv-5", "modality": "image",
+      "description": "Warp an image using a validated perspective matrix.", "bundle": "vision-operators", "optional_dependency": "opencv", "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.transform.colorspace", "command": "transform-colorspace", "provider": "opencv", "model": "opencv-5", "modality": "image",
+      "description": "Convert an image between supported color spaces.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.transform.blur", "command": "transform-blur", "provider": "opencv", "model": "opencv-5", "modality": "image",
+      "description": "Apply a bounded Gaussian blur.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "vision.transform.threshold", "command": "transform-threshold", "provider": "opencv", "model": "opencv-5", "modality": "image",
+      "description": "Apply a bounded binary threshold.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.probe", "command": "media-probe", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "media",
+      "description": "Inspect media container and stream metadata.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic",
+      "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.video.extract_frames", "command": "extract-frames", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "video",
+      "description": "Extract video frames by FPS or timestamps.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic",
+      "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.video.trim", "command": "trim-video", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "video", "description": "Trim a video to a validated time range.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic", "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.video.transcode", "command": "transcode-video", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "video", "description": "Transcode media with an allow-listed format and codec.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic", "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 512, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.video.concat", "command": "concat-video", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "video", "description": "Concatenate a bounded list of compatible videos.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic", "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 512, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.audio.extract", "command": "extract-audio", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "media", "description": "Extract mono 48 kHz PCM audio from media.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic", "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.audio.trim", "command": "trim-audio", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "audio", "description": "Trim audio to a validated time range.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic", "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.audio.resample", "command": "resample-audio", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "audio", "description": "Resample audio to a validated sample rate.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic", "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.audio.convert", "command": "convert-audio", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "audio", "description": "Convert audio to an allow-listed output format.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic", "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "media.audio.normalize", "command": "normalize-audio", "provider": "ffmpeg", "model": "ffmpeg-9", "modality": "audio", "description": "Normalize audio loudness with a fixed filter profile.", "bundle": "media", "optional_dependency": null, "source_url": "https://ffmpeg.org/", "license": {"weights": "LGPL-2.1", "commercial": true}, "determinism": "deterministic", "models": [{"id": "ffmpeg-9", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
+    },
+    {
+      "name": "speech.align_transcript", "command": "align-transcript", "provider": "composite", "model": "runtime-composite-1", "modality": "audio", "description": "Join transcript timestamps with speaker intervals.", "bundle": "speech", "optional_dependency": null, "source_url": "https://github.com/TsekaLuk/specialist-os", "license": {"weights": "MIT", "commercial": true}, "determinism": "deterministic", "models": [{"id": "runtime-composite-1", "recommended": true, "memory_mb": 64, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "runtime"}}]
+    },
+    {
+      "name": "speech.meeting", "command": "meeting", "provider": "composite", "model": "runtime-composite-1", "modality": "audio", "description": "Prepare, transcribe, diarize, and align a meeting recording.", "bundle": "speech", "optional_dependency": null, "source_url": "https://github.com/TsekaLuk/specialist-os", "license": {"weights": "MIT", "commercial": true}, "supports": {"batch": true}, "determinism": "provider_defined", "models": [{"id": "runtime-composite-1", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "runtime"}}]
+    },
+    {
+      "name": "vision.human_state", "command": "human-state", "provider": "composite", "model": "runtime-composite-1", "modality": "image", "description": "Combine detection, human landmarks, and depth into one state result.", "bundle": "human", "optional_dependency": null, "source_url": "https://github.com/TsekaLuk/specialist-os", "license": {"weights": "MIT", "commercial": true}, "determinism": "provider_defined", "models": [{"id": "runtime-composite-1", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "runtime"}}]
+    },
+    {
+      "name": "vision.find_similar", "command": "find-similar", "provider": "composite", "model": "runtime-composite-1", "modality": "image", "description": "Find semantically similar images in a local corpus.", "bundle": "retrieval", "optional_dependency": null, "source_url": "https://github.com/TsekaLuk/specialist-os", "license": {"weights": "MIT", "commercial": true}, "determinism": "provider_defined", "models": [{"id": "runtime-composite-1", "recommended": true, "memory_mb": 64, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "runtime"}}]
+    },
+    {
+      "name": "vision.face_compare", "command": "face-compare", "provider": "composite", "model": "runtime-composite-1", "modality": "image", "description": "Compare two faces through the sensitive identity pipeline.", "bundle": "identity", "optional_dependency": null, "source_url": "https://github.com/TsekaLuk/specialist-os", "license": {"weights": "MIT", "commercial": true}, "privacy_level": "restricted", "determinism": "provider_defined", "models": [{"id": "runtime-composite-1", "recommended": true, "memory_mb": 64, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "runtime"}}]
+    },
+    {
+      "name": "media.transcribe_video", "command": "transcribe-video", "provider": "composite", "model": "runtime-composite-1", "modality": "video", "description": "Extract, clean, and transcribe a video's audio track.", "bundle": "media", "optional_dependency": null, "source_url": "https://github.com/TsekaLuk/specialist-os", "license": {"weights": "MIT", "commercial": true}, "determinism": "provider_defined", "models": [{"id": "runtime-composite-1", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "runtime"}}]
+    },
+    {
+      "name": "vision.measure", "command": "measure", "provider": "composite", "model": "runtime-composite-1", "modality": "image", "description": "Estimate visual dimensions by combining perception, depth, and geometry.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://github.com/TsekaLuk/specialist-os", "license": {"weights": "MIT", "commercial": true}, "determinism": "provider_defined", "models": [{"id": "runtime-composite-1", "recommended": true, "memory_mb": 128, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "runtime"}}]
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://specialist.runtime/schemas/result-envelope.schema.json",
+  "$id": "https://raw.githubusercontent.com/TsekaLuk/specialist-os/main/schemas/result-envelope.schema.json",
   "title": "Specialist Result Envelope",
   "type": "object",
   "required": ["capability", "provider", "model", "input", "result", "performance", "warnings", "error", "observations", "evidence", "artifacts", "metrics", "provenance", "confidence", "trace"],

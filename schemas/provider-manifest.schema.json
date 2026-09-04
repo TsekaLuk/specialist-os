@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://specialist.runtime/schemas/provider-manifest.schema.json",
+  "$id": "https://raw.githubusercontent.com/TsekaLuk/specialist-os/main/schemas/provider-manifest.schema.json",
   "title": "Specialist Provider Manifest",
   "type": "object",
   "required": ["provider", "version", "runtime", "models", "metrics", "license", "platform"],

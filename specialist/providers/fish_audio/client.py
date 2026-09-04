@@ -35,7 +35,7 @@ class FishAudioClient:
 
     def _request(self, path: str, *, method: str = "GET", payload: dict | None = None, timeout: float | None = None):
         body = None
-        headers = {"Accept": "application/json, audio/*", "User-Agent": "specialist-runtime/fish-audio"}
+        headers = {"Accept": "application/json, audio/*", "User-Agent": "specialist-os/fish-audio"}
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
         if payload is not None:
@@ -49,7 +49,10 @@ class FishAudioClient:
                     raise FishAudioError("Fish Audio response exceeds the audio safety limit", code="fish_audio_output_too_large", retryable=False)
                 return response.status, response.headers, raw
         except urllib.error.HTTPError as exc:
-            detail = exc.read(4096).decode("utf-8", errors="replace")
+            try:
+                detail = exc.read(4096).decode("utf-8", errors="replace")
+            finally:
+                exc.close()
             retryable = exc.code >= 500 or exc.code == 429
             raise FishAudioError(f"Fish Audio server returned HTTP {exc.code}: {detail[:500]}", code="fish_audio_http_error", retryable=retryable) from exc
         except (urllib.error.URLError, TimeoutError, OSError) as exc:

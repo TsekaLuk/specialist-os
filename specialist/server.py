@@ -12,10 +12,9 @@ import base64
 import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
 from urllib.parse import urlsplit
 
-from .registry import CAPABILITIES
+from .registry import CAPABILITIES, resolve_capability
 
 
 def _tool_schema(capability):
@@ -152,8 +151,11 @@ class RuntimeRequestHandler(BaseHTTPRequestHandler):
             if not isinstance(payload, dict):
                 return self._send(400, {"error": {"code": "invalid_request", "message": "JSON body must be an object"}})
             endpoint = route.removeprefix("/v1/").strip("/").replace("/", ".")
-            capability = endpoint if endpoint in CAPABILITIES else endpoint.replace("_", ".")
-            if capability not in CAPABILITIES:
+            try:
+                capability = resolve_capability(endpoint)
+            except KeyError:
+                capability = None
+            if capability is None:
                 return self._send(404, {"error": {"code": "unknown_capability", "message": endpoint}})
             path = payload.get("path")
             request_options = payload.get("options") or {}
@@ -229,7 +231,7 @@ def serve_http(runtime, host="127.0.0.1", port=8741, token=None, max_concurrency
     server.api_token = token
     server.max_request_bytes = max_request_bytes
     server.request_semaphore = threading.BoundedSemaphore(max(1, max_concurrency))
-    print(f"Specialist Runtime HTTP listening on http://{host}:{port}", flush=True)
+    print(f"Specialist OS HTTP listening on http://{host}:{port}", flush=True)
     try:
         previous = {name: signal.getsignal(name) for name in (signal.SIGTERM, signal.SIGINT)}
     except ValueError:
@@ -282,7 +284,7 @@ def serve_mcp(runtime, max_request_bytes=4 * 1024 * 1024):
                     if method == "initialize":
                         from . import __version__
 
-                        result = {"protocolVersion": "2024-11-05", "capabilities": {"tools": {}}, "serverInfo": {"name": "specialist-runtime", "version": __version__}}
+                        result = {"protocolVersion": "2024-11-05", "capabilities": {"tools": {}}, "serverInfo": {"name": "specialist-os", "version": __version__}}
                     elif method == "notifications/initialized":
                         continue
                     elif method == "tools/list":

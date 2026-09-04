@@ -25,7 +25,23 @@ PROVIDER_REQUIREMENTS = {
     "transformers": ["transformers==4.57.3", "Pillow==12.3.0", "torch==2.14.0"],
     "silero-vad": ["silero-vad==6.2.1", "torch==2.14.0"],
     "mineru": ["mineru==3.4.5"],
-    "omniparser": [],
+    "omniparser": [
+        "ultralytics==8.3.70",
+        "transformers==4.49.0",
+        "Pillow==12.3.0",
+        "torch==2.8.0",
+        "torchvision==0.23.0",
+        "timm==1.0.20",
+        "einops==0.8.0",
+        "paddleocr==3.7.0",
+        "paddlepaddle==3.3.1",
+    ],
+    "mediapipe": ["mediapipe==0.10.21"],
+    "pyannote.audio": ["pyannote.audio==4.0.7", "torch==2.8.0", "torchaudio==2.8.0", "torchcodec==0.7.0", "soundfile==0.13.1"],
+    "deepfilternet": ["DeepFilterNet==0.5.6"],
+    "open_clip": ["open_clip_torch==2.31.0", "Pillow==12.3.0", "torch==2.4.1"],
+    "insightface": ["insightface==0.7.3", "onnxruntime==1.19.2"],
+    "opencv": ["opencv-python-headless==4.10.0.84"],
 }
 
 PROVIDER_IMPORTS = {
@@ -35,6 +51,13 @@ PROVIDER_IMPORTS = {
     "transformers": ["transformers", "PIL", "torch"],
     "silero-vad": ["silero_vad", "torch"],
     "mineru": ["mineru"],
+    "omniparser": ["ultralytics", "transformers", "torch", "torchvision", "paddleocr", "paddle", "PIL"],
+    "mediapipe": ["mediapipe"],
+    "pyannote.audio": ["pyannote", "torch", "soundfile"],
+    "deepfilternet": ["df"],
+    "open_clip": ["open_clip", "PIL", "torch"],
+    "insightface": ["insightface"],
+    "opencv": ["cv2"],
 }
 
 REQUIREMENT_IMPORTS = {

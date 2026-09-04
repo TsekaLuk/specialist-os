@@ -15,7 +15,6 @@ import socket
 from unittest.mock import patch
 
 from specialist.runtime import SpecialistRuntime
-from specialist.voices import VoiceRegistry
 from specialist.providers.fish_audio import FishAudioProvider
 from specialist.providers.fish_audio.client import FishAudioClient, FishAudioError
 from specialist.providers.fish_audio.lifecycle import FishAudioLifecycle

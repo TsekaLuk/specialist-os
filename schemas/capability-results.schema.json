@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://specialist.runtime/schemas/capability-results.schema.json",
+  "$id": "https://raw.githubusercontent.com/TsekaLuk/specialist-os/main/schemas/capability-results.schema.json",
   "title": "Specialist capability result payloads",
   "type": "object",
   "oneOf": [
@@ -14,6 +14,52 @@
     {"properties": {"capability": {"const": "audio.vad"}, "result": {"$ref": "#/$defs/vad"}}, "required": ["capability", "result"]}
     ,{"properties": {"capability": {"const": "speech.synthesize"}, "result": {"$ref": "#/$defs/speech"}}, "required": ["capability", "result"]}
     ,{"properties": {"capability": {"const": "speech.clone_voice"}, "result": {"$ref": "#/$defs/speech"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "human.pose"}, "result": {"$ref": "#/$defs/human_pose"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "human.hand_landmarks"}, "result": {"$ref": "#/$defs/human_hands"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "human.face_landmarks"}, "result": {"$ref": "#/$defs/human_faces"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "human.gesture"}, "result": {"$ref": "#/$defs/gesture"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "speech.diarize"}, "result": {"$ref": "#/$defs/timeline"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "speech.align_transcript"}, "result": {"$ref": "#/$defs/timeline"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "speech.meeting"}, "result": {"$ref": "#/$defs/timeline"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "audio.denoise"}, "result": {"$ref": "#/$defs/denoise"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.embed"}, "result": {"$ref": "#/$defs/embedding_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.embed_text"}, "result": {"$ref": "#/$defs/embedding_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.similarity"}, "result": {"$ref": "#/$defs/similarity"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.search"}, "result": {"$ref": "#/$defs/search"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "identity.face.detect"}, "result": {"$ref": "#/$defs/face_detect"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "identity.face.embed"}, "result": {"$ref": "#/$defs/face_embedding"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "identity.face.verify"}, "result": {"$ref": "#/$defs/face_verify"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.face_compare"}, "result": {"$ref": "#/$defs/face_verify"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.find_similar"}, "result": {"$ref": "#/$defs/search"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.transcribe_video"}, "result": {"$ref": "#/$defs/video_transcript"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.distance"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.angle"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.area"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.contour"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.homography"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.match_features"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.perspective_transform"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.calibrate_camera"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.geometry.solve_pnp"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.transform.crop"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.transform.resize"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.transform.rotate"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.transform.warp"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.transform.colorspace"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.transform.blur"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.transform.threshold"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.probe"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.video.extract_frames"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.video.trim"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.video.transcode"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.video.concat"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.audio.extract"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.audio.trim"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.audio.resample"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.audio.convert"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "media.audio.normalize"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.human_state"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "vision.measure"}, "result": {"$ref": "#/$defs/object_result"}}, "required": ["capability", "result"]}
   ],
   "$defs": {
     "bbox": {
@@ -46,7 +92,7 @@
     "depth": {
       "type": "object",
       "required": ["width", "height", "depth_map", "preview", "mode"],
-      "properties": {"width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}, "depth_map": {"type": ["string", "null"]}, "preview": {"type": ["string", "null"]}, "mode": {"type": "string"}}
+      "properties": {"width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}, "depth_map": {"type": ["string", "null"]}, "preview": {"type": ["string", "null"]}, "mode": {"type": "string", "enum": ["relative", "metric"]}, "unit": {"type": ["string", "null"]}, "estimated": {"type": "boolean"}}
     },
     "screen": {"type": "object", "required": ["elements"], "properties": {"elements": {"type": "array"}}},
     "document": {
@@ -71,6 +117,22 @@
         "voice": {"type": ["string", "null"]},
         "server": {"type": "string"}
       }
-    }
+    },
+    "landmark": {"type": "object", "required": ["name", "x", "y", "z", "visibility"], "properties": {"name": {"type": "string"}, "x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}, "visibility": {"type": "number"}}},
+    "human_pose": {"type": "object", "required": ["persons"], "properties": {"persons": {"type": "array"}}},
+    "human_hands": {"type": "object", "required": ["hands"], "properties": {"hands": {"type": "array"}}},
+    "human_faces": {"type": "object", "required": ["faces"], "properties": {"faces": {"type": "array"}}},
+    "gesture": {"type": "object", "required": ["gesture"], "properties": {"gesture": {"type": ["string", "null"]}}},
+    "timeline": {"type": "object", "required": ["segments"], "properties": {"segments": {"type": "array", "items": {"type": "object", "required": ["start", "end"], "properties": {"start": {"type": "number", "minimum": 0}, "end": {"type": "number", "minimum": 0}}}}}},
+    "video_transcript": {"type": "object", "required": ["text", "segments"], "properties": {"text": {"type": "string"}, "segments": {"type": "array"}}},
+    "denoise": {"type": "object", "required": ["audio", "profile"], "properties": {"audio": {"type": "object", "required": ["artifact", "mime"], "properties": {"artifact": {"type": "string", "pattern": "^artifact://[0-9a-f]{64}$"}, "mime": {"type": "string", "pattern": "^audio/"}}}, "profile": {"type": "string", "enum": ["light", "balanced", "strong"]}}},
+    "embedding": {"type": "object", "required": ["artifact", "dimension"], "properties": {"artifact": {"type": "string", "pattern": "^artifact://[0-9a-f]{64}$"}, "dimension": {"type": "integer", "minimum": 1}, "normalized": {"type": "boolean"}}},
+    "embedding_result": {"type": "object", "required": ["embedding"], "properties": {"embedding": {"$ref": "#/$defs/embedding"}}},
+    "face_embedding": {"type": "object", "required": ["embedding"], "properties": {"embedding": {"anyOf": [{"$ref": "#/$defs/embedding"}, {"type": "null"}]}}},
+    "similarity": {"type": "object", "required": ["score"], "properties": {"score": {"type": ["number", "null"]}}},
+    "search": {"type": "object", "required": ["results"], "properties": {"results": {"type": "array"}}},
+    "face_detect": {"type": "object", "required": ["faces"], "properties": {"faces": {"type": "array"}}},
+    "face_verify": {"type": "object", "required": ["match", "similarity", "threshold", "profile"], "properties": {"match": {"type": ["boolean", "null"]}, "similarity": {"type": ["number", "null"]}, "threshold": {"type": "number", "minimum": 0, "maximum": 1}, "profile": {"type": "string"}}},
+    "object_result": {"type": "object"}
   }
 }

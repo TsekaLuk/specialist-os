@@ -40,6 +40,24 @@ class IPCTests(unittest.TestCase):
                 provider.infer(source, {}, type("Cache", (), {"home": Path(temp)})())
             self.assertEqual(caught.exception.code, "provider_timeout")
 
+    def test_worker_request_preserves_selected_model_identity(self):
+        script = (
+            "import json,sys\n"
+            "for line in sys.stdin:\n"
+            " request=json.loads(line)\n"
+            " print(json.dumps({'result': {'selected_model': request.get('model')}, 'warnings': []}), flush=True)\n"
+        )
+        provider = JsonlProcessProvider("model-aware", "vision.embed", "mobileclip2-fast", [sys.executable, "-c", script], timeout_seconds=1)
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / "input.txt"
+            source.write_text("x", encoding="utf-8")
+            try:
+                result, warnings = provider.infer(source, {}, type("Cache", (), {"home": Path(temp)})())
+                self.assertEqual(result["selected_model"], "mobileclip2-fast")
+                self.assertEqual(warnings, [])
+            finally:
+                provider.unload()
+
     def test_worker_invalid_json_and_crash_are_reported(self):
         for command, expected in [
             ([sys.executable, "-c", "print('not-json', flush=True)"], "worker_invalid_output"),

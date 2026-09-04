@@ -90,7 +90,7 @@ def check_registry(require_artifacts: bool) -> list[str]:
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description="Validate Specialist Runtime release metadata")
+    parser = argparse.ArgumentParser(description="Validate Specialist OS release metadata")
     parser.add_argument("--require-artifacts", action="store_true", help="require downloadable models to have a pinned URL and SHA256; server-managed models are operator-owned")
     parser.add_argument("--tag", help="verify a release tag matches project.version")
     args = parser.parse_args(argv)

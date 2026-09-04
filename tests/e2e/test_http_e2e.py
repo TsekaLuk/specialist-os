@@ -32,7 +32,9 @@ class HttpE2ETests(unittest.TestCase):
 
                 status, _, body = http_request(f"{service.url}/v1/capabilities")
                 self.assertEqual(status, 200)
-                self.assertEqual(len(json.loads(body)["capabilities"]), 10)
+                capabilities = json.loads(body)["capabilities"]
+                self.assertGreaterEqual(len(capabilities), 56)
+                self.assertIn("media.probe", {item["capability"] for item in capabilities})
 
                 status, _, body = http_request(f"{service.url}/v1/vision/ocr", method="POST", payload={"path": str(source)})
                 self.assertEqual(status, 200)
@@ -94,7 +96,7 @@ class HttpE2ETests(unittest.TestCase):
                     headers={"Authorization": "Bearer e2e-secret"},
                 )
                 self.assertEqual(status, 200)
-                self.assertEqual(len(json.loads(body)["capabilities"]), 10)
+                self.assertGreaterEqual(len(json.loads(body)["capabilities"]), 56)
 
                 process = service.process
                 self.assertIsNotNone(process)

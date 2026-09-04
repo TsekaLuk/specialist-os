@@ -14,6 +14,8 @@ import zlib
 from pathlib import Path
 from typing import Any
 
+from .ipc import WorkerError
+
 
 def image_dimensions(path: Path) -> tuple[int, int] | None:
     try:
@@ -134,6 +136,11 @@ class DepthProvider(BuiltinProvider):
     name, capability, model = "depth-anything", "vision.depth", "fallback"
 
     def infer(self, input_path, options, cache):
+        mode = str(options.get("mode", "relative")).lower()
+        if mode not in {"relative", "metric"}:
+            raise WorkerError("mode must be relative or metric", code="invalid_options", retryable=False)
+        if mode == "metric":
+            raise WorkerError("the fallback depth provider only supports relative depth; install a metric-capable provider", code="unsupported_mode", retryable=False)
         dimensions = image_dimensions(input_path) or (1, 1)
         width, height = dimensions
         width = min(max(width, 1), 512)
@@ -142,7 +149,7 @@ class DepthProvider(BuiltinProvider):
         preview = cache.results / f"{cache.input_hash(input_path)[:16]}-depth.png"
         cache.ensure_dirs()
         _png(preview, width, height, pixels)
-        return {"width": dimensions[0], "height": dimensions[1], "depth_map": None, "preview": str(preview), "mode": "relative"}, self._warning()
+        return {"width": dimensions[0], "height": dimensions[1], "depth_map": None, "preview": str(preview), "mode": "relative", "unit": None, "estimated": False}, self._warning()
 
 
 class ScreenProvider(BuiltinProvider):

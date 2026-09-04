@@ -103,7 +103,7 @@ class FishAudioProvider:
 
     def install(self, cache, spec):
         self._cache = cache
-        marker = cache.mark_installed(spec.name, self.name, getattr(self, "model", spec.model), status="ready", license_name=spec.license, source="fish-audio-server", commercial=spec.commercial, source_url=spec.source_url, server_endpoint=self._get_lifecycle().client.endpoint, start_policy=self._get_lifecycle().start_policy, max_concurrency=self.max_concurrency)
+        cache.mark_installed(spec.name, self.name, getattr(self, "model", spec.model), status="ready", license_name=spec.license, source="fish-audio-server", commercial=spec.commercial, source_url=spec.source_url, server_endpoint=self._get_lifecycle().client.endpoint, start_policy=self._get_lifecycle().start_policy, max_concurrency=self.max_concurrency)
         return {"status": "ready", "downloaded": False, "backend": "fish-audio-server", "server": self._get_lifecycle().client.endpoint, "license_mode": "research_only" if not spec.commercial else "commercial"}
 
     def doctor(self, hardware):

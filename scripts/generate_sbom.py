@@ -49,11 +49,11 @@ def models() -> list[dict]:
 
 
 def build() -> dict:
-    components = [{"type": "library", "bom-ref": f"pkg:pypi/specialist-runtime@{project_version()}", "name": "specialist-runtime", "version": project_version(), "licenses": [{"license": {"id": "MIT"}}]}]
+    components = [{"type": "library", "bom-ref": f"pkg:pypi/specialist-os@{project_version()}", "name": "specialist-os", "version": project_version(), "licenses": [{"license": {"id": "MIT"}}]}]
     components.extend({"type": "library", "bom-ref": f"pkg:pypi/{item['name'].lower()}@{item['version']}", **item} for item in packages())
     components.extend(models())
-    serial = uuid.uuid5(uuid.NAMESPACE_URL, f"https://github.com/TsekaLuk/specialist-runtime/releases/{project_version()}")
-    return {"bomFormat": "CycloneDX", "specVersion": "1.5", "serialNumber": f"urn:uuid:{serial}", "version": 1, "metadata": {"timestamp": datetime.now(timezone.utc).isoformat(), "component": {"name": "specialist-runtime", "version": project_version()}}, "components": components}
+    serial = uuid.uuid5(uuid.NAMESPACE_URL, f"https://github.com/TsekaLuk/specialist-os/releases/{project_version()}")
+    return {"bomFormat": "CycloneDX", "specVersion": "1.5", "serialNumber": f"urn:uuid:{serial}", "version": 1, "metadata": {"timestamp": datetime.now(timezone.utc).isoformat(), "component": {"name": "specialist-os", "version": project_version()}}, "components": components}
 
 
 def main() -> int:

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://specialist.runtime/schemas/models.schema.json",
+  "$id": "https://raw.githubusercontent.com/TsekaLuk/specialist-os/main/registry/models.schema.json",
   "title": "Specialist model registry",
   "type": "object",
   "required": ["schema_version", "code_license", "capabilities"],
@@ -18,7 +18,7 @@
           "command": {"type": "string", "minLength": 1},
           "provider": {"type": "string", "minLength": 1},
           "model": {"type": "string", "minLength": 1},
-          "modality": {"type": "string", "enum": ["image", "audio", "document"]},
+          "modality": {"type": "string", "enum": ["image", "audio", "document", "video", "media", "geometry", "text"]},
           "description": {"type": "string", "minLength": 1},
           "input_schema": {"type": "object"},
           "output_schema": {"type": "object"},

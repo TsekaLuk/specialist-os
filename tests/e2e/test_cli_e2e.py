@@ -23,8 +23,8 @@ class CliE2ETests(unittest.TestCase):
             capabilities = run_cli(["capabilities"], home)
             self.assertEqual(capabilities.returncode, 0, capabilities.stderr)
             capability_payload = json.loads(capabilities.stdout)
-            self.assertEqual(len(capability_payload), 10)
-            self.assertEqual({item["capability"] for item in capability_payload}, {
+            self.assertGreaterEqual(len(capability_payload), 56)
+            self.assertTrue({
                 "vision.detect",
                 "vision.segment",
                 "vision.ocr",
@@ -35,7 +35,7 @@ class CliE2ETests(unittest.TestCase):
                 "audio.vad",
                 "speech.synthesize",
                 "speech.clone_voice",
-            })
+            }.issubset({item["capability"] for item in capability_payload}))
 
             ocr = run_cli(["--backend", "fallback", "ocr", str(source), "--json"], home)
             self.assertEqual(ocr.returncode, 0, ocr.stderr)
@@ -51,7 +51,7 @@ class CliE2ETests(unittest.TestCase):
             doctor = run_cli(["doctor", "--json"], home)
             self.assertEqual(doctor.returncode, 0, doctor.stderr)
             doctor_payload = json.loads(doctor.stdout)
-            self.assertEqual(len(doctor_payload["capabilities"]), 10)
+            self.assertGreaterEqual(len(doctor_payload["capabilities"]), 56)
             self.assertEqual(doctor_payload["home"], str(home))
 
             strict_doctor = run_cli(["--backend", "fallback", "doctor", "--strict", "--json"], home)

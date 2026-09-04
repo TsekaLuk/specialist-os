@@ -12,9 +12,9 @@ import venv
 import shutil
 
 try:
-    from .support import ROOT, test_environment
+    from .support import ROOT
 except ImportError:
-    from support import ROOT, test_environment
+    from support import ROOT
 
 
 @unittest.skipUnless(os.environ.get("SPECIALIST_RUN_PACKAGE_E2E") == "1", "set SPECIALIST_RUN_PACKAGE_E2E=1 to run the wheel installation E2E")
@@ -72,7 +72,19 @@ class PackageE2ETests(unittest.TestCase):
                 timeout=30,
             )
             self.assertEqual(capabilities.returncode, 0, capabilities.stdout + capabilities.stderr)
-            self.assertEqual(len(json.loads(capabilities.stdout)), 10)
+            installed_capabilities = json.loads(capabilities.stdout)
+            self.assertEqual(len(installed_capabilities), 56)
+            capability_names = {item["capability"] for item in installed_capabilities}
+            self.assertTrue(
+                {
+                    "human.pose",
+                    "speech.diarize",
+                    "vision.search",
+                    "identity.face.verify",
+                    "media.video.transcode",
+                    "vision.human_state",
+                }.issubset(capability_names)
+            )
 
             source = root / "installed.txt"
             source.write_text("installed package", encoding="utf-8")

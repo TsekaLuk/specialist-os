@@ -1,6 +1,6 @@
 # Deployment
 
-Specialist Runtime is intended to run as a local service next to an agent. The
+Specialist OS is intended to run as a local service next to an agent. The
 recommended production process is:
 
 ```bash
@@ -74,9 +74,9 @@ specialist --backend auto --with-dependencies doctor --strict --json
 The isolated worker prepends its environment's `bin` directory to `PATH`, so
 console entry points such as `mineru` are resolved from the same environment as
 their Python modules. Set `SPECIALIST_WHISPER_BINARY`,
-`SPECIALIST_MINERU_COMMAND`, or `SPECIALIST_OMNIPARSER_COMMAND` when a host
-binary or a reviewed wrapper lives outside the default name. The default
-MinerU command for version 3.4.5 is `mineru`.
+or `SPECIALIST_MINERU_COMMAND` when a host binary or a reviewed wrapper lives
+outside the default name. The default MinerU command for version 3.4.5 is
+`mineru`.
 
 MinerU's published wheel is verified and installed into its provider
 environment, but its pipeline model repository is a separate upstream snapshot.
@@ -84,8 +84,8 @@ Provision those models locally and configure MinerU before enabling
 `document.parse` by setting `SPECIALIST_MINERU_MODEL_DIR`; verified Specialist
 workers set `MINERU_MODEL_SOURCE=local` to prevent an accidental remote
 download. OmniParser is similarly exposed as a
-JSON CLI contract and receives the verified bundle path through
-`OMNIPARSER_MODEL_DIR` and `SPECIALIST_MODEL_ARTIFACT`.
+native isolated Python provider backed by a commit-pinned, SHA256-verified
+OmniParser, Florence-2, and PP-OCRv5 bundle.
 
 Use `specialist models list`, `specialist doctor --json` and
 `specialist doctor --strict --json` in deployment health checks. The strict
@@ -118,7 +118,7 @@ every file before loading.
 
 Reference service-manager templates are provided at
 `deploy/systemd/specialist.service` and
-`deploy/launchd/com.specialist.runtime.plist`. Replace paths and secrets for
+`deploy/launchd/com.specialist.os.plist`. Replace paths and secrets for
 the target host; never commit a real API token.
 
 To explicitly repair provider environments, run:

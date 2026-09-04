@@ -187,7 +187,7 @@ class JsonlProcessProvider:
             self._stderr_stream = None
 
     def infer(self, input_path: Path, options: dict[str, Any], cache):
-        request = {"capability": self.capability, "provider": self.name, "input_path": str(input_path), "options": options}
+        request = {"capability": self.capability, "provider": self.name, "model": self.model, "input_path": str(input_path), "options": options}
         encoded_request = json.dumps(request, ensure_ascii=True, separators=(",", ":")) + "\n"
         if len(encoded_request.encode("utf-8")) > self.max_request_bytes:
             raise WorkerError("provider worker request exceeds safety limit", code="worker_request_too_large", retryable=False)
@@ -247,6 +247,9 @@ def run_worker(request: dict[str, Any], backend="fallback", providers=None) -> d
     try:
         worker_cache = _WorkerCache()
         provider._cache = worker_cache
+        requested_model = request.get("model")
+        if isinstance(requested_model, str) and requested_model:
+            provider.model = requested_model
         installation = worker_cache.installation(capability)
         if installation and installation.get("artifact_path"):
             provider.model = installation["artifact_path"]
@@ -271,6 +274,7 @@ class _WorkerCache:
     home = Path(os.environ.get("SPECIALIST_HOME", Path.home() / ".specialist"))
     models = home / "models"
     results = home / "cache" / "results"
+    artifacts = home / "artifacts"
     metadata = home / "metadata"
 
     def ensure_dirs(self):

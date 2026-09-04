@@ -132,6 +132,30 @@ def build_observations(capability: str, result: dict[str, Any], *, provider: str
         audio = result.get("audio") or {}
         if isinstance(audio, dict) and audio.get("artifact"):
             add(0, "audio_artifact", {"artifact": audio.get("artifact"), "mime": audio.get("mime"), "duration_ms": audio.get("duration_ms"), "sample_rate": audio.get("sample_rate"), "voice": result.get("voice")}, None, 1.0)
+    elif capability in {"human.pose", "human.hand_landmarks", "human.face_landmarks"}:
+        key = {"human.pose": "persons", "human.hand_landmarks": "hands", "human.face_landmarks": "faces"}[capability]
+        for index, item in enumerate(result.get(key) or []):
+            if isinstance(item, dict):
+                add(index, key[:-1], item, None, item.get("confidence"))
+    elif capability == "human.gesture":
+        add(0, "gesture", result.get("gesture"), None, result.get("confidence"))
+    elif capability in {"speech.diarize", "speech.align_transcript", "speech.meeting", "media.transcribe_video"}:
+        for index, item in enumerate(result.get("segments") or []):
+            if isinstance(item, dict):
+                add(index, "timeline_segment", item, {"start": item.get("start"), "end": item.get("end")}, item.get("confidence"))
+    elif capability in {"vision.embed", "vision.embed_text", "identity.face.embed"}:
+        embedding = result.get("embedding")
+        if isinstance(embedding, dict) and embedding.get("artifact"):
+            add(0, "embedding", {"artifact": embedding.get("artifact"), "dimension": embedding.get("dimension"), "model": embedding.get("model")}, None, result.get("quality"))
+    elif capability in {"identity.face.detect", "identity.face.verify", "vision.face_compare"}:
+        if capability == "identity.face.detect":
+            for index, item in enumerate(result.get("faces") or []):
+                if isinstance(item, dict):
+                    add(index, "face", item, {"bbox": item.get("bbox")}, item.get("confidence"))
+        else:
+            add(0, "face_verification", {"match": result.get("match"), "similarity": result.get("similarity"), "threshold": result.get("threshold"), "profile": result.get("profile")}, None, result.get("similarity"))
+    elif capability in {"vision.geometry.distance", "vision.geometry.angle", "vision.geometry.area", "vision.geometry.contour", "vision.geometry.homography", "vision.geometry.match_features", "vision.geometry.perspective_transform", "vision.geometry.calibrate_camera", "vision.geometry.solve_pnp", "vision.transform.crop", "vision.transform.resize", "vision.transform.rotate", "vision.transform.warp", "vision.transform.colorspace", "vision.transform.blur", "vision.transform.threshold", "media.probe", "media.video.extract_frames", "media.video.trim", "media.video.transcode", "media.video.concat", "media.audio.extract", "media.audio.trim", "media.audio.resample", "media.audio.convert", "media.audio.normalize", "vision.human_state", "vision.measure"}:
+        add(0, "operator_result", result, None, result.get("confidence"))
     return [item.to_dict() for item in records]
 
 

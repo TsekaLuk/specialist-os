@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from .registry import BUNDLES
+
 
 @dataclass(frozen=True)
 class CapabilityPack:
@@ -22,11 +24,24 @@ PACKS = (
     CapabilityPack("voice", "Speech synthesis, voice cloning, transcription and activity detection", ("speech.synthesize", "speech.clone_voice", "audio.transcribe", "audio.vad")),
     CapabilityPack("screen", "Actionable screen element parsing", ("screen.parse",)),
     CapabilityPack("spatial", "Depth and geometry primitives", ("vision.depth", "vision.detect", "vision.segment")),
+    CapabilityPack("human", "Pose, hand, face landmarks and gestures", tuple(BUNDLES.get("human", ()))),
+    CapabilityPack("identity", "Local sensitive face detection, embeddings and verification", tuple(BUNDLES.get("identity", ()))),
+    CapabilityPack("audio-plus", "Diarization, denoising and meeting timelines", tuple(BUNDLES.get("audio-plus", ()))),
+    CapabilityPack("retrieval", "Image and text embeddings with semantic search", tuple(BUNDLES.get("retrieval", ()))),
+    CapabilityPack("media", "Deterministic FFmpeg media operations", tuple(BUNDLES.get("media", ()))),
+    CapabilityPack("vision-operators", "Geometry, transforms and measurement operators", tuple(BUNDLES.get("vision-operators", ()))),
+    CapabilityPack("core", "Complete Specialist capability surface with lazy providers", tuple(BUNDLES.get("core", ()))),
 )
+
+_PACK_ALIASES = {
+    "vision": "vision-core",
+    "audio": "voice",
+    "all": "core",
+}
 
 
 def get_pack(name: str) -> CapabilityPack:
-    key = name.strip().lower()
+    key = _PACK_ALIASES.get(name.strip().lower(), name.strip().lower())
     for pack in PACKS:
         if pack.name == key:
             return pack

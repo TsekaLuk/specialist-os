@@ -34,7 +34,64 @@ from .voices import VoiceRegistry
 
 
 class SpecialistRuntime:
-    TIMEOUTS = {"vision.detect": 120, "vision.segment": 120, "vision.ocr": 120, "vision.depth": 300, "screen.parse": 120, "document.parse": 900, "audio.transcribe": 900, "audio.vad": 300, "speech.synthesize": 1800, "speech.clone_voice": 1800}
+    TIMEOUTS = {
+        "vision.detect": 120,
+        "vision.segment": 120,
+        "vision.ocr": 120,
+        "vision.depth": 300,
+        "screen.parse": 120,
+        "document.parse": 900,
+        "audio.transcribe": 900,
+        "audio.vad": 300,
+        "speech.synthesize": 1800,
+        "speech.clone_voice": 1800,
+        "human.pose": 180,
+        "human.hand_landmarks": 180,
+        "human.face_landmarks": 180,
+        "human.gesture": 180,
+        "speech.diarize": 1800,
+        "speech.align_transcript": 120,
+        "speech.meeting": 3600,
+        "audio.denoise": 1800,
+        "vision.embed": 600,
+        "vision.embed_text": 600,
+        "vision.similarity": 600,
+        "vision.search": 1800,
+        "vision.find_similar": 1800,
+        "identity.face.detect": 300,
+        "identity.face.embed": 300,
+        "identity.face.verify": 300,
+        "vision.face_compare": 300,
+        "vision.human_state": 900,
+        "vision.measure": 900,
+        "media.probe": 120,
+        "media.video.extract_frames": 900,
+        "media.video.trim": 1800,
+        "media.video.transcode": 3600,
+        "media.video.concat": 3600,
+        "media.audio.extract": 1800,
+        "media.audio.trim": 1800,
+        "media.audio.resample": 1800,
+        "media.audio.convert": 1800,
+        "media.audio.normalize": 1800,
+        "media.transcribe_video": 3600,
+        "vision.geometry.distance": 120,
+        "vision.geometry.angle": 120,
+        "vision.geometry.area": 120,
+        "vision.geometry.contour": 120,
+        "vision.geometry.homography": 120,
+        "vision.geometry.match_features": 600,
+        "vision.geometry.perspective_transform": 120,
+        "vision.geometry.calibrate_camera": 300,
+        "vision.geometry.solve_pnp": 300,
+        "vision.transform.crop": 600,
+        "vision.transform.resize": 600,
+        "vision.transform.rotate": 600,
+        "vision.transform.warp": 600,
+        "vision.transform.colorspace": 600,
+        "vision.transform.blur": 600,
+        "vision.transform.threshold": 600,
+    }
 
     def __init__(self, home=None, provider_overrides=None, isolate=False, backend="auto", with_dependencies=False, max_loaded=4, allow_unverified_models=None):
         self.cache = Cache(home)
@@ -46,6 +103,12 @@ class SpecialistRuntime:
         self.allow_unverified_models = bool(os.environ.get("SPECIALIST_ALLOW_UNVERIFIED_MODELS") == "1") if allow_unverified_models is None else bool(allow_unverified_models)
         self.max_loaded = max(1, int(max_loaded))
         self.providers = provider_map(backend)
+        # Composite providers orchestrate child calls through this runtime and
+        # therefore must remain in-process even when leaf providers are
+        # isolated. Binding here also makes their lifecycle explicit.
+        for provider in self.providers.values():
+            if getattr(provider, "composite", False):
+                provider.runtime = self
         self.environments = ProviderEnvironmentManager(self.cache)
         if backend == "auto":
             # Promote only capabilities with a persisted artifact. This keeps
@@ -66,7 +129,7 @@ class SpecialistRuntime:
         self.isolate = bool(isolate or with_dependencies or os.environ.get("SPECIALIST_ISOLATE") == "1")
         if self.isolate:
             for name, provider in list(self.providers.items()):
-                if name not in (provider_overrides or {}):
+                if name not in (provider_overrides or {}) and not getattr(provider, "composite", False):
                     self.providers[name] = self._worker_provider(name, provider, sys.executable)
         self._loaded: set[str] = set()
         self._active_providers: dict[str, Any] = {}
@@ -86,7 +149,7 @@ class SpecialistRuntime:
         # environment instead of silently wrapping the dependency-free
         # fallback with the host interpreter. This keeps ``doctor`` and actual
         # inference aligned after a production install.
-        if self.with_dependencies and self.backend != "fallback":
+        if self.backend != "fallback":
             real_providers = provider_map("real")
             for name, spec in CAPABILITIES.items():
                 requirements = PROVIDER_REQUIREMENTS.get(spec.optional_dependency or "", [])
@@ -141,8 +204,6 @@ class SpecialistRuntime:
             "SPECIALIST_WHISPER_BINARY",
             "SPECIALIST_MINERU_COMMAND",
             "SPECIALIST_MINERU_MODEL_DIR",
-            "SPECIALIST_OMNIPARSER_COMMAND",
-            "OMNIPARSER_MODEL_DIR",
             "MINERU_TOOLS_CONFIG_JSON",
             "SPECIALIST_FISH_AUDIO_URL",
             "SPECIALIST_FISH_AUDIO_TOKEN",
@@ -746,6 +807,16 @@ class SpecialistRuntime:
         envelope.setdefault("provenance", {})
         envelope.setdefault("confidence", None)
         envelope.setdefault("trace", [])
+        if not isinstance(envelope.get("provenance"), dict):
+            envelope["provenance"] = {}
+        if not isinstance(envelope.get("metrics"), dict):
+            envelope["metrics"] = {}
+        spec = CAPABILITIES.get(envelope.get("capability"))
+        if spec:
+            envelope["provenance"].setdefault("privacy_level", spec.privacy_level)
+            envelope["provenance"].setdefault("deterministic", spec.determinism == "deterministic")
+            envelope["metrics"].setdefault("privacy_level", spec.privacy_level)
+            envelope["metrics"].setdefault("deterministic", spec.determinism == "deterministic")
         try:
             validate_envelope(envelope)
         except (TypeError, ValueError, KeyError) as exc:
@@ -758,7 +829,8 @@ class SpecialistRuntime:
                 self._metrics["cache_hits_total"] += 1
             if envelope.get("error") is not None:
                 self._metrics["errors_total"] += 1
-        self.logger.emit("capability.run", capability=envelope.get("capability"), provider=envelope.get("provider"), model=envelope.get("model"), input_sha256=(envelope.get("input") or {}).get("sha256"), input_size_bytes=(envelope.get("input") or {}).get("size_bytes"), latency_ms=performance.get("latency_ms"), cached=performance.get("cached", False), success=envelope.get("error") is None, error_code=(envelope.get("error") or {}).get("code"))
+        if not spec or spec.privacy_level not in {"sensitive", "restricted"}:
+            self.logger.emit("capability.run", capability=envelope.get("capability"), provider=envelope.get("provider"), model=envelope.get("model"), input_sha256=(envelope.get("input") or {}).get("sha256"), input_size_bytes=(envelope.get("input") or {}).get("size_bytes"), latency_ms=performance.get("latency_ms"), cached=performance.get("cached", False), success=envelope.get("error") is None, error_code=(envelope.get("error") or {}).get("code"))
         return envelope
 
     def _collect_artifacts(self, capability: str, result: dict[str, Any]) -> list[dict[str, Any]]:
@@ -767,20 +839,47 @@ class SpecialistRuntime:
         existing = result.get("artifacts")
         if isinstance(existing, list):
             references.extend(item for item in existing if isinstance(item, dict) and item.get("id"))
-        for key in ("preview", "artifact_path"):
-            value = result.get(key)
+
+        def promote(value: Any, key: str, mime: str | None = None) -> str | None:
             if not isinstance(value, str) or value.startswith("artifact://"):
-                continue
+                return value if isinstance(value, str) else None
             path = Path(value).expanduser()
             try:
-                if path.is_file():
-                    reference = self.artifacts.put_file(path, metadata={"capability": capability, "result_key": key})
-                    if reference.to_dict() not in references:
-                        references.append(reference.to_dict())
+                if not path.is_file():
+                    return value
+                reference = self.artifacts.put_file(path, mime=mime, metadata={"capability": capability, "result_key": key})
             except (ArtifactError, OSError):
-                # A provider result remains useful when an optional preview
-                # cannot be copied; the original result path is preserved.
-                continue
+                # A provider result remains useful when an optional output
+                # cannot be copied; leave its diagnostic path untouched.
+                return value
+            if not any(item.get("id") == reference.id for item in references if isinstance(item, dict)):
+                references.append(reference.to_dict())
+            return reference.uri
+
+        mime_by_key = {
+            "preview": "image/png",
+            "image_path": "image/png",
+            "audio_path": "audio/wav",
+            "media_path": None,
+            "artifact_path": None,
+            "embedding_path": "application/json",
+        }
+        for key, mime in mime_by_key.items():
+            if key in result:
+                result[key] = promote(result.get(key), key, mime)
+
+        for key in ("frames", "files"):
+            values = result.get(key)
+            if isinstance(values, list):
+                result[key] = [promote(item, key, "image/png" if key == "frames" else None) for item in values]
+
+        embedding = result.get("embedding")
+        if isinstance(embedding, dict):
+            if isinstance(embedding.get("path"), str):
+                embedding["artifact"] = promote(embedding.pop("path"), "embedding", "application/json")
+            elif isinstance(embedding.get("artifact"), str):
+                embedding["artifact"] = embedding["artifact"]
+
         audio = result.get("audio")
         if isinstance(audio, dict):
             path_value = audio.get("path")
@@ -794,7 +893,7 @@ class SpecialistRuntime:
                         audio["mime"] = reference.mime
                         audio.pop("path", None)
                         audio.pop("temporary", None)
-                        if reference.to_dict() not in references:
+                        if not any(item.get("id") == reference.id for item in references if isinstance(item, dict)):
                             references.append(reference.to_dict())
                         if temporary_output:
                             path.unlink(missing_ok=True)
@@ -850,7 +949,7 @@ class SpecialistRuntime:
         spec = CAPABILITIES[canonical]
         provider = self.providers[canonical]
         try:
-            if canonical == "speech.clone_voice" and isinstance(input_path, str) and input_path.startswith("artifact://"):
+            if isinstance(input_path, str) and input_path.startswith("artifact://"):
                 path = self.artifacts.resolve(input_path)
             else:
                 path = Path(input_path).expanduser()
@@ -860,6 +959,28 @@ class SpecialistRuntime:
         if not isinstance(raw_options, dict):
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, {"type": CAPABILITIES[canonical].modality, "path": str(input_path)}, "invalid_options", "options must be an object").to_dict())
         options = dict(raw_options)
+        if "allow_sensitive_cache" in options and not isinstance(options["allow_sensitive_cache"], bool):
+            return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", "allow_sensitive_cache must be a boolean").to_dict())
+        # Secondary image inputs may be returned by an earlier capability as
+        # content-addressed artifacts. Resolve them once at the Core boundary
+        # so in-process and isolated providers receive the same safe local
+        # path, while the artifact store still enforces traversal checks.
+        if canonical in {"vision.similarity", "identity.face.verify", "vision.face_compare"}:
+            other_input = options.get("other_input")
+            if isinstance(other_input, str) and other_input.startswith("artifact://"):
+                try:
+                    options["other_input"] = str(self.artifacts.resolve(other_input))
+                except (ArtifactError, OSError, ValueError) as exc:
+                    return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_artifact", str(exc)).to_dict())
+        # Normalize option spellings before routing/cache identity so equivalent
+        # typed media and embedding requests share deterministic results.
+        for key in ("format", "mode", "strength", "profile"):
+            if isinstance(options.get(key), str):
+                options[key] = options[key].lower().lstrip(".") if key == "format" else options[key].lower()
+        # Denoise ``profile`` names describe enhancement strength, whereas the
+        # runtime policy profile uses fast/balanced/quality/ultra.
+        if canonical == "audio.denoise" and options.get("profile") in {"light", "balanced", "strong"}:
+            options["strength"] = options.pop("profile")
         try:
             policy_rule = self.policy.resolve(canonical, options)
         except PolicyError as exc:
@@ -876,8 +997,9 @@ class SpecialistRuntime:
                 timeout = float(options["timeout_seconds"])
             except (TypeError, ValueError):
                 return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", "timeout_seconds must be numeric").to_dict())
-            if timeout <= 0 or timeout > self.TIMEOUTS[canonical]:
-                return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", f"timeout_seconds must be between 0 and {self.TIMEOUTS[canonical]}").to_dict())
+            maximum_timeout = self.TIMEOUTS.get(canonical, 900)
+            if timeout <= 0 or timeout > maximum_timeout:
+                return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", f"timeout_seconds must be between 0 and {maximum_timeout}").to_dict())
             options["timeout_seconds"] = timeout
         try:
             route = self._router().route(canonical, options)
@@ -921,7 +1043,8 @@ class SpecialistRuntime:
         if hasattr(provider, "model"):
             provider.model = selected_model
         key = self.cache.result_key(path, canonical, provider.name, selected_model, options)
-        cached = self.cache.read_result(key)
+        cache_allowed = spec.privacy_level not in {"sensitive", "restricted"} or options.get("allow_sensitive_cache") is True
+        cached = self.cache.read_result(key) if cache_allowed else None
         if cached:
             try:
                 validate_envelope(cached)
@@ -968,6 +1091,19 @@ class SpecialistRuntime:
             self._last_used[canonical] = time.monotonic()
             self.cache.update_state(canonical, "running")
             result, warnings = provider.infer(path, options, self.cache)
+            if not isinstance(result, dict):
+                raise WorkerError("provider result must be an object", code="provider_result_invalid", retryable=False)
+            if not isinstance(warnings, list) or any(not isinstance(item, str) for item in warnings):
+                raise WorkerError("provider warnings must be a string array", code="provider_result_invalid", retryable=False)
+            provider_trace = result.pop("_trace", [])
+            if not isinstance(provider_trace, list):
+                provider_trace = []
+            child_artifacts = result.pop("_child_artifacts", [])
+            if not isinstance(child_artifacts, list):
+                child_artifacts = []
+            child_provenance = result.pop("_child_provenance", [])
+            if not isinstance(child_provenance, list):
+                child_provenance = []
             performance = {"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}
             if canonical in {"speech.synthesize", "speech.clone_voice"} and isinstance(result, dict):
                 audio = result.get("audio")
@@ -982,6 +1118,9 @@ class SpecialistRuntime:
 
             artifacts = self._collect_artifacts(canonical, result)
             observations = build_observations(canonical, result, provider=provider.name, model=selected_model, source=input_info, runtime_version=__version__)
+            deterministic = result.get("deterministic")
+            if not isinstance(deterministic, bool):
+                deterministic = spec.determinism == "deterministic"
             envelope = ResultEnvelope(
                 canonical,
                 provider.name,
@@ -992,11 +1131,11 @@ class SpecialistRuntime:
                 warnings=warnings,
                 observations=observations,
                 evidence=evidence_from_observations(observations),
-                artifacts=artifacts,
-                metrics={**performance, "observation_count": len(observations), "artifact_count": len(artifacts)},
-                provenance={"source": input_info, "provider": provider.name, "model_version": selected_model, "runtime_version": __version__, "transformations": []},
+                artifacts=artifacts + [item for item in child_artifacts if isinstance(item, dict) and item.get("id") and not any(existing.get("id") == item.get("id") for existing in artifacts)],
+                metrics={**performance, "observation_count": len(observations), "artifact_count": len(artifacts) + len([item for item in child_artifacts if isinstance(item, dict) and item.get("id") and not any(existing.get("id") == item.get("id") for existing in artifacts)]), "deterministic": deterministic, "privacy_level": spec.privacy_level},
+                provenance={"source": input_info, "provider": provider.name, "model_version": selected_model, "runtime_version": __version__, "transformations": [], "deterministic": deterministic, "privacy_level": spec.privacy_level, "cache": {"enabled": cache_allowed, "sensitive_override": bool(options.get("allow_sensitive_cache"))}, "children": child_provenance},
                 confidence=aggregate_confidence(observations),
-                trace=[{"stage": "routing", **route}, {"stage": "policy", "profile": policy_rule.get("profile"), "constraints": policy_rule, "decision": policy_decision.to_dict()}],
+                trace=[{"stage": "routing", **route}, {"stage": "policy", "profile": policy_rule.get("profile"), "constraints": policy_rule, "decision": policy_decision.to_dict()}] + [item for item in provider_trace if isinstance(item, dict)],
             ).to_dict()
             minimum_confidence = policy_rule.get("min_confidence")
             if minimum_confidence is not None and envelope.get("confidence") is not None and float(envelope["confidence"]) < float(minimum_confidence):
@@ -1022,7 +1161,7 @@ class SpecialistRuntime:
         finally:
             self.cache.update_state(canonical, "ready")
         envelope = self._finish(envelope)
-        if envelope.get("error") is None:
+        if envelope.get("error") is None and cache_allowed:
             try:
                 self.cache.write_result(key, envelope)
             except OSError as exc:

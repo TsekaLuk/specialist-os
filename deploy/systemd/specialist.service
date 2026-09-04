@@ -1,5 +1,5 @@
 [Unit]
-Description=Specialist Runtime local capability service
+Description=Specialist OS local capability service
 After=network.target
 
 [Service]

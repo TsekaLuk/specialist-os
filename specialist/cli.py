@@ -1,4 +1,4 @@
-"""Command line interface for Specialist Runtime."""
+"""Command line interface for Specialist OS."""
 
 from __future__ import annotations
 
@@ -18,7 +18,6 @@ from .models import ModelArtifactError
 from .environments import EnvironmentError
 from .provider_manifest import ProviderCatalog, ProviderManifest, ProviderManifestError, builtin_manifests
 from .node import ComputeNode, NodeError
-from .hardware import detect_hardware
 from .providers.fish_audio.client import FishAudioError
 
 
@@ -57,7 +56,7 @@ def _human_result(value):
 
 def _human_doctor(value):
     system = value.get("system", {})
-    print(f"Specialist Runtime {value.get('version', __version__)}")
+    print(f"Specialist OS {value.get('version', __version__)}")
     print("\nSystem")
     for key in ("os", "architecture", "cpu", "memory_gb", "metal", "mps", "ffmpeg", "onnxruntime"):
         if key in system:
@@ -167,7 +166,22 @@ def build_parser():
     voice_remove = voice_sub.add_parser("remove")
     voice_remove.add_argument("voice")
 
-    for command in ["detect", "segment", "ocr", "depth", "parse-screen", "parse-document", "transcribe", "vad"]:
+    legacy_commands = {"detect", "segment", "ocr", "depth", "parse-screen", "parse-document", "transcribe", "vad"}
+    for command in sorted({spec.command for spec in CAPABILITIES.values()} - legacy_commands - {"speak", "clone-voice"}):
+        # Every registry command gets a safe typed path/options shell. The
+        # runtime validates capability-specific fields; CLI never accepts raw
+        # subprocess arguments or provider code.
+        item = sub.add_parser(command)
+        item.add_argument("input", help="Local input path")
+        if command == "segment":
+            item.add_argument("--prompt")
+        if command == "denoise":
+            item.add_argument("--strength", choices=["light", "balanced", "strong"], default=None)
+        item.add_argument("--profile", choices=["fast", "balanced", "quality", "ultra"])
+        item.add_argument("--json", action="store_true", dest="as_json")
+        item.add_argument("--options", help="Additional options as a JSON object")
+
+    for command in sorted(legacy_commands):
         item = sub.add_parser(command)
         item.add_argument("input", help="Local input path")
         if command == "segment":
@@ -459,6 +473,8 @@ def main(argv=None):
             return 2
     if args.command == "segment" and args.prompt:
         options["prompt"] = args.prompt
+    if args.command == "denoise" and getattr(args, "strength", None):
+        options["strength"] = args.strength
     if getattr(args, "profile", None):
         options["profile"] = args.profile
     try:

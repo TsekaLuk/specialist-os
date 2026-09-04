@@ -11,7 +11,7 @@ import urllib.error
 import urllib.request
 from types import ModuleType
 from unittest.mock import patch
-from http.server import ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from specialist.cache import Cache
@@ -20,7 +20,8 @@ from specialist.models import ModelArtifactError, ModelManager
 from specialist.registry import CAPABILITIES, REGISTRY_DOCUMENT
 from specialist.runtime import SpecialistRuntime
 from specialist.server import RuntimeRequestHandler
-from specialist.providers.optional import CommandDocumentProvider, OptionalProvider, PaddleOCRProvider, WhisperCppProvider
+from specialist.providers.optional import CommandDocumentProvider, OmniParserProvider, OptionalProvider, PaddleOCRProvider, WhisperCppProvider
+from specialist.providers.optional_expansion import PyannoteProvider
 
 
 class ProductionBoundaryTests(unittest.TestCase):
@@ -110,7 +111,8 @@ class ProductionBoundaryTests(unittest.TestCase):
 
     def test_registry_is_validated_and_has_one_recommended_model(self):
         self.assertEqual(REGISTRY_DOCUMENT["schema_version"], 1)
-        self.assertEqual(len(CAPABILITIES), 10)
+        self.assertGreaterEqual(len(CAPABILITIES), 56)
+        self.assertTrue({"human.pose", "speech.diarize", "vision.search", "identity.face.verify", "media.probe"}.issubset(CAPABILITIES))
         for spec in CAPABILITIES.values():
             self.assertEqual(sum(item.recommended for item in spec.models), 1)
             self.assertEqual(spec.model_spec().id, spec.model)
@@ -122,7 +124,7 @@ class ProductionBoundaryTests(unittest.TestCase):
                     self.assertGreaterEqual(len(model.artifact_files), 1)
                     self.assertTrue(all(item.url.startswith("https://") and len(item.sha256) == 64 for item in model.artifact_files))
                 else:
-                    if spec.provider == "fish_audio":
+                    if spec.provider == "fish_audio" or model.artifact_kind == "server":
                         self.assertIsNone(model.artifact_url)
                         self.assertIsNone(model.artifact_sha256)
                     else:
@@ -146,6 +148,59 @@ class ProductionBoundaryTests(unittest.TestCase):
             (bundle / "weights/weights.bin").write_bytes(b"tampered")
             with self.assertRaises(ModelArtifactError):
                 manager.verify_bundle(bundle)
+
+    def test_model_download_retries_transport_and_checksum_failures(self):
+        payload = b"verified model artifact"
+
+        class FlakyArtifactHandler(BaseHTTPRequestHandler):
+            attempts = 0
+            ranges = []
+
+            def do_GET(self):
+                type(self).attempts += 1
+                type(self).ranges.append(self.headers.get("Range"))
+                if self.attempts == 1:
+                    self.send_response(200)
+                    self.send_header("Content-Length", str(len(payload)))
+                    self.end_headers()
+                    self.wfile.write(payload[:8])
+                    self.wfile.flush()
+                    self.connection.shutdown(socket.SHUT_RDWR)
+                    return
+                if self.attempts == 2:
+                    body = b"x" * (len(payload) - 8)
+                    self.send_response(206)
+                    self.send_header("Content-Range", f"bytes 8-{len(payload) - 1}/{len(payload)}")
+                else:
+                    body = payload
+                    self.send_response(200)
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+            def log_message(self, _format, *_args):
+                return
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), FlakyArtifactHandler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with tempfile.TemporaryDirectory() as temp:
+                destination = Path(temp) / "model.bin"
+                expected = hashlib.sha256(payload).hexdigest()
+                result = ModelManager(Cache(Path(temp) / "home"), timeout=2).download(
+                    f"http://127.0.0.1:{server.server_port}/model.bin",
+                    destination,
+                    expected_sha256=expected,
+                )
+                self.assertEqual(destination.read_bytes(), payload)
+                self.assertEqual(result["sha256"], expected)
+                self.assertEqual(FlakyArtifactHandler.attempts, 3)
+                self.assertEqual(FlakyArtifactHandler.ranges, [None, "bytes=8-", None])
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
 
     def test_deepseek_harness_lists_every_core_tool(self):
         tools = json.loads((Path(__file__).parents[1] / "integrations" / "deepseek_harness" / "tools.json").read_text(encoding="utf-8"))["tools"]
@@ -189,6 +244,23 @@ class ProductionBoundaryTests(unittest.TestCase):
             self.assertEqual(worker.env["MINERU_TOOLS_CONFIG_JSON"], "/opt/mineru.json")
             runtime.close()
 
+    def test_runtime_reuses_ready_provider_environment_without_install_flag(self):
+        environment_python = "/tmp/omniparser-provider/bin/python"
+
+        def environment_status(_manager, provider):
+            if provider == "omniparser":
+                return {"provider": provider, "status": "ready", "python": environment_python}
+            return {"provider": provider, "status": "not installed"}
+
+        with tempfile.TemporaryDirectory() as temp, patch.object(ProviderEnvironmentManager, "status", environment_status):
+            runtime = SpecialistRuntime(home=Path(temp) / "home", backend="real", isolate=True)
+            try:
+                worker = runtime.providers["screen.parse"]
+                self.assertEqual(worker.command[0], environment_python)
+                self.assertEqual(worker.env["PATH"].split(os.pathsep)[0], "/tmp/omniparser-provider/bin")
+            finally:
+                runtime.close()
+
     def test_sam_worker_has_heavy_model_address_space_budget(self):
         with tempfile.TemporaryDirectory() as temp:
             runtime = SpecialistRuntime(home=Path(temp) / "home", backend="real", isolate=True)
@@ -207,6 +279,87 @@ class ProductionBoundaryTests(unittest.TestCase):
                 runtime.install("document.parse", with_dependencies=False)
             self.assertEqual(caught.exception.code, "provider_environment_required")
             runtime.close()
+
+    def test_mineru_normalizes_structured_content_list(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            content = [
+                {"type": "table", "page_idx": 0, "bbox": [1, 2, 3, 4], "table_body": "<table><tr><td>A</td></tr></table>", "table_caption": ["Results"], "table_footnote": [], "img_path": "images/table.jpg"},
+                {"type": "image", "page_idx": 1, "bbox": [5, 6, 7, 8], "image_caption": ["Architecture"], "image_footnote": ["Source"], "img_path": "images/figure.jpg"},
+                {"type": "equation", "page_idx": 2, "bbox": [9, 10, 11, 12], "text": "x^2", "text_format": "latex", "img_path": "images/equation.jpg"},
+            ]
+            (root / "report_content_list.json").write_text(json.dumps(content), encoding="utf-8")
+            pages, tables, figures, formulas = CommandDocumentProvider._structure(root)
+            self.assertEqual(pages, 3)
+            self.assertEqual(tables[0]["html"], "<table><tr><td>A</td></tr></table>")
+            self.assertEqual(figures[0]["caption"], ["Architecture"])
+            self.assertEqual(formulas[0]["text"], "x^2")
+
+    def test_mineru_rejects_untyped_and_remote_options_before_execution(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "input.pdf"
+            source.write_bytes(b"pdf")
+            cache = Cache(root / "home")
+            provider = CommandDocumentProvider(command="/usr/bin/true")
+            provider._cache = cache
+            provider._allow_unverified_models = True
+            with self.assertRaises(Exception) as caught:
+                provider.infer(source, {"start": "0"}, cache)
+            self.assertEqual(caught.exception.code, "invalid_options")
+            with self.assertRaises(Exception) as caught:
+                provider.infer(source, {"backend": "vlm-http-client", "server_url": "https://example.com"}, cache)
+            self.assertEqual(caught.exception.code, "remote_not_allowed")
+
+    def test_omniparser_validates_options_and_merges_real_output_shapes(self):
+        with self.assertRaises(Exception) as caught:
+            OmniParserProvider._number_option({"max_elements": True}, "max_elements", 300, 1, 1000, integer=True)
+        self.assertEqual(caught.exception.code, "invalid_options")
+        elements = OmniParserProvider._merge_elements(
+            [{"type": "text", "bbox": [0.1, 0.1, 0.2, 0.2], "content": "Save"}],
+            [{"type": "icon", "bbox": [0.09, 0.09, 0.21, 0.21], "content": None}],
+            0.7,
+        )
+        self.assertEqual(len(elements), 1)
+        self.assertEqual(elements[0]["content"], "Save")
+
+    def test_omniparser_environment_and_bundle_pin_offline_florence_code(self):
+        from specialist.environments import PROVIDER_REQUIREMENTS
+
+        requirements = PROVIDER_REQUIREMENTS["omniparser"]
+        self.assertIn("transformers==4.49.0", requirements)
+        self.assertIn("timm==1.0.20", requirements)
+        self.assertIn("einops==0.8.0", requirements)
+        artifact_files = {
+            item["path"]: item
+            for item in REGISTRY_DOCUMENT["capabilities"]
+            if item["name"] == "screen.parse"
+            for item in item["models"][0]["artifact"]["files"]
+        }
+        self.assertIn("processor/processing_florence2.py", artifact_files)
+        self.assertIn("icon_caption/configuration_florence2.py", artifact_files)
+        self.assertIn("icon_caption/modeling_florence2.py", artifact_files)
+        self.assertTrue(all("/resolve/" in item["url"] and "/resolve/main/" not in item["url"] for item in artifact_files.values()))
+
+    def test_pyannote_four_result_objects_normalize_to_sorted_timeline(self):
+        class Turn:
+            def __init__(self, start, end):
+                self.start = start
+                self.end = end
+
+        class Annotation:
+            def itertracks(self, yield_label=False):
+                self.yield_label = yield_label
+                return iter([(Turn(2, 3), "track-b", "SPEAKER_01"), (Turn(0, 1), "track-a", "SPEAKER_00")])
+
+        class Result:
+            speaker_diarization = Annotation()
+            exclusive_speaker_diarization = Annotation()
+
+        segments = PyannoteProvider._normalize_segments(Result())
+        exclusive = PyannoteProvider._normalize_segments(Result(), exclusive=True)
+        self.assertEqual([item["speaker"] for item in segments], ["SPEAKER_00", "SPEAKER_01"])
+        self.assertEqual(exclusive[0]["start"], 0.0)
 
     def test_paddleocr_uses_pinned_v5_bundle_without_extra_downloads(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -312,10 +465,12 @@ class ProductionBoundaryTests(unittest.TestCase):
                 with self.assertRaises(urllib.error.HTTPError) as caught:
                     urllib.request.urlopen(request, timeout=2)
                 self.assertEqual(caught.exception.code, 413)
+                caught.exception.close()
                 request = urllib.request.Request(url, data=b"{}", headers={"Content-Type": "text/plain"})
                 with self.assertRaises(urllib.error.HTTPError) as caught:
                     urllib.request.urlopen(request, timeout=2)
                 self.assertEqual(caught.exception.code, 415)
+                caught.exception.close()
             finally:
                 server.shutdown()
                 server.server_close()
@@ -361,6 +516,7 @@ class ProductionBoundaryTests(unittest.TestCase):
             with self.assertRaises(urllib.error.HTTPError) as caught:
                 urllib.request.urlopen(request, timeout=2)
             self.assertEqual(caught.exception.code, 429)
+            caught.exception.close()
         finally:
             runtime.release.set()
             first.join(timeout=3)

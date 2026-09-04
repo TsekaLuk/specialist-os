@@ -25,7 +25,11 @@ class CLITests(unittest.TestCase):
 
     def test_capabilities(self):
         completed = subprocess.run([sys.executable, "-m", "specialist", "capabilities"], cwd=ROOT, capture_output=True, text=True, check=True)
-        self.assertEqual(len(json.loads(completed.stdout)), 10)
+        payload = json.loads(completed.stdout)
+        self.assertGreaterEqual(len(payload), 56)
+        names = {item["capability"] for item in payload}
+        self.assertIn("vision.geometry.distance", names)
+        self.assertIn("media.video.extract_frames", names)
 
     def test_json_error_has_nonzero_exit(self):
         completed = subprocess.run([sys.executable, "-m", "specialist", "ocr", "/tmp/does-not-exist", "--json"], cwd=ROOT, capture_output=True, text=True)

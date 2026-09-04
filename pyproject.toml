@@ -3,19 +3,25 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "specialist-runtime"
-version = "1.0.4"
+name = "specialist-os"
+version = "1.1.0"
 description = "A local-first specialist capability runtime for any LLM."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-authors = [{name = "Specialist Runtime contributors"}]
+authors = [{name = "Specialist OS contributors"}]
 keywords = ["llm", "mcp", "ocr", "computer-vision", "local-ai"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
 ]
+
+[project.urls]
+Homepage = "https://github.com/TsekaLuk/specialist-os"
+Repository = "https://github.com/TsekaLuk/specialist-os"
+Issues = "https://github.com/TsekaLuk/specialist-os/issues"
+Documentation = "https://github.com/TsekaLuk/specialist-os#readme"
 
 [project.scripts]
 specialist = "specialist.cli:main"

@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import tempfile
+import time
 import urllib.request
 import urllib.error
 import json
@@ -21,10 +22,11 @@ SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 class ModelManager:
-    def __init__(self, cache, timeout=60, max_bytes=20 * 1024**3):
+    def __init__(self, cache, timeout=60, max_bytes=20 * 1024**3, download_attempts=5):
         self.cache = cache
         self.timeout = timeout
         self.max_bytes = max_bytes
+        self.download_attempts = max(1, int(download_attempts))
 
     def verify(self, path: Path, expected_sha256: str | None = None) -> str:
         if not path.is_file():
@@ -147,48 +149,84 @@ class ModelManager:
         except OSError:
             pass
         fd, temporary = tempfile.mkstemp(prefix=f".{destination.name}.", dir=destination.parent)
-        size = 0
-        digest = hashlib.sha256()
+        os.close(fd)
+        last_error = None
+        remote = url.startswith(("http://", "https://"))
         try:
-            request = urllib.request.Request(url, headers={"User-Agent": "specialist-runtime/0.1"})
-            with urllib.request.urlopen(request, timeout=self.timeout) as response, os.fdopen(fd, "wb") as stream:
-                final_url = response.geturl()
-                if url.startswith("https://") and final_url.startswith("http://"):
-                    raise ModelArtifactError("refusing HTTPS model download redirected to plain HTTP")
-                content_length = response.headers.get("Content-Length")
-                if content_length:
-                    try:
-                        if int(content_length) > self.max_bytes:
+            for attempt in range(self.download_attempts):
+                existing_size = os.path.getsize(temporary)
+                headers = {"User-Agent": "specialist-os/1.0", "Accept": "application/octet-stream"}
+                if remote and existing_size:
+                    headers["Range"] = f"bytes={existing_size}-"
+                try:
+                    request = urllib.request.Request(url, headers=headers)
+                    with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                        final_url = response.geturl()
+                        if url.startswith("https://") and final_url.startswith("http://"):
+                            raise ModelArtifactError("refusing HTTPS model download redirected to plain HTTP")
+                        response_status = response.getcode()
+                        append = bool(existing_size and response_status == 206)
+                        expected_size = None
+                        if append:
+                            content_range = response.headers.get("Content-Range", "")
+                            matched_range = re.fullmatch(r"bytes (\d+)-(\d+)/(\d+)", content_range)
+                            if not matched_range or int(matched_range.group(1)) != existing_size:
+                                raise ModelArtifactError("model server returned an invalid Content-Range")
+                            expected_size = int(matched_range.group(3))
+                        else:
+                            existing_size = 0
+                            content_length = response.headers.get("Content-Length")
+                            if content_length:
+                                try:
+                                    expected_size = int(content_length)
+                                except ValueError:
+                                    expected_size = None
+                        if expected_size is not None and expected_size > self.max_bytes:
                             raise ModelArtifactError(f"model download exceeds {self.max_bytes} bytes")
-                    except ValueError:
-                        pass
-                while True:
-                    chunk = response.read(1024 * 1024)
-                    if not chunk:
-                        break
-                    size += len(chunk)
-                    if size > self.max_bytes:
-                        raise ModelArtifactError(f"model download exceeds {self.max_bytes} bytes")
-                    digest.update(chunk)
-                    stream.write(chunk)
-            actual = digest.hexdigest()
-            if actual.lower() != expected_sha256.lower():
-                raise ModelArtifactError(f"checksum mismatch: expected {expected_sha256}, got {actual}")
-            os.replace(temporary, destination)
-            return {"path": str(destination), "size_bytes": size, "sha256": actual, "source": url}
-        except ModelArtifactError:
-            try:
-                os.close(fd)
-            except OSError:
-                pass
+                        size = existing_size
+                        with open(temporary, "ab" if append else "wb") as stream:
+                            while True:
+                                chunk = response.read(1024 * 1024)
+                                if not chunk:
+                                    break
+                                size += len(chunk)
+                                if size > self.max_bytes:
+                                    raise ModelArtifactError(f"model download exceeds {self.max_bytes} bytes")
+                                stream.write(chunk)
+                    if expected_size is not None and size != expected_size:
+                        last_error = ModelArtifactError(f"model download was truncated: expected {expected_size} bytes, got {size}")
+                        if remote and attempt + 1 < self.download_attempts:
+                            time.sleep(0.25 * (2**attempt))
+                            continue
+                        raise last_error
+                    actual = self.verify(Path(temporary))
+                    if actual.lower() != expected_sha256.lower():
+                        last_error = ModelArtifactError(f"checksum mismatch: expected {expected_sha256}, got {actual}")
+                        if remote and attempt + 1 < self.download_attempts:
+                            with open(temporary, "wb"):
+                                pass
+                            time.sleep(0.25 * (2**attempt))
+                            continue
+                        raise last_error
+                    os.replace(temporary, destination)
+                    return {"path": str(destination), "size_bytes": size, "sha256": actual, "source": url}
+                except ModelArtifactError:
+                    raise
+                except urllib.error.HTTPError as exc:
+                    last_error = exc
+                    retryable = exc.code in {408, 425, 429, 416} or exc.code >= 500
+                    if exc.code == 416:
+                        with open(temporary, "wb"):
+                            pass
+                    exc.close()
+                    if not retryable or attempt + 1 >= self.download_attempts:
+                        raise ModelArtifactError(f"model download failed: {exc}") from exc
+                except (OSError, urllib.error.URLError, TimeoutError) as exc:
+                    last_error = exc
+                    if attempt + 1 >= self.download_attempts:
+                        raise ModelArtifactError(f"model download failed: {exc}") from exc
+                time.sleep(0.25 * (2**attempt))
+            raise ModelArtifactError(f"model download failed: {last_error}")
+        finally:
             if os.path.exists(temporary):
                 os.unlink(temporary)
-            raise
-        except (OSError, urllib.error.URLError, TimeoutError) as exc:
-            try:
-                os.close(fd)
-            except OSError:
-                pass
-            if os.path.exists(temporary):
-                os.unlink(temporary)
-            raise ModelArtifactError(f"model download failed: {exc}") from exc

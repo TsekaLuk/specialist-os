@@ -1,6 +1,6 @@
 # Security policy
 
-Specialist Runtime treats local inputs as untrusted. The runtime enforces a
+Specialist OS treats local inputs as untrusted. The runtime enforces a
 512 MiB input limit, JSON request limits, provider timeouts, worker output
 limits, optional POSIX memory/CPU limits, and atomic artifact verification.
 

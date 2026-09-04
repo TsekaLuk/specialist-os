@@ -164,11 +164,18 @@ def builtin_manifests() -> list[ProviderManifest]:
         ("sam", ["vision.segment"], "8.3.0", "python", ["cpu", "mps", "cuda"], "Apache-2.0"),
         ("paddleocr", ["vision.ocr"], "3.7.0", "python", ["cpu", "mps", "cuda"], "Apache-2.0"),
         ("depth-anything", ["vision.depth"], "2", "python", ["cpu", "mps", "cuda"], "Apache-2.0"),
-        ("omniparser", ["screen.parse"], "2", "command", ["cpu", "mps", "cuda"], "MIT"),
+        ("omniparser", ["screen.parse"], "2", "python", ["cpu", "mps", "cuda"], "AGPL-3.0/MIT"),
         ("mineru", ["document.parse"], "3.4.5", "command", ["cpu", "cuda"], "AGPL-3.0"),
         ("whisper.cpp", ["audio.transcribe"], "1.9.2", "native", ["cpu", "mps", "cuda"], "MIT"),
         ("silero-vad", ["audio.vad"], "6.2.1", "python", ["cpu", "mps", "cuda"], "MIT"),
         ("fish_audio", ["speech.synthesize", "speech.clone_voice"], "S2", "http", ["cpu", "mps", "cuda"], "Fish Audio Research License"),
+        ("mediapipe", ["human.pose", "human.hand_landmarks", "human.face_landmarks", "human.gesture"], "0.10.21", "python", ["cpu", "mps"], "Apache-2.0"),
+        ("pyannote", ["speech.diarize"], "4.0.7", "python", ["cpu", "mps", "cuda"], "MIT"),
+        ("deepfilternet", ["audio.denoise"], "0.5.6", "python", ["cpu", "cuda"], "MIT"),
+        ("openclip", ["vision.embed", "vision.embed_text", "vision.similarity", "vision.search"], "2.31.0", "python", ["cpu", "mps", "cuda"], "MIT"),
+        ("insightface", ["identity.face.detect", "identity.face.embed", "identity.face.verify"], "0.7.3", "python", ["cpu", "cuda"], "MIT"),
+        ("opencv", ["vision.geometry.*", "vision.transform.*"], "4.10", "native", ["cpu"], "Apache-2.0"),
+        ("ffmpeg", ["media.*"], "7", "native", ["cpu"], "LGPL-2.1"),
     ]
     manifests = [
         ProviderManifest(
@@ -199,5 +206,19 @@ def builtin_manifests() -> list[ProviderManifest]:
         network_required=False,
         trust_level="official",
         source="builtin",
+    )
+    pyannote = next(item for item in manifests if item.provider == "pyannote")
+    manifests[manifests.index(pyannote)] = ProviderManifest(
+        provider=pyannote.provider,
+        version=pyannote.version,
+        capabilities=pyannote.capabilities,
+        runtime=pyannote.runtime,
+        models=pyannote.models,
+        metrics=pyannote.metrics,
+        license={"code": "MIT", "weights": "CC-BY-4.0"},
+        platform=pyannote.platform,
+        network_required=pyannote.network_required,
+        trust_level=pyannote.trust_level,
+        source=pyannote.source,
     )
     return manifests

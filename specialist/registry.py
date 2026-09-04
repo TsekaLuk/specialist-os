@@ -215,15 +215,28 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
 
 
 CAPABILITIES, REGISTRY_DOCUMENT = _load_registry()
+
+# Bundle names are part of the public install surface. Keep the original
+# bundles stable while deriving expansion bundles from the single registry so
+# a newly registered capability cannot be omitted from discovery/install.
 BUNDLES = {
     "vision": [name for name, spec in CAPABILITIES.items() if spec.bundle == "vision"],
     "audio": [name for name, spec in CAPABILITIES.items() if spec.bundle == "audio"],
     "document": [name for name, spec in CAPABILITIES.items() if spec.bundle == "document"],
-    "all": list(CAPABILITIES),
 }
+for bundle_name in ("human", "identity", "audio-plus", "retrieval", "media", "vision-operators", "speech"):
+    BUNDLES[bundle_name] = [name for name, spec in CAPABILITIES.items() if spec.bundle == bundle_name]
+BUNDLES["audio-plus"] = [name for name, spec in CAPABILITIES.items() if spec.bundle in {"audio-plus", "speech"} or name in {"audio.denoise", "speech.diarize"}]
+# ``core`` intentionally includes metadata for every capability. Installation
+# remains lazy at the provider boundary, so this does not download every model.
+BUNDLES["core"] = list(CAPABILITIES)
+BUNDLES["all"] = list(CAPABILITIES)
 
 ALIASES = {spec.command: name for name, spec in CAPABILITIES.items()}
 ALIASES.update({name.replace(".", "_"): name for name in CAPABILITIES})
+# Backward-compatible depth naming used by early Spatial prototypes.
+ALIASES["spatial.depth"] = "vision.depth"
+ALIASES["spatial_depth"] = "vision.depth"
 
 
 def resolve_capability(value: str) -> str:

@@ -1,5 +1,3 @@
-import hashlib
-import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -90,7 +88,7 @@ class AdvancedProtocolTests(unittest.TestCase):
             decision = NodeScheduler().select("vision.ocr", registry.list(), local_only=True)
             self.assertEqual(decision["selected"]["node_id"], node.node_id)
             benchmarks = BenchmarkRegistry(root / "benchmarks.json")
-            item = benchmarks.record(BenchmarkRecord("vision.ocr", "paddleocr", "model", {"os": "x", "architecture": "y", "cpu": "z"}, 10.0))
+            benchmarks.record(BenchmarkRecord("vision.ocr", "paddleocr", "model", {"os": "x", "architecture": "y", "cpu": "z"}, 10.0))
             self.assertEqual(benchmarks.best("vision.ocr")["latency_ms"], 10.0)
 
     def test_confidence_and_verification(self):
