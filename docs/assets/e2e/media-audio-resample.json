@@ -1,0 +1,186 @@
+{
+  "capability": "media.audio.resample",
+  "provider": "ffmpeg",
+  "model": "ffmpeg-9",
+  "input": {
+    "type": "audio",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+    "size_bytes": 640932,
+    "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+  },
+  "result": {
+    "audio_path": "artifact://b531951a4a3f0422b5c9d459a285320ed2326aa7220b9d2bc5259f72985f199c",
+    "mime": "audio/wav",
+    "format": "wav",
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 110,
+    "device": "cpu",
+    "memory_mb": 197.6,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_964fdf6e4c495f97",
+      "type": "operator_result",
+      "value": {
+        "audio_path": "artifact://b531951a4a3f0422b5c9d459a285320ed2326aa7220b9d2bc5259f72985f199c",
+        "mime": "audio/wav",
+        "format": "wav",
+        "deterministic": true
+      },
+      "evidence": [
+        {
+          "provider": "ffmpeg",
+          "model": "ffmpeg-9"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "ffmpeg",
+        "model_version": "ffmpeg-9",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_b531951a4a3f0422b5c9d459a285320ed2326aa7220b9d2bc5259f72985f199c",
+      "mime": "audio/wav",
+      "size_bytes": 320506,
+      "sha256": "b531951a4a3f0422b5c9d459a285320ed2326aa7220b9d2bc5259f72985f199c",
+      "uri": "artifact://b531951a4a3f0422b5c9d459a285320ed2326aa7220b9d2bc5259f72985f199c",
+      "metadata": {
+        "source_name": "meeting-two-speaker-58fbc2f168aa0085.wav",
+        "capability": "media.audio.resample",
+        "result_key": "audio_path"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 110,
+    "device": "cpu",
+    "memory_mb": 197.6,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 1,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+      "size_bytes": 640932,
+      "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "provider": "ffmpeg",
+    "model_version": "ffmpeg-9",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "media.audio.resample",
+        "options": {
+          "sample_rate": 8000,
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "media.audio.resample",
+          "provider": "ffmpeg",
+          "model": "ffmpeg-9",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "media.audio.resample",
+        "provider": "ffmpeg",
+        "model": "ffmpeg-9",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

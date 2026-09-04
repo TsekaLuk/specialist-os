@@ -1,0 +1,188 @@
+{
+  "capability": "vision.depth",
+  "provider": "depth-anything",
+  "model": "depth-anything-v2-small",
+  "input": {
+    "type": "image",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+    "size_bytes": 137419,
+    "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+  },
+  "result": {
+    "width": 810,
+    "height": 1080,
+    "depth_map": null,
+    "preview": "artifact://1966700de5d6e7111c27f25952609aa1ee001735dbc48e2e90a905fbe19c1d5d",
+    "mode": "relative",
+    "unit": null,
+    "estimated": false
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 190.0,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_8928407adf282b36",
+      "type": "depth_map",
+      "value": {
+        "width": 810,
+        "height": 1080,
+        "mode": "relative"
+      },
+      "evidence": [
+        {
+          "provider": "depth-anything",
+          "model": "depth-anything-v2-small"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "depth-anything",
+        "model_version": "depth-anything-v2-small",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "depth-anything",
+      "model": "depth-anything-v2-small"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_1966700de5d6e7111c27f25952609aa1ee001735dbc48e2e90a905fbe19c1d5d",
+      "mime": "image/png",
+      "size_bytes": 62207,
+      "sha256": "1966700de5d6e7111c27f25952609aa1ee001735dbc48e2e90a905fbe19c1d5d",
+      "uri": "artifact://1966700de5d6e7111c27f25952609aa1ee001735dbc48e2e90a905fbe19c1d5d",
+      "metadata": {
+        "source_name": "c02019c4979c191e-depth.png",
+        "capability": "vision.depth",
+        "result_key": "preview"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 4493,
+    "device": "cpu",
+    "memory_mb": 190.0,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 1,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+      "size_bytes": 137419,
+      "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "provider": "depth-anything",
+    "model_version": "depth-anything-v2-small",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.depth",
+        "options": {
+          "mode": "relative",
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.depth",
+          "provider": "depth-anything",
+          "model": "depth-anything-v2-small",
+          "quality": 0.82,
+          "estimated_latency_ms": 122,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.6474,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.depth",
+        "provider": "depth-anything",
+        "model": "depth-anything-v2-small",
+        "quality": 0.82,
+        "estimated_latency_ms": 122,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.6474,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

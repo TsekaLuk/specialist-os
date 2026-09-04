@@ -10,10 +10,10 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/TsekaLuk/specialist-runtime/ci.yml?branch=main&label=CI&logo=github)](https://github.com/TsekaLuk/specialist-runtime/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/TsekaLuk/specialist-runtime?display_name=tag&sort=semver)](https://github.com/TsekaLuk/specialist-runtime/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/TsekaLuk/specialist-os/ci.yml?branch=main&label=CI&logo=github)](https://github.com/TsekaLuk/specialist-os/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/TsekaLuk/specialist-os?display_name=tag&sort=semver)](https://github.com/TsekaLuk/specialist-os/releases/latest)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
-[![License](https://img.shields.io/github/license/TsekaLuk/specialist-runtime)](LICENSE)
+[![License](https://img.shields.io/github/license/TsekaLuk/specialist-os)](LICENSE)
 
 `CLI` · `Python SDK` · `HTTP` · `MCP` · `Rust Core`
 
@@ -27,7 +27,7 @@ Specialist OS 是面向 AI 产品的能力层，让应用直接获得看、听�
 它把目标检测、分割、OCR、深度、界面理解、文档解析、转写和语音等专业智能封装
 成稳定的产品原语，让能力可以直接进入真实业务流程。
 
-开源实现 `specialist-runtime` 负责发现 Provider、根据请求选择执行路径，并返回
+开源实现 `specialist-os` 负责发现 Provider、根据请求选择执行路径，并返回
 统一的结果协议。你的产品只依赖能力名称；模型、硬件、隔离和 Provider 的变化由
 Runtime 在底层处理。
 
@@ -69,8 +69,8 @@ Specialist OS 位于 Agent Framework、Chatbot、RAG 产品和各类模型应用
 使用 [uv](https://docs.astral.sh/uv/) 从源码安装：
 
 ```bash
-git clone https://github.com/TsekaLuk/specialist-runtime.git
-cd specialist-runtime
+git clone https://github.com/TsekaLuk/specialist-os.git
+cd specialist-os
 uv tool install .
 
 specialist doctor
@@ -112,6 +112,55 @@ Runtime 数据默认保存在 `~/.specialist/`。可以通过 `SPECIALIST_HOME` 
 | `audio.vad` | Silero VAD | 检测语音区间，构建响应更快的实时语音体验 | `specialist vad` |
 | `speech.synthesize` | Fish Audio S2 / 系统 TTS | 为助手、产品和内容生产线提供一致的声音 | `specialist speak` |
 | `speech.clone_voice` | Fish Audio S2 | 为明确的产品或内容流程建立可控的声音身份 | `specialist clone-voice` |
+| `human.pose` · `human.hand_landmarks` · `human.face_landmarks` · `human.gesture` | MediaPipe Tasks | 把动作、姿态和手势变成健身、零售与机器人可用的交互信号 | `specialist pose` |
+| `speech.diarize` · `speech.meeting` · `audio.denoise` | pyannote.audio · DeepFilterNet | 产出干净、可区分说话人的会议时间线，直接接入搜索和跟进流程 | `specialist diarize` · `specialist denoise` |
+| `vision.embed` · `vision.embed_text` · `vision.similarity` · `vision.search` | OpenCLIP / SigLIP2 | 为产品加入视觉发现、推荐和图文检索能力 | `specialist embed` · `specialist search` |
+| `identity.face.*` · `vision.face_compare` | InsightFace | 在本地完成带明确阈值和隐私控制的人脸身份匹配 | `specialist face-verify` |
+| `vision.geometry.*` · `vision.transform.*` | OpenCV | 为质检、AR 和自动化流程完成测量、对齐与视觉变换 | `specialist geometry-distance` · `specialist transform-resize` |
+| `media.*` | FFmpeg | 把视频和音频探测、剪辑、转换为可复用的产品 Artifact | `specialist media-probe` · `specialist extract-frames` |
+
+### 能力画廊
+
+画廊编排成几条完整的产品场景：城市路侧安全、体育动作、运营表格、会议音频和
+媒体发布流水线。所有场景都由公开 CLI 生成，同时展示检测框、掩码、OCR 区域、
+深度图、关键点、时间线、变换结果以及可复用的媒体 Artifact。
+
+<p align="center">
+  <img src="docs/assets/e2e/capability-gallery.png" alt="Specialist OS 本地 CLI 能力画廊" width="100%">
+</p>
+
+<p align="center"><sub>4 列结果网格 · 每个格子都由保存的 CLI 结果信封渲染，完整记录见 <a href="docs/assets/e2e/capability-gallery.json"><code>capability-gallery.json</code></a></sub></p>
+
+画廊使用的输入素材和许可信息一并放在<a href="docs/assets/e2e/README.md">素材说明</a>中，
+方便复现和替换场景。
+
+同一轮运行生成的音频可以直接播放：
+
+<table>
+<tr><th>能力</th><th>本地结果</th></tr>
+<tr><td><code>audio.vad</code> · Silero VAD</td><td><audio controls preload="metadata" style="width:100%" aria-label="Silero VAD 输入"><source src="./docs/assets/e2e/meeting-two-speaker.wav" type="audio/wav"><a href="./docs/assets/e2e/meeting-two-speaker.wav">打开 WAV</a></audio></td></tr>
+<tr><td><code>audio.transcribe</code> · whisper.cpp</td><td><audio controls preload="metadata" style="width:100%" aria-label="whisper.cpp 输入"><source src="./docs/assets/e2e/meeting-two-speaker.wav" type="audio/wav"><a href="./docs/assets/e2e/meeting-two-speaker.wav">打开 WAV</a></audio></td></tr>
+<tr><td><code>audio.denoise</code> · DeepFilterNet balanced</td><td><audio controls preload="metadata" style="width:100%" aria-label="DeepFilterNet 输出"><source src="./docs/assets/e2e/audio-denoised-balanced.wav" type="audio/wav"><a href="./docs/assets/e2e/audio-denoised-balanced.wav">打开 WAV</a></audio></td></tr>
+<tr><td><code>speech.synthesize</code> · Fish Audio S2</td><td><audio controls preload="metadata" style="width:100%" aria-label="Fish Audio S2 合成语音"><source src="./docs/assets/e2e/speech-synthesize.wav" type="audio/wav"><a href="./docs/assets/e2e/speech-synthesize.wav">打开 WAV</a></audio></td></tr>
+<tr><td><code>speech.clone_voice</code> · Fish Audio S2</td><td><audio controls preload="metadata" style="width:100%" aria-label="Fish Audio S2 声音克隆"><source src="./docs/assets/e2e/speech-clone-voice.wav" type="audio/wav"><a href="./docs/assets/e2e/speech-clone-voice.wav">打开 WAV</a></audio></td></tr>
+<tr><td><code>media.audio.extract</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="提取的音频"><source src="./docs/assets/e2e/media-audio-extract.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-extract.wav">打开 WAV</a></audio></td></tr>
+<tr><td><code>media.audio.trim</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="裁剪后的音频"><source src="./docs/assets/e2e/media-audio-trim.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-trim.wav">打开 WAV</a></audio></td></tr>
+<tr><td><code>media.audio.resample</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="重采样后的音频"><source src="./docs/assets/e2e/media-audio-resample.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-resample.wav">打开 WAV</a></audio></td></tr>
+<tr><td><code>media.audio.convert</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="转换后的音频"><source src="./docs/assets/e2e/media-audio-convert.flac" type="audio/flac"><a href="./docs/assets/e2e/media-audio-convert.flac">打开 FLAC</a></audio></td></tr>
+<tr><td><code>media.audio.normalize</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="归一化后的音频"><source src="./docs/assets/e2e/media-audio-normalize.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-normalize.wav">打开 WAV</a></audio></td></tr>
+</table>
+
+在已配置 Provider 环境的机器上复现同一条生产流程：
+
+```bash
+python scripts/generate_readme_gallery.py \
+  --python /path/to/provider-python \
+  --home ~/.specialist \
+  --backend real
+```
+
+命令会把每个 JSON 结果信封和画板写入 `docs/assets/e2e/`。每个信封都保留 Provider、
+模型和来源信息，更换模型配置或硬件路由后可以重新生成画廊。
 
 ### 一套契约，组合出完整流程
 
@@ -120,7 +169,7 @@ Runtime 数据默认保存在 `~/.specialist/`。可以通过 `SPECIALIST_HOME` 
 的 Provider 选择、Artifact、置信度和来源信息。
 
 <p align="center">
-  <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist Runtime YOLO11s 实际结果，街景中检测到一辆公交车和四个人" width="810">
+  <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist OS YOLO11s 实际结果，街景中检测到一辆公交车和四个人" width="810">
 </p>
 
 <p align="center"><sub>实际参考结果 · <code>yolo</code> / <code>yolo11s</code> · CPU · <a href="https://www.ultralytics.com/images/bus.jpg">Ultralytics bus.jpg</a></sub></p>
@@ -141,6 +190,10 @@ specialist --backend real --isolate detect bus.jpg --json
 specialist install vision.ocr
 specialist pack list
 specialist pack install vision-core
+specialist pack install human
+specialist pack install retrieval
+specialist pack install media
+specialist pack install core
 specialist install all
 ```
 
@@ -299,5 +352,5 @@ CI 覆盖 Python 3.10–3.13、macOS ARM64、Wheel 安装、Rust/Python ABI 检�
 欢迎参与贡献。新增 Provider 或修改 Capability Contract 前，请阅读
 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-Specialist Runtime 使用 [MIT License](LICENSE)。Provider 代码和模型权重保留各自
+Specialist OS 使用 [MIT License](LICENSE)。Provider 代码和模型权重保留各自
 许可证，具体记录在 Registry 中。

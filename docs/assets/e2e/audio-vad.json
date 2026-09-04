@@ -1,0 +1,313 @@
+{
+  "capability": "audio.vad",
+  "provider": "silero-vad",
+  "model": "silero-vad-v5",
+  "input": {
+    "type": "audio",
+    "path": "docs/assets/e2e/meeting-two-speaker.wav",
+    "size_bytes": 640932,
+    "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+  },
+  "result": {
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 4.1
+      },
+      {
+        "start": 4.5,
+        "end": 6.6
+      },
+      {
+        "start": 6.8,
+        "end": 9.7
+      },
+      {
+        "start": 10.1,
+        "end": 13.4
+      },
+      {
+        "start": 13.7,
+        "end": 20.0
+      }
+    ],
+    "duration_seconds": 20.0266875
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 198.9,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_50b332be02592bb4",
+      "type": "speech_interval",
+      "value": {
+        "start": 0.0,
+        "end": 4.1
+      },
+      "geometry": {
+        "start": 0.0,
+        "end": 4.1
+      },
+      "evidence": [
+        {
+          "provider": "silero-vad",
+          "model": "silero-vad-v5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "silero-vad",
+        "model_version": "silero-vad-v5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_f9ce41d1c27e92cd",
+      "type": "speech_interval",
+      "value": {
+        "start": 4.5,
+        "end": 6.6
+      },
+      "geometry": {
+        "start": 4.5,
+        "end": 6.6
+      },
+      "evidence": [
+        {
+          "provider": "silero-vad",
+          "model": "silero-vad-v5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "silero-vad",
+        "model_version": "silero-vad-v5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_569b0c03b6f006d8",
+      "type": "speech_interval",
+      "value": {
+        "start": 6.8,
+        "end": 9.7
+      },
+      "geometry": {
+        "start": 6.8,
+        "end": 9.7
+      },
+      "evidence": [
+        {
+          "provider": "silero-vad",
+          "model": "silero-vad-v5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "silero-vad",
+        "model_version": "silero-vad-v5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_a2d0f93d107ea680",
+      "type": "speech_interval",
+      "value": {
+        "start": 10.1,
+        "end": 13.4
+      },
+      "geometry": {
+        "start": 10.1,
+        "end": 13.4
+      },
+      "evidence": [
+        {
+          "provider": "silero-vad",
+          "model": "silero-vad-v5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "silero-vad",
+        "model_version": "silero-vad-v5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_97ea7f14a059c687",
+      "type": "speech_interval",
+      "value": {
+        "start": 13.7,
+        "end": 20.0
+      },
+      "geometry": {
+        "start": 13.7,
+        "end": 20.0
+      },
+      "evidence": [
+        {
+          "provider": "silero-vad",
+          "model": "silero-vad-v5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "silero-vad",
+        "model_version": "silero-vad-v5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "silero-vad",
+      "model": "silero-vad-v5"
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 1373,
+    "device": "cpu",
+    "memory_mb": 198.9,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 5,
+    "artifact_count": 0,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "docs/assets/e2e/meeting-two-speaker.wav",
+      "size_bytes": 640932,
+      "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "provider": "silero-vad",
+    "model_version": "silero-vad-v5",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "audio.vad",
+        "options": {
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "audio.vad",
+          "provider": "silero-vad",
+          "model": "silero-vad-v5",
+          "quality": 0.82,
+          "estimated_latency_ms": 81,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.6802,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "audio.vad",
+        "provider": "silero-vad",
+        "model": "silero-vad-v5",
+        "quality": 0.82,
+        "estimated_latency_ms": 81,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.6802,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+	"systeminfo": "WHISPER : COREML = 0 | OPENVINO = 0 | MTL : EMBED_LIBRARY = 1 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | MATMUL_INT8 = 1 | DOTPROD = 1 | SME = 1 | ACCELERATE = 1 | OPENMP = 1 | REPACK = 1 | ",
+	"model": {
+		"type": "base",
+		"multilingual": false,
+		"vocab": 51864,
+		"audio": {
+			"ctx": 1500,
+			"state": 512,
+			"head": 8,
+			"layer": 6
+		},
+		"text": {
+			"ctx": 448,
+			"state": 512,
+			"head": 8,
+			"layer": 6
+		},
+		"mels": 80,
+		"ftype": 1
+	},
+	"params": {
+		"model": "/tmp/specialist-gallery-home.E6RTAM/models/audio__transcribe/ggml-base.en/ggml-base.en.bin",
+		"language": "en",
+		"translate": false
+	},
+	"result": {
+		"language": "en"
+	},
+	"transcription": [
+		{
+			"timestamps": {
+				"from": "00:00:00,000",
+				"to": "00:00:04,520"
+			},
+			"offsets": {
+				"from": 0,
+				"to": 4520
+			},
+			"text": " The customer reported an intermittent checkout failure after the morning release."
+		},
+		{
+			"timestamps": {
+				"from": "00:00:04,520",
+				"to": "00:00:10,280"
+			},
+			"offsets": {
+				"from": 4520,
+				"to": 10280
+			},
+			"text": " I traced it to the payment callback, error rates peaked at 9% for 6 minutes."
+		},
+		{
+			"timestamps": {
+				"from": "00:00:10,280",
+				"to": "00:00:13,760"
+			},
+			"offsets": {
+				"from": 10280,
+				"to": 13760
+			},
+			"text": " Can we roll back safely and preserve the successful orders?"
+		},
+		{
+			"timestamps": {
+				"from": "00:00:13,760",
+				"to": "00:00:17,400"
+			},
+			"offsets": {
+				"from": 13760,
+				"to": 17400
+			},
+			"text": " Yes, the database migration is backward compatible."
+		},
+		{
+			"timestamps": {
+				"from": "00:00:17,400",
+				"to": "00:00:20,000"
+			},
+			"offsets": {
+				"from": 17400,
+				"to": 20000
+			},
+			"text": " I will start the roll back and monitor recovery."
+		}
+	]
+}

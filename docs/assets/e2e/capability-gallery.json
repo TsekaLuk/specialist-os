@@ -1,0 +1,523 @@
+{
+  "generated_at": "2026-09-04T14:19:14.747844+00:00",
+  "generated_by": "scripts/generate_readme_gallery.py",
+  "backend": "real",
+  "records": {
+    "vision.detect": {
+      "capability": "vision.detect",
+      "title": "YOLO object detection",
+      "json": "vision-detect.json",
+      "status": "ok",
+      "provider": "yolo",
+      "model": "yolo11n",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.segment": {
+      "capability": "vision.segment",
+      "title": "SAM segmentation",
+      "json": "vision-segment.json",
+      "status": "ok",
+      "provider": "sam",
+      "model": "sam2-small",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.ocr": {
+      "capability": "vision.ocr",
+      "title": "PaddleOCR",
+      "json": "vision-ocr.json",
+      "status": "ok",
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "input_sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+    },
+    "vision.depth": {
+      "capability": "vision.depth",
+      "title": "Depth Anything",
+      "json": "vision-depth.json",
+      "status": "ok",
+      "provider": "depth-anything",
+      "model": "depth-anything-v2-small",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "human.pose": {
+      "capability": "human.pose",
+      "title": "MediaPipe pose",
+      "json": "human-pose.json",
+      "status": "ok",
+      "provider": "mediapipe",
+      "model": "mediapipe-tasks",
+      "input_sha256": "197f8a11cb74a2ecff8aa106271e5d3088a64c8fea691dc081385fb8ba4a6aa0"
+    },
+    "human.face_landmarks": {
+      "capability": "human.face_landmarks",
+      "title": "MediaPipe face landmarks",
+      "json": "human-face-landmarks.json",
+      "status": "ok",
+      "provider": "mediapipe",
+      "model": "mediapipe-tasks",
+      "input_sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+    },
+    "human.hand_landmarks": {
+      "capability": "human.hand_landmarks",
+      "title": "MediaPipe hand landmarks",
+      "json": "human-hand-landmarks.json",
+      "status": "ok",
+      "provider": "mediapipe",
+      "model": "mediapipe-tasks",
+      "input_sha256": "197f8a11cb74a2ecff8aa106271e5d3088a64c8fea691dc081385fb8ba4a6aa0"
+    },
+    "human.gesture": {
+      "capability": "human.gesture",
+      "title": "MediaPipe gesture",
+      "json": "human-gesture.json",
+      "status": "ok",
+      "provider": "mediapipe",
+      "model": "mediapipe-tasks",
+      "input_sha256": "197f8a11cb74a2ecff8aa106271e5d3088a64c8fea691dc081385fb8ba4a6aa0"
+    },
+    "audio.vad": {
+      "capability": "audio.vad",
+      "title": "Silero VAD",
+      "json": "audio-vad.json",
+      "status": "ok",
+      "provider": "silero-vad",
+      "model": "silero-vad-v5",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "audio.transcribe": {
+      "capability": "audio.transcribe",
+      "title": "whisper.cpp",
+      "json": "audio-transcribe.json",
+      "status": "ok",
+      "provider": "whisper.cpp",
+      "model": "ggml-base.en",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "audio.denoise": {
+      "capability": "audio.denoise",
+      "title": "DeepFilterNet",
+      "json": "audio-denoise.json",
+      "status": "ok",
+      "provider": "deepfilternet",
+      "model": "deepfilternet-2",
+      "input_sha256": "b0568536cee74548de620c3196c46695c6f19e650c377ffc5389fd4a54ec42ba"
+    },
+    "screen.parse": {
+      "capability": "screen.parse",
+      "title": "screen.parse",
+      "json": "screen-parse.json",
+      "status": "ok",
+      "provider": "omniparser",
+      "model": "omniparser-v2",
+      "input_sha256": "2149b711fdcd37e6e42448eda253e9317d99c11cb9f699b6a46af3ca3b9e566f"
+    },
+    "document.parse": {
+      "capability": "document.parse",
+      "title": "document.parse",
+      "json": "document-parse.json",
+      "status": "ok",
+      "provider": "mineru",
+      "model": "mineru-2",
+      "input_sha256": "7fa1e7e571b093a671c5daff7c1d4838144114ceca80fd57c127537f4da3a5c2"
+    },
+    "speech.diarize": {
+      "capability": "speech.diarize",
+      "title": "speech.diarize",
+      "json": "speech-diarize.json",
+      "status": "ok",
+      "provider": "pyannote",
+      "model": "pyannote-community-1",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "speech.align_transcript": {
+      "capability": "speech.align_transcript",
+      "title": "speech.align_transcript",
+      "json": "speech-align-transcript.json",
+      "status": "ok",
+      "provider": "composite",
+      "model": "runtime-composite-1",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "speech.meeting": {
+      "capability": "speech.meeting",
+      "title": "speech.meeting",
+      "json": "speech-meeting.json",
+      "status": "ok",
+      "provider": "composite",
+      "model": "runtime-composite-1",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "vision.embed": {
+      "capability": "vision.embed",
+      "title": "vision.embed",
+      "json": "vision-embed.json",
+      "status": "ok",
+      "provider": "openclip",
+      "model": "mobileclip2-fast",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.embed_text": {
+      "capability": "vision.embed_text",
+      "title": "vision.embed_text",
+      "json": "vision-embed-text.json",
+      "status": "ok",
+      "provider": "openclip",
+      "model": "siglip2-balanced",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.similarity": {
+      "capability": "vision.similarity",
+      "title": "vision.similarity",
+      "json": "vision-similarity.json",
+      "status": "ok",
+      "provider": "openclip",
+      "model": "siglip2-balanced",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.search": {
+      "capability": "vision.search",
+      "title": "vision.search",
+      "json": "vision-search.json",
+      "status": "ok",
+      "provider": "openclip",
+      "model": "siglip2-balanced",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.find_similar": {
+      "capability": "vision.find_similar",
+      "title": "vision.find_similar",
+      "json": "vision-find-similar.json",
+      "status": "ok",
+      "provider": "composite",
+      "model": "runtime-composite-1",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "identity.face.detect": {
+      "capability": "identity.face.detect",
+      "title": "identity.face.detect",
+      "json": "identity-face-detect.json",
+      "status": "ok",
+      "provider": "insightface",
+      "model": "buffalo_l",
+      "input_sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+    },
+    "identity.face.embed": {
+      "capability": "identity.face.embed",
+      "title": "identity.face.embed",
+      "json": "identity-face-embed.json",
+      "status": "ok",
+      "provider": "insightface",
+      "model": "buffalo_l",
+      "input_sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+    },
+    "identity.face.verify": {
+      "capability": "identity.face.verify",
+      "title": "identity.face.verify",
+      "json": "identity-face-verify.json",
+      "status": "ok",
+      "provider": "insightface",
+      "model": "buffalo_l",
+      "input_sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+    },
+    "vision.face_compare": {
+      "capability": "vision.face_compare",
+      "title": "vision.face_compare",
+      "json": "vision-face-compare.json",
+      "status": "ok",
+      "provider": "composite",
+      "model": "runtime-composite-1",
+      "input_sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+    },
+    "vision.human_state": {
+      "capability": "vision.human_state",
+      "title": "vision.human_state",
+      "json": "vision-human-state.json",
+      "status": "ok",
+      "provider": "composite",
+      "model": "runtime-composite-1",
+      "input_sha256": "197f8a11cb74a2ecff8aa106271e5d3088a64c8fea691dc081385fb8ba4a6aa0"
+    },
+    "vision.measure": {
+      "capability": "vision.measure",
+      "title": "vision.measure",
+      "json": "vision-measure.json",
+      "status": "ok",
+      "provider": "composite",
+      "model": "runtime-composite-1",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "media.transcribe_video": {
+      "capability": "media.transcribe_video",
+      "title": "media.transcribe_video",
+      "json": "media-transcribe-video.json",
+      "status": "ok",
+      "provider": "composite",
+      "model": "runtime-composite-1",
+      "input_sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "vision.geometry.distance": {
+      "capability": "vision.geometry.distance",
+      "title": "vision.geometry.distance",
+      "json": "vision-geometry-distance.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.geometry.angle": {
+      "capability": "vision.geometry.angle",
+      "title": "vision.geometry.angle",
+      "json": "vision-geometry-angle.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.geometry.area": {
+      "capability": "vision.geometry.area",
+      "title": "vision.geometry.area",
+      "json": "vision-geometry-area.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.geometry.contour": {
+      "capability": "vision.geometry.contour",
+      "title": "vision.geometry.contour",
+      "json": "vision-geometry-contour.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.geometry.homography": {
+      "capability": "vision.geometry.homography",
+      "title": "vision.geometry.homography",
+      "json": "vision-geometry-homography.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.geometry.perspective_transform": {
+      "capability": "vision.geometry.perspective_transform",
+      "title": "vision.geometry.perspective_transform",
+      "json": "vision-geometry-perspective-transform.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.geometry.calibrate_camera": {
+      "capability": "vision.geometry.calibrate_camera",
+      "title": "vision.geometry.calibrate_camera",
+      "json": "vision-geometry-calibrate-camera.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.geometry.solve_pnp": {
+      "capability": "vision.geometry.solve_pnp",
+      "title": "vision.geometry.solve_pnp",
+      "json": "vision-geometry-solve-pnp.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.geometry.match_features": {
+      "capability": "vision.geometry.match_features",
+      "title": "vision.geometry.match_features",
+      "json": "vision-geometry-match-features.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.transform.crop": {
+      "capability": "vision.transform.crop",
+      "title": "vision.transform.crop",
+      "json": "vision-transform-crop.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "vision.transform.resize": {
+      "capability": "vision.transform.resize",
+      "title": "vision.transform.resize",
+      "json": "vision-transform-resize.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+    },
+    "vision.transform.rotate": {
+      "capability": "vision.transform.rotate",
+      "title": "vision.transform.rotate",
+      "json": "vision-transform-rotate.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+    },
+    "vision.transform.warp": {
+      "capability": "vision.transform.warp",
+      "title": "vision.transform.warp",
+      "json": "vision-transform-warp.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+    },
+    "vision.transform.colorspace": {
+      "capability": "vision.transform.colorspace",
+      "title": "vision.transform.colorspace",
+      "json": "vision-transform-colorspace.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+    },
+    "vision.transform.blur": {
+      "capability": "vision.transform.blur",
+      "title": "vision.transform.blur",
+      "json": "vision-transform-blur.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+    },
+    "vision.transform.threshold": {
+      "capability": "vision.transform.threshold",
+      "title": "vision.transform.threshold",
+      "json": "vision-transform-threshold.json",
+      "status": "ok",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "input_sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+    },
+    "media.probe": {
+      "capability": "media.probe",
+      "title": "media.probe",
+      "json": "media-probe.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "media.video.extract_frames": {
+      "capability": "media.video.extract_frames",
+      "title": "media.video.extract_frames",
+      "json": "media-video-extract-frames.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "media.video.trim": {
+      "capability": "media.video.trim",
+      "title": "media.video.trim",
+      "json": "media-video-trim.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "media.video.transcode": {
+      "capability": "media.video.transcode",
+      "title": "media.video.transcode",
+      "json": "media-video-transcode.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "media.video.concat": {
+      "capability": "media.video.concat",
+      "title": "media.video.concat",
+      "json": "media-video-concat.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "media.audio.extract": {
+      "capability": "media.audio.extract",
+      "title": "media.audio.extract",
+      "json": "media-audio-extract.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "media.audio.trim": {
+      "capability": "media.audio.trim",
+      "title": "media.audio.trim",
+      "json": "media-audio-trim.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "media.audio.resample": {
+      "capability": "media.audio.resample",
+      "title": "media.audio.resample",
+      "json": "media-audio-resample.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "media.audio.convert": {
+      "capability": "media.audio.convert",
+      "title": "media.audio.convert",
+      "json": "media-audio-convert.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "media.audio.normalize": {
+      "capability": "media.audio.normalize",
+      "title": "media.audio.normalize",
+      "json": "media-audio-normalize.json",
+      "status": "ok",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "input_sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "speech.synthesize": {
+      "capability": "speech.synthesize",
+      "title": "Fish Audio S2 synthesis",
+      "json": "speech-synthesize.json",
+      "status": "ok",
+      "provider": "fish_audio",
+      "model": "s2-pro",
+      "input_sha256": "3d911d7e077d8ae090eb764d9962a23dfeb5fb6d1ebc9b3db97ab6d3f7c3c542"
+    },
+    "speech.clone_voice": {
+      "capability": "speech.clone_voice",
+      "title": "Fish Audio S2 voice cloning",
+      "json": "speech-clone-voice.json",
+      "status": "ok",
+      "provider": "fish_audio",
+      "model": "s2-pro",
+      "input_sha256": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e"
+    }
+  },
+  "audio": {
+    "audio.vad": "meeting-two-speaker.wav",
+    "audio.transcribe": "meeting-two-speaker.wav",
+    "audio.denoise": "audio-denoised-balanced.wav",
+    "media.audio.extract": "media-audio-extract.wav",
+    "media.audio.trim": "media-audio-trim.wav",
+    "media.audio.resample": "media-audio-resample.wav",
+    "media.audio.convert": "media-audio-convert.flac",
+    "media.audio.normalize": "media-audio-normalize.wav",
+    "speech.synthesize": "speech-synthesize.wav",
+    "speech.clone_voice": "speech-clone-voice.wav"
+  }
+}

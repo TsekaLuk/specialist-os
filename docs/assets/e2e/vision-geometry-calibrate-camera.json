@@ -1,0 +1,268 @@
+{
+  "capability": "vision.geometry.calibrate_camera",
+  "provider": "opencv",
+  "model": "opencv-5",
+  "input": {
+    "type": "geometry",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+    "size_bytes": 137419,
+    "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+  },
+  "result": {
+    "camera_matrix": [
+      [
+        1080.0,
+        0.0,
+        405.0
+      ],
+      [
+        0.0,
+        1080.0,
+        540.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "distortion": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "image_size": [
+      810,
+      1080
+    ],
+    "estimated": true,
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 189.9,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_f3dd1e8c84fc4af9",
+      "type": "operator_result",
+      "value": {
+        "camera_matrix": [
+          [
+            1080.0,
+            0.0,
+            405.0
+          ],
+          [
+            0.0,
+            1080.0,
+            540.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "distortion": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "image_size": [
+          810,
+          1080
+        ],
+        "estimated": true,
+        "deterministic": true
+      },
+      "evidence": [
+        {
+          "provider": "opencv",
+          "model": "opencv-5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "geometry",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "opencv",
+        "model_version": "opencv-5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "opencv",
+      "model": "opencv-5"
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 89,
+    "device": "cpu",
+    "memory_mb": 189.9,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 0,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "geometry",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+      "size_bytes": 137419,
+      "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "provider": "opencv",
+    "model_version": "opencv-5",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.geometry.calibrate_camera",
+        "options": {
+          "image_size": [
+            810,
+            1080
+          ],
+          "object_points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ],
+          "image_points": [
+            [
+              3.83,
+              229.36
+            ],
+            [
+              796.19,
+              229.36
+            ],
+            [
+              796.19,
+              728.41
+            ],
+            [
+              3.83,
+              728.41
+            ]
+          ],
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.geometry.calibrate_camera",
+          "provider": "opencv",
+          "model": "opencv-5",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.geometry.calibrate_camera",
+        "provider": "opencv",
+        "model": "opencv-5",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

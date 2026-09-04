@@ -10,10 +10,10 @@ The capability layer between AI applications and specialist intelligence.
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/TsekaLuk/specialist-runtime/ci.yml?branch=main&label=CI&logo=github)](https://github.com/TsekaLuk/specialist-runtime/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/TsekaLuk/specialist-runtime?display_name=tag&sort=semver)](https://github.com/TsekaLuk/specialist-runtime/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/TsekaLuk/specialist-os/ci.yml?branch=main&label=CI&logo=github)](https://github.com/TsekaLuk/specialist-os/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/TsekaLuk/specialist-os?display_name=tag&sort=semver)](https://github.com/TsekaLuk/specialist-os/releases/latest)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
-[![License](https://img.shields.io/github/license/TsekaLuk/specialist-runtime)](LICENSE)
+[![License](https://img.shields.io/github/license/TsekaLuk/specialist-os)](LICENSE)
 
 `CLI` · `Python SDK` · `HTTP` · `MCP` · `Rust core`
 
@@ -28,7 +28,7 @@ read and speak. It turns specialist intelligence into product primitives for
 object detection, segmentation, OCR, depth, screen understanding, document
 extraction, transcription and speech, ready to flow into real product workflows.
 
-The open-source `specialist-runtime` implementation discovers providers, chooses
+The open-source `specialist-os` implementation discovers providers, chooses
 the right execution path for the request, and returns one result contract that
 your application can build on. Your product talks to a capability; the runtime
 handles models, hardware, isolation and provider changes underneath it.
@@ -74,8 +74,8 @@ perception and specialist computation.
 Install from a checkout with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-git clone https://github.com/TsekaLuk/specialist-runtime.git
-cd specialist-runtime
+git clone https://github.com/TsekaLuk/specialist-os.git
+cd specialist-os
 uv tool install .
 
 specialist doctor
@@ -120,6 +120,58 @@ result contract and the same routing, caching and deployment surface.
 | `audio.vad` | Silero VAD | Detect speech intervals for responsive, low-latency voice experiences | `specialist vad` |
 | `speech.synthesize` | Fish Audio S2 / system TTS | Give assistants, products and content pipelines a consistent voice | `specialist speak` |
 | `speech.clone_voice` | Fish Audio S2 | Create a controlled voice identity for a defined product or content workflow | `specialist clone-voice` |
+| `human.pose` · `human.hand_landmarks` · `human.face_landmarks` · `human.gesture` | MediaPipe Tasks | Turn movement, posture and gesture into interaction signals for fitness, retail and robotics | `specialist pose` |
+| `speech.diarize` · `speech.meeting` · `audio.denoise` | pyannote.audio · DeepFilterNet | Produce clean, speaker-aware meeting timelines ready for search and follow-up workflows | `specialist diarize` · `specialist denoise` |
+| `vision.embed` · `vision.embed_text` · `vision.similarity` · `vision.search` | OpenCLIP / SigLIP2 | Add visual discovery, recommendations and image-to-text retrieval to any product | `specialist embed` · `specialist search` |
+| `identity.face.*` · `vision.face_compare` | InsightFace | Build local identity matching with explicit thresholds and privacy controls | `specialist face-verify` |
+| `vision.geometry.*` · `vision.transform.*` | OpenCV | Measure, align and transform visual data for inspection, AR and automation | `specialist geometry-distance` · `specialist transform-resize` |
+| `media.*` | FFmpeg | Probe, edit, convert and prepare video/audio as reusable product artifacts | `specialist media-probe` · `specialist extract-frames` |
+
+### Capability gallery
+
+The gallery is a compact set of product scenarios rendered by the public CLI:
+curbside safety, sports motion, operations tables, meeting audio and a media
+publishing pass. Each scenario keeps the same result contract while showing
+detections, masks, OCR regions, depth, landmarks, timelines, transforms and
+reusable media artifacts.
+
+<p align="center">
+  <img src="docs/assets/e2e/capability-gallery.png" alt="Specialist OS local CLI capability gallery" width="100%">
+</p>
+
+<p align="center"><sub>4-column result grid · each tile is rendered from a saved CLI result envelope in <a href="docs/assets/e2e/capability-gallery.json"><code>capability-gallery.json</code></a></sub></p>
+
+The source set is kept with the gallery so the scenarios stay reproducible:
+<a href="docs/assets/e2e/README.md">input and license notes</a>.
+
+Audio outputs are available as playable artifacts from the same run:
+
+<table>
+<tr><th>Capability</th><th>Local result</th></tr>
+<tr><td><code>audio.vad</code> · Silero VAD</td><td><audio controls preload="metadata" style="width:100%" aria-label="Silero VAD input"><source src="./docs/assets/e2e/meeting-two-speaker.wav" type="audio/wav"><a href="./docs/assets/e2e/meeting-two-speaker.wav">Open WAV</a></audio></td></tr>
+<tr><td><code>audio.transcribe</code> · whisper.cpp</td><td><audio controls preload="metadata" style="width:100%" aria-label="whisper.cpp input"><source src="./docs/assets/e2e/meeting-two-speaker.wav" type="audio/wav"><a href="./docs/assets/e2e/meeting-two-speaker.wav">Open WAV</a></audio></td></tr>
+<tr><td><code>audio.denoise</code> · DeepFilterNet balanced</td><td><audio controls preload="metadata" style="width:100%" aria-label="DeepFilterNet output"><source src="./docs/assets/e2e/audio-denoised-balanced.wav" type="audio/wav"><a href="./docs/assets/e2e/audio-denoised-balanced.wav">Open WAV</a></audio></td></tr>
+<tr><td><code>speech.synthesize</code> · Fish Audio S2</td><td><audio controls preload="metadata" style="width:100%" aria-label="Fish Audio S2 synthesis output"><source src="./docs/assets/e2e/speech-synthesize.wav" type="audio/wav"><a href="./docs/assets/e2e/speech-synthesize.wav">Open WAV</a></audio></td></tr>
+<tr><td><code>speech.clone_voice</code> · Fish Audio S2</td><td><audio controls preload="metadata" style="width:100%" aria-label="Fish Audio S2 voice clone output"><source src="./docs/assets/e2e/speech-clone-voice.wav" type="audio/wav"><a href="./docs/assets/e2e/speech-clone-voice.wav">Open WAV</a></audio></td></tr>
+<tr><td><code>media.audio.extract</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Extracted audio"><source src="./docs/assets/e2e/media-audio-extract.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-extract.wav">Open WAV</a></audio></td></tr>
+<tr><td><code>media.audio.trim</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Trimmed audio"><source src="./docs/assets/e2e/media-audio-trim.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-trim.wav">Open WAV</a></audio></td></tr>
+<tr><td><code>media.audio.resample</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Resampled audio"><source src="./docs/assets/e2e/media-audio-resample.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-resample.wav">Open WAV</a></audio></td></tr>
+<tr><td><code>media.audio.convert</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Converted audio"><source src="./docs/assets/e2e/media-audio-convert.flac" type="audio/flac"><a href="./docs/assets/e2e/media-audio-convert.flac">Open FLAC</a></audio></td></tr>
+<tr><td><code>media.audio.normalize</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Normalized audio"><source src="./docs/assets/e2e/media-audio-normalize.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-normalize.wav">Open WAV</a></audio></td></tr>
+</table>
+
+Run the same production-shaped flow with a provisioned provider environment:
+
+```bash
+python scripts/generate_readme_gallery.py \
+  --python /path/to/provider-python \
+  --home ~/.specialist \
+  --backend real
+```
+
+The command writes each JSON envelope and the derived grid to
+`docs/assets/e2e/`. Provider/model provenance remains in every envelope, so the
+gallery can be regenerated after changing a model profile or hardware route.
 
 ### One contract, many workflows
 
@@ -129,7 +181,7 @@ an agent or a customer-facing feature. The runtime keeps provider selection,
 artifacts, confidence and provenance consistent across every step.
 
 <p align="center">
-  <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist Runtime YOLO11s result detecting one bus and four people in a street photo" width="810">
+  <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist OS YOLO11s result detecting one bus and four people in a street photo" width="810">
 </p>
 
 <p align="center"><sub>Live reference result · <code>yolo</code> / <code>yolo11s</code> · CPU · <a href="https://www.ultralytics.com/images/bus.jpg">Ultralytics bus.jpg</a></sub></p>
@@ -150,6 +202,10 @@ Install one capability, a pack or the complete reference set:
 specialist install vision.ocr
 specialist pack list
 specialist pack install vision-core
+specialist pack install human
+specialist pack install retrieval
+specialist pack install media
+specialist pack install core
 specialist install all
 ```
 
@@ -320,5 +376,5 @@ generation. Release tags also publish checksums and build provenance.
 Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before adding
 a provider or changing a capability contract.
 
-Specialist Runtime is released under the [MIT License](LICENSE). Provider code
+Specialist OS is released under the [MIT License](LICENSE). Provider code
 and model weights retain their own licenses as recorded in the registry.

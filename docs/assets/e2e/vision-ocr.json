@@ -1,0 +1,6077 @@
+{
+  "capability": "vision.ocr",
+  "provider": "paddleocr",
+  "model": "pp-ocrv5-mobile",
+  "input": {
+    "type": "image",
+    "path": "/tmp/ocr-cand-005.png",
+    "size_bytes": 229473,
+    "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+  },
+  "result": {
+    "blocks": [
+      {
+        "text": "Branch:M.A, Political Science&PublicAdministration",
+        "bbox": [
+          81,
+          89,
+          353,
+          103
+        ],
+        "confidence": 0.9631450176239014
+      },
+      {
+        "text": "Time:2.00pm to5.00pm",
+        "bbox": [
+          391,
+          87,
+          518,
+          105
+        ],
+        "confidence": 0.9569627046585083
+      },
+      {
+        "text": "Date & Day",
+        "bbox": [
+          79,
+          104,
+          141,
+          124
+        ],
+        "confidence": 0.9372197389602661
+      },
+      {
+        "text": "Paper",
+        "bbox": [
+          152,
+          107,
+          189,
+          122
+        ],
+        "confidence": 0.9925295114517212
+      },
+      {
+        "text": "Titles",
+        "bbox": [
+          217,
+          107,
+          251,
+          122
+        ],
+        "confidence": 0.9866443276405334
+      },
+      {
+        "text": "Marks",
+        "bbox": [
+          522,
+          107,
+          560,
+          122
+        ],
+        "confidence": 0.9978458285331726
+      },
+      {
+        "text": "31-10-2011",
+        "bbox": [
+          78,
+          121,
+          139,
+          139
+        ],
+        "confidence": 0.9582969546318054
+      },
+      {
+        "text": "1",
+        "bbox": [
+          154,
+          125,
+          163,
+          135
+        ],
+        "confidence": 0.8961195349693298
+      },
+      {
+        "text": "Pollitical Thought",
+        "bbox": [
+          216,
+          120,
+          302,
+          140
+        ],
+        "confidence": 0.9211397171020508
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          122,
+          544,
+          139
+        ],
+        "confidence": 0.9966332912445068
+      },
+      {
+        "text": "Monday",
+        "bbox": [
+          79,
+          136,
+          126,
+          155
+        ],
+        "confidence": 0.9399160742759705
+      },
+      {
+        "text": "02-11-2011",
+        "bbox": [
+          77,
+          151,
+          138,
+          169
+        ],
+        "confidence": 0.9939864873886108
+      },
+      {
+        "text": "1I",
+        "bbox": [
+          154,
+          155,
+          168,
+          169
+        ],
+        "confidence": 0.5537502765655518
+      },
+      {
+        "text": "Modern Pollti eal Theory",
+        "bbox": [
+          218,
+          153,
+          334,
+          171
+        ],
+        "confidence": 0.918804943561554
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          154,
+          544,
+          172
+        ],
+        "confidence": 0.9888366460800171
+      },
+      {
+        "text": "Wednesday",
+        "bbox": [
+          78,
+          165,
+          142,
+          186
+        ],
+        "confidence": 0.9972255229949951
+      },
+      {
+        "text": "04-11-2011",
+        "bbox": [
+          77,
+          181,
+          140,
+          202
+        ],
+        "confidence": 0.9891767501831055
+      },
+      {
+        "text": "Ⅲ",
+        "bbox": [
+          154,
+          185,
+          171,
+          199
+        ],
+        "confidence": 0.2755102515220642
+      },
+      {
+        "text": "Comparative Govermment & Polltics",
+        "bbox": [
+          220,
+          185,
+          386,
+          199
+        ],
+        "confidence": 0.9294931292533875
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          184,
+          543,
+          202
+        ],
+        "confidence": 0.9710710048675537
+      },
+      {
+        "text": "Friday",
+        "bbox": [
+          78,
+          198,
+          118,
+          218
+        ],
+        "confidence": 0.9909138679504395
+      },
+      {
+        "text": "08-11-2011",
+        "bbox": [
+          78,
+          215,
+          138,
+          232
+        ],
+        "confidence": 0.9818248748779297
+      },
+      {
+        "text": "IV",
+        "bbox": [
+          154,
+          217,
+          172,
+          231
+        ],
+        "confidence": 0.9235807061195374
+      },
+      {
+        "text": "Public Policy",
+        "bbox": [
+          217,
+          213,
+          281,
+          232
+        ],
+        "confidence": 0.9505348205566406
+      },
+      {
+        "text": "Tuesday",
+        "bbox": [
+          78,
+          227,
+          126,
+          249
+        ],
+        "confidence": 0.9981452226638794
+      },
+      {
+        "text": "80",
+        "bbox": [
+          524,
+          218,
+          543,
+          231
+        ],
+        "confidence": 0.996073842048645
+      },
+      {
+        "text": "10-11-2011",
+        "bbox": [
+          78,
+          245,
+          138,
+          263
+        ],
+        "confidence": 0.9595271348953247
+      },
+      {
+        "text": "V",
+        "bbox": [
+          154,
+          248,
+          168,
+          261
+        ],
+        "confidence": 0.6836206912994385
+      },
+      {
+        "text": "Administrative Theorles",
+        "bbox": [
+          218,
+          247,
+          332,
+          262
+        ],
+        "confidence": 0.959541916847229
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          247,
+          543,
+          264
+        ],
+        "confidence": 0.9945040941238403
+      },
+      {
+        "text": "Thursday",
+        "bbox": [
+          77,
+          257,
+          133,
+          281
+        ],
+        "confidence": 0.9976416826248169
+      },
+      {
+        "text": "Branch: M.A, History",
+        "bbox": [
+          79,
+          294,
+          190,
+          313
+        ],
+        "confidence": 0.9549356698989868
+      },
+      {
+        "text": "Time:2.00pm to5.00pm",
+        "bbox": [
+          315,
+          295,
+          439,
+          313
+        ],
+        "confidence": 0.9720239639282227
+      },
+      {
+        "text": "Date & Day",
+        "bbox": [
+          77,
+          310,
+          141,
+          330
+        ],
+        "confidence": 0.9601834416389465
+      },
+      {
+        "text": "Paper",
+        "bbox": [
+          150,
+          313,
+          189,
+          331
+        ],
+        "confidence": 0.9725452661514282
+      },
+      {
+        "text": "Titles",
+        "bbox": [
+          219,
+          314,
+          250,
+          328
+        ],
+        "confidence": 0.9977843165397644
+      },
+      {
+        "text": "Marks",
+        "bbox": [
+          523,
+          314,
+          560,
+          328
+        ],
+        "confidence": 0.9985309839248657
+      },
+      {
+        "text": "31-10-2011",
+        "bbox": [
+          78,
+          327,
+          138,
+          345
+        ],
+        "confidence": 0.943304181098938
+      },
+      {
+        "text": "1",
+        "bbox": [
+          154,
+          332,
+          164,
+          341
+        ],
+        "confidence": 0.6371955871582031
+      },
+      {
+        "text": "History of Mo dern Europe (1870-197z A.D.)",
+        "bbox": [
+          219,
+          329,
+          419,
+          346
+        ],
+        "confidence": 0.9791173338890076
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          328,
+          544,
+          346
+        ],
+        "confidence": 0.9946680068969727
+      },
+      {
+        "text": "Monday",
+        "bbox": [
+          78,
+          340,
+          127,
+          362
+        ],
+        "confidence": 0.9951226711273193
+      },
+      {
+        "text": "02-11-2011",
+        "bbox": [
+          77,
+          357,
+          137,
+          375
+        ],
+        "confidence": 0.9888180494308472
+      },
+      {
+        "text": "1II",
+        "bbox": [
+          154,
+          361,
+          168,
+          374
+        ],
+        "confidence": 0.3928302526473999
+      },
+      {
+        "text": "History of Mo dern India (1757-1856 A.D.)",
+        "bbox": [
+          221,
+          361,
+          409,
+          375
+        ],
+        "confidence": 0.9462125897407532
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          359,
+          544,
+          377
+        ],
+        "confidence": 0.975522518157959
+      },
+      {
+        "text": "Witrlalday",
+        "bbox": [
+          78,
+          371,
+          134,
+          393
+        ],
+        "confidence": 0.9114052057266235
+      },
+      {
+        "text": "04-11-2011",
+        "bbox": [
+          78,
+          390,
+          139,
+          408
+        ],
+        "confidence": 0.9938644170761108
+      },
+      {
+        "text": "",
+        "bbox": [
+          153,
+          391,
+          172,
+          408
+        ],
+        "confidence": 0.0
+      },
+      {
+        "text": "History of East Asia (China and Japan 1840-1970 A.D.)",
+        "bbox": [
+          218,
+          390,
+          464,
+          408
+        ],
+        "confidence": 0.942703902721405
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          391,
+          544,
+          408
+        ],
+        "confidence": 0.9958432912826538
+      },
+      {
+        "text": "Friday",
+        "bbox": [
+          77,
+          401,
+          119,
+          423
+        ],
+        "confidence": 0.8955307006835938
+      },
+      {
+        "text": "08-11-2011",
+        "bbox": [
+          78,
+          421,
+          138,
+          439
+        ],
+        "confidence": 0.9805377125740051
+      },
+      {
+        "text": "Tuesday",
+        "bbox": [
+          77,
+          432,
+          129,
+          457
+        ],
+        "confidence": 0.9715206027030945
+      },
+      {
+        "text": "IV",
+        "bbox": [
+          154,
+          424,
+          172,
+          438
+        ],
+        "confidence": 0.9432477951049805
+      },
+      {
+        "text": "Historical Method & Historiogra phy",
+        "bbox": [
+          219,
+          423,
+          385,
+          440
+        ],
+        "confidence": 0.9638119339942932
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          423,
+          544,
+          439
+        ],
+        "confidence": 0.9931832551956177
+      },
+      {
+        "text": "10-11-2011",
+        "bbox": [
+          77,
+          450,
+          139,
+          472
+        ],
+        "confidence": 0.9934480786323547
+      },
+      {
+        "text": "W",
+        "bbox": [
+          154,
+          455,
+          167,
+          469
+        ],
+        "confidence": 0.4171728789806366
+      },
+      {
+        "text": "Soelal and Cultural History of Indlia up to 1206 A.D.",
+        "bbox": [
+          221,
+          454,
+          450,
+          469
+        ],
+        "confidence": 0.9284998774528503
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          453,
+          544,
+          471
+        ],
+        "confidence": 0.9916462302207947
+      },
+      {
+        "text": "Thursday",
+        "bbox": [
+          77,
+          465,
+          132,
+          488
+        ],
+        "confidence": 0.9891260862350464
+      },
+      {
+        "text": "Branch: M.Sc., Mathematics",
+        "bbox": [
+          79,
+          499,
+          229,
+          519
+        ],
+        "confidence": 0.9183078408241272
+      },
+      {
+        "text": "Time:2.00pm to5.00pm",
+        "bbox": [
+          351,
+          499,
+          480,
+          519
+        ],
+        "confidence": 0.9278333783149719
+      },
+      {
+        "text": "Date & Day",
+        "bbox": [
+          76,
+          516,
+          141,
+          537
+        ],
+        "confidence": 0.9198196530342102
+      },
+      {
+        "text": "Paper",
+        "bbox": [
+          148,
+          518,
+          189,
+          536
+        ],
+        "confidence": 0.9865058660507202
+      },
+      {
+        "text": "Titles",
+        "bbox": [
+          216,
+          517,
+          252,
+          536
+        ],
+        "confidence": 0.8928804993629456
+      },
+      {
+        "text": "Marks",
+        "bbox": [
+          521,
+          518,
+          561,
+          536
+        ],
+        "confidence": 0.9961568713188171
+      },
+      {
+        "text": "31-10-2011",
+        "bbox": [
+          78,
+          533,
+          139,
+          552
+        ],
+        "confidence": 0.9960028529167175
+      },
+      {
+        "text": "Algelbra",
+        "bbox": [
+          217,
+          533,
+          262,
+          553
+        ],
+        "confidence": 0.9193021059036255
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          534,
+          545,
+          553
+        ],
+        "confidence": 0.989028811454773
+      },
+      {
+        "text": "Monday",
+        "bbox": [
+          79,
+          547,
+          126,
+          567
+        ],
+        "confidence": 0.8945707678794861
+      },
+      {
+        "text": "02-11-2011",
+        "bbox": [
+          78,
+          565,
+          140,
+          583
+        ],
+        "confidence": 0.953108012676239
+      },
+      {
+        "text": "II",
+        "bbox": [
+          154,
+          568,
+          168,
+          581
+        ],
+        "confidence": 0.30304813385009766
+      },
+      {
+        "text": "Real An alysls",
+        "bbox": [
+          218,
+          566,
+          286,
+          583
+        ],
+        "confidence": 0.9022575616836548
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          566,
+          544,
+          584
+        ],
+        "confidence": 0.9877703189849854
+      },
+      {
+        "text": "Wednesday",
+        "bbox": [
+          79,
+          580,
+          141,
+          598
+        ],
+        "confidence": 0.9454978108406067
+      },
+      {
+        "text": "04-11-2011",
+        "bbox": [
+          78,
+          597,
+          137,
+          611
+        ],
+        "confidence": 0.9385536313056946
+      },
+      {
+        "text": "",
+        "bbox": [
+          150,
+          594,
+          173,
+          617
+        ],
+        "confidence": 0.0
+      },
+      {
+        "text": "Friday",
+        "bbox": [
+          77,
+          607,
+          119,
+          632
+        ],
+        "confidence": 0.9204971194267273
+      },
+      {
+        "text": "Differential Equations",
+        "bbox": [
+          219,
+          598,
+          324,
+          612
+        ],
+        "confidence": 0.9393537044525146
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          598,
+          544,
+          615
+        ],
+        "confidence": 0.997174859046936
+      },
+      {
+        "text": "08-11-2011",
+        "bbox": [
+          78,
+          627,
+          138,
+          646
+        ],
+        "confidence": 0.9440135955810547
+      },
+      {
+        "text": "Tuesday",
+        "bbox": [
+          78,
+          638,
+          128,
+          663
+        ],
+        "confidence": 0.932148814201355
+      },
+      {
+        "text": "IV",
+        "bbox": [
+          154,
+          630,
+          172,
+          645
+        ],
+        "confidence": 0.8332338333129883
+      },
+      {
+        "text": "this paper)",
+        "bbox": [
+          216,
+          639,
+          275,
+          663
+        ],
+        "confidence": 0.9770898222923279
+      },
+      {
+        "text": "Computing Techniques (There Is no Practical Examinations for",
+        "bbox": [
+          220,
+          630,
+          520,
+          645
+        ],
+        "confidence": 0.954651951789856
+      },
+      {
+        "text": "80",
+        "bbox": [
+          524,
+          630,
+          542,
+          644
+        ],
+        "confidence": 0.9945793151855469
+      },
+      {
+        "text": "10-11-2011",
+        "bbox": [
+          77,
+          657,
+          137,
+          675
+        ],
+        "confidence": 0.9913265109062195
+      },
+      {
+        "text": "V",
+        "bbox": [
+          154,
+          661,
+          167,
+          674
+        ],
+        "confidence": 0.6262004971504211
+      },
+      {
+        "text": "Complex Analysls",
+        "bbox": [
+          219,
+          660,
+          304,
+          677
+        ],
+        "confidence": 0.9311017394065857
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          660,
+          544,
+          677
+        ],
+        "confidence": 0.978676438331604
+      },
+      {
+        "text": "Thursday",
+        "bbox": [
+          78,
+          672,
+          132,
+          693
+        ],
+        "confidence": 0.9990864396095276
+      },
+      {
+        "text": "Branch:M.A.,Hindi",
+        "bbox": [
+          79,
+          708,
+          185,
+          726
+        ],
+        "confidence": 0.9603201746940613
+      },
+      {
+        "text": "Time:2.00pm to5.00pm",
+        "bbox": [
+          315,
+          707,
+          440,
+          725
+        ],
+        "confidence": 0.9403676986694336
+      },
+      {
+        "text": "Date & Day",
+        "bbox": [
+          77,
+          725,
+          140,
+          742
+        ],
+        "confidence": 0.9683762788772583
+      },
+      {
+        "text": "Paper",
+        "bbox": [
+          149,
+          726,
+          189,
+          744
+        ],
+        "confidence": 0.9090468287467957
+      },
+      {
+        "text": "Titles",
+        "bbox": [
+          216,
+          725,
+          252,
+          743
+        ],
+        "confidence": 0.8764854073524475
+      },
+      {
+        "text": "Marks",
+        "bbox": [
+          521,
+          726,
+          560,
+          744
+        ],
+        "confidence": 0.9962908625602722
+      },
+      {
+        "text": "31-10-2011",
+        "bbox": [
+          76,
+          737,
+          140,
+          761
+        ],
+        "confidence": 0.985231876373291
+      },
+      {
+        "text": "1.",
+        "bbox": [
+          155,
+          746,
+          164,
+          755
+        ],
+        "confidence": 0.5397025942802429
+      },
+      {
+        "text": "Audhunik Hind Kavya",
+        "bbox": [
+          218,
+          740,
+          324,
+          759
+        ],
+        "confidence": 0.94130939245224
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          742,
+          544,
+          759
+        ],
+        "confidence": 0.9877389669418335
+      },
+      {
+        "text": "Monday",
+        "bbox": [
+          78,
+          754,
+          127,
+          775
+        ],
+        "confidence": 0.9958071112632751
+      },
+      {
+        "text": "02-11-2011",
+        "bbox": [
+          78,
+          772,
+          139,
+          789
+        ],
+        "confidence": 0.9642674326896667
+      },
+      {
+        "text": "1I",
+        "bbox": [
+          154,
+          774,
+          168,
+          788
+        ],
+        "confidence": 0.4470983147621155
+      },
+      {
+        "text": "Hindi Gadhya Vidhayen",
+        "bbox": [
+          218,
+          772,
+          331,
+          790
+        ],
+        "confidence": 0.9726095795631409
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          773,
+          544,
+          791
+        ],
+        "confidence": 0.9859794974327087
+      },
+      {
+        "text": "Wedtrialy",
+        "bbox": [
+          78,
+          784,
+          134,
+          806
+        ],
+        "confidence": 0.9628609418869019
+      },
+      {
+        "text": "04-11-2011",
+        "bbox": [
+          77,
+          803,
+          138,
+          821
+        ],
+        "confidence": 0.9965980648994446
+      },
+      {
+        "text": "Ⅲ",
+        "bbox": [
+          154,
+          806,
+          171,
+          820
+        ],
+        "confidence": 0.2081790417432785
+      },
+      {
+        "text": "Bhasha Vignan aur Hindi Bhasha ka Itihas",
+        "bbox": [
+          220,
+          806,
+          410,
+          820
+        ],
+        "confidence": 0.9750527143478394
+      },
+      {
+        "text": "80",
+        "bbox": [
+          522,
+          804,
+          544,
+          822
+        ],
+        "confidence": 0.9961279630661011
+      },
+      {
+        "text": "Friday",
+        "bbox": [
+          78,
+          818,
+          118,
+          837
+        ],
+        "confidence": 0.9812033772468567
+      },
+      {
+        "text": "08-11-2011",
+        "bbox": [
+          77,
+          834,
+          138,
+          852
+        ],
+        "confidence": 0.9893547296524048
+      },
+      {
+        "text": "IN",
+        "bbox": [
+          154,
+          837,
+          172,
+          851
+        ],
+        "confidence": 0.7433780431747437
+      },
+      {
+        "text": "Hindi Sahitya ka Itihas",
+        "bbox": [
+          220,
+          837,
+          324,
+          851
+        ],
+        "confidence": 0.9417572021484375
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          836,
+          544,
+          853
+        ],
+        "confidence": 0.9835917949676514
+      },
+      {
+        "text": "Tuesday",
+        "bbox": [
+          78,
+          847,
+          127,
+          869
+        ],
+        "confidence": 0.9944717288017273
+      },
+      {
+        "text": "10-11-2011",
+        "bbox": [
+          79,
+          865,
+          138,
+          883
+        ],
+        "confidence": 0.9829031229019165
+      },
+      {
+        "text": "V",
+        "bbox": [
+          154,
+          868,
+          168,
+          882
+        ],
+        "confidence": 0.6842281818389893
+      },
+      {
+        "text": "Telugu Bhasha aur Sahitya ka Iti has",
+        "bbox": [
+          220,
+          868,
+          382,
+          882
+        ],
+        "confidence": 0.9564386010169983
+      },
+      {
+        "text": "80",
+        "bbox": [
+          523,
+          867,
+          544,
+          883
+        ],
+        "confidence": 0.9932239651679993
+      },
+      {
+        "text": "Thursday",
+        "bbox": [
+          78,
+          878,
+          131,
+          900
+        ],
+        "confidence": 0.9983055591583252
+      }
+    ]
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 190.6,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_78c6145c608ed096",
+      "type": "text_region",
+      "value": "Branch:M.A, Political Science&PublicAdministration",
+      "geometry": {
+        "bbox": [
+          81,
+          89,
+          353,
+          103
+        ]
+      },
+      "confidence": 0.9631450176239014,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9631450176239014
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_7ab70ec79fda7994",
+      "type": "text_region",
+      "value": "Time:2.00pm to5.00pm",
+      "geometry": {
+        "bbox": [
+          391,
+          87,
+          518,
+          105
+        ]
+      },
+      "confidence": 0.9569627046585083,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9569627046585083
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_c182be9c3ea4d2e3",
+      "type": "text_region",
+      "value": "Date & Day",
+      "geometry": {
+        "bbox": [
+          79,
+          104,
+          141,
+          124
+        ]
+      },
+      "confidence": 0.9372197389602661,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9372197389602661
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_4d7c24112dd49d0f",
+      "type": "text_region",
+      "value": "Paper",
+      "geometry": {
+        "bbox": [
+          152,
+          107,
+          189,
+          122
+        ]
+      },
+      "confidence": 0.9925295114517212,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9925295114517212
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_0afc566c98b8a17f",
+      "type": "text_region",
+      "value": "Titles",
+      "geometry": {
+        "bbox": [
+          217,
+          107,
+          251,
+          122
+        ]
+      },
+      "confidence": 0.9866443276405334,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9866443276405334
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d5d54165daafc07e",
+      "type": "text_region",
+      "value": "Marks",
+      "geometry": {
+        "bbox": [
+          522,
+          107,
+          560,
+          122
+        ]
+      },
+      "confidence": 0.9978458285331726,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9978458285331726
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_1361a10a069f4ec3",
+      "type": "text_region",
+      "value": "31-10-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          121,
+          139,
+          139
+        ]
+      },
+      "confidence": 0.9582969546318054,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9582969546318054
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_f01d896d7e7cc592",
+      "type": "text_region",
+      "value": "1",
+      "geometry": {
+        "bbox": [
+          154,
+          125,
+          163,
+          135
+        ]
+      },
+      "confidence": 0.8961195349693298,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.8961195349693298
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b88ec7cd57a234ea",
+      "type": "text_region",
+      "value": "Pollitical Thought",
+      "geometry": {
+        "bbox": [
+          216,
+          120,
+          302,
+          140
+        ]
+      },
+      "confidence": 0.9211397171020508,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9211397171020508
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b6f8df88e5eaa032",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          122,
+          544,
+          139
+        ]
+      },
+      "confidence": 0.9966332912445068,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9966332912445068
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_c8d6e271f2168856",
+      "type": "text_region",
+      "value": "Monday",
+      "geometry": {
+        "bbox": [
+          79,
+          136,
+          126,
+          155
+        ]
+      },
+      "confidence": 0.9399160742759705,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9399160742759705
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_76f80a26cd5808cc",
+      "type": "text_region",
+      "value": "02-11-2011",
+      "geometry": {
+        "bbox": [
+          77,
+          151,
+          138,
+          169
+        ]
+      },
+      "confidence": 0.9939864873886108,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9939864873886108
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_9f837156100b25e8",
+      "type": "text_region",
+      "value": "1I",
+      "geometry": {
+        "bbox": [
+          154,
+          155,
+          168,
+          169
+        ]
+      },
+      "confidence": 0.5537502765655518,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.5537502765655518
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_3262c917f785155d",
+      "type": "text_region",
+      "value": "Modern Pollti eal Theory",
+      "geometry": {
+        "bbox": [
+          218,
+          153,
+          334,
+          171
+        ]
+      },
+      "confidence": 0.918804943561554,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.918804943561554
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_c2960f3b7535df8d",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          154,
+          544,
+          172
+        ]
+      },
+      "confidence": 0.9888366460800171,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9888366460800171
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_bb4f8848a8111cab",
+      "type": "text_region",
+      "value": "Wednesday",
+      "geometry": {
+        "bbox": [
+          78,
+          165,
+          142,
+          186
+        ]
+      },
+      "confidence": 0.9972255229949951,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9972255229949951
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d016e155a8a16035",
+      "type": "text_region",
+      "value": "04-11-2011",
+      "geometry": {
+        "bbox": [
+          77,
+          181,
+          140,
+          202
+        ]
+      },
+      "confidence": 0.9891767501831055,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9891767501831055
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_fa0f62ad6bef82ef",
+      "type": "text_region",
+      "value": "Ⅲ",
+      "geometry": {
+        "bbox": [
+          154,
+          185,
+          171,
+          199
+        ]
+      },
+      "confidence": 0.2755102515220642,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.2755102515220642
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_fa921f33899050a3",
+      "type": "text_region",
+      "value": "Comparative Govermment & Polltics",
+      "geometry": {
+        "bbox": [
+          220,
+          185,
+          386,
+          199
+        ]
+      },
+      "confidence": 0.9294931292533875,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9294931292533875
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_66c8f0face8ada70",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          184,
+          543,
+          202
+        ]
+      },
+      "confidence": 0.9710710048675537,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9710710048675537
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_abe0229b7bea31de",
+      "type": "text_region",
+      "value": "Friday",
+      "geometry": {
+        "bbox": [
+          78,
+          198,
+          118,
+          218
+        ]
+      },
+      "confidence": 0.9909138679504395,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9909138679504395
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_5557ddbd5d73d238",
+      "type": "text_region",
+      "value": "08-11-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          215,
+          138,
+          232
+        ]
+      },
+      "confidence": 0.9818248748779297,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9818248748779297
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_aace4bc377ae34eb",
+      "type": "text_region",
+      "value": "IV",
+      "geometry": {
+        "bbox": [
+          154,
+          217,
+          172,
+          231
+        ]
+      },
+      "confidence": 0.9235807061195374,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9235807061195374
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_8d8b4f38b1074e61",
+      "type": "text_region",
+      "value": "Public Policy",
+      "geometry": {
+        "bbox": [
+          217,
+          213,
+          281,
+          232
+        ]
+      },
+      "confidence": 0.9505348205566406,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9505348205566406
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_f9deb8bcd8913276",
+      "type": "text_region",
+      "value": "Tuesday",
+      "geometry": {
+        "bbox": [
+          78,
+          227,
+          126,
+          249
+        ]
+      },
+      "confidence": 0.9981452226638794,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9981452226638794
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_539c8b7be8f949bb",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          524,
+          218,
+          543,
+          231
+        ]
+      },
+      "confidence": 0.996073842048645,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.996073842048645
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_021ec48cbbc8322c",
+      "type": "text_region",
+      "value": "10-11-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          245,
+          138,
+          263
+        ]
+      },
+      "confidence": 0.9595271348953247,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9595271348953247
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_a3e0cbf3260378d4",
+      "type": "text_region",
+      "value": "V",
+      "geometry": {
+        "bbox": [
+          154,
+          248,
+          168,
+          261
+        ]
+      },
+      "confidence": 0.6836206912994385,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.6836206912994385
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_7f1cd1cd9bbba1b4",
+      "type": "text_region",
+      "value": "Administrative Theorles",
+      "geometry": {
+        "bbox": [
+          218,
+          247,
+          332,
+          262
+        ]
+      },
+      "confidence": 0.959541916847229,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.959541916847229
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_872bd761335ffdcf",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          247,
+          543,
+          264
+        ]
+      },
+      "confidence": 0.9945040941238403,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9945040941238403
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_42f4238b5bf340a6",
+      "type": "text_region",
+      "value": "Thursday",
+      "geometry": {
+        "bbox": [
+          77,
+          257,
+          133,
+          281
+        ]
+      },
+      "confidence": 0.9976416826248169,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9976416826248169
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_3fb7df6bc1eec229",
+      "type": "text_region",
+      "value": "Branch: M.A, History",
+      "geometry": {
+        "bbox": [
+          79,
+          294,
+          190,
+          313
+        ]
+      },
+      "confidence": 0.9549356698989868,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9549356698989868
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_dad87e42e4ce9a47",
+      "type": "text_region",
+      "value": "Time:2.00pm to5.00pm",
+      "geometry": {
+        "bbox": [
+          315,
+          295,
+          439,
+          313
+        ]
+      },
+      "confidence": 0.9720239639282227,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9720239639282227
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_27b62ea3fe0dd5e1",
+      "type": "text_region",
+      "value": "Date & Day",
+      "geometry": {
+        "bbox": [
+          77,
+          310,
+          141,
+          330
+        ]
+      },
+      "confidence": 0.9601834416389465,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9601834416389465
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_3eb43a79e3bb2be1",
+      "type": "text_region",
+      "value": "Paper",
+      "geometry": {
+        "bbox": [
+          150,
+          313,
+          189,
+          331
+        ]
+      },
+      "confidence": 0.9725452661514282,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9725452661514282
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_87101204124d7157",
+      "type": "text_region",
+      "value": "Titles",
+      "geometry": {
+        "bbox": [
+          219,
+          314,
+          250,
+          328
+        ]
+      },
+      "confidence": 0.9977843165397644,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9977843165397644
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_e5eadcb1235aa4b0",
+      "type": "text_region",
+      "value": "Marks",
+      "geometry": {
+        "bbox": [
+          523,
+          314,
+          560,
+          328
+        ]
+      },
+      "confidence": 0.9985309839248657,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9985309839248657
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_c843a4c7f5d8e883",
+      "type": "text_region",
+      "value": "31-10-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          327,
+          138,
+          345
+        ]
+      },
+      "confidence": 0.943304181098938,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.943304181098938
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_0094ac83af1d16b0",
+      "type": "text_region",
+      "value": "1",
+      "geometry": {
+        "bbox": [
+          154,
+          332,
+          164,
+          341
+        ]
+      },
+      "confidence": 0.6371955871582031,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.6371955871582031
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_2e63af7a802ff6f2",
+      "type": "text_region",
+      "value": "History of Mo dern Europe (1870-197z A.D.)",
+      "geometry": {
+        "bbox": [
+          219,
+          329,
+          419,
+          346
+        ]
+      },
+      "confidence": 0.9791173338890076,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9791173338890076
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b3d9c38be3e0e667",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          328,
+          544,
+          346
+        ]
+      },
+      "confidence": 0.9946680068969727,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9946680068969727
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_a5fc3166ea5f8a31",
+      "type": "text_region",
+      "value": "Monday",
+      "geometry": {
+        "bbox": [
+          78,
+          340,
+          127,
+          362
+        ]
+      },
+      "confidence": 0.9951226711273193,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9951226711273193
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d81ee4c268fc80c2",
+      "type": "text_region",
+      "value": "02-11-2011",
+      "geometry": {
+        "bbox": [
+          77,
+          357,
+          137,
+          375
+        ]
+      },
+      "confidence": 0.9888180494308472,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9888180494308472
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_544c3a403bab60f1",
+      "type": "text_region",
+      "value": "1II",
+      "geometry": {
+        "bbox": [
+          154,
+          361,
+          168,
+          374
+        ]
+      },
+      "confidence": 0.3928302526473999,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.3928302526473999
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_487256c6372b1609",
+      "type": "text_region",
+      "value": "History of Mo dern India (1757-1856 A.D.)",
+      "geometry": {
+        "bbox": [
+          221,
+          361,
+          409,
+          375
+        ]
+      },
+      "confidence": 0.9462125897407532,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9462125897407532
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_5cbb626e54bc9b95",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          359,
+          544,
+          377
+        ]
+      },
+      "confidence": 0.975522518157959,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.975522518157959
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_7c09f29cd07bb7b8",
+      "type": "text_region",
+      "value": "Witrlalday",
+      "geometry": {
+        "bbox": [
+          78,
+          371,
+          134,
+          393
+        ]
+      },
+      "confidence": 0.9114052057266235,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9114052057266235
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_fac1f8ae1d491f6e",
+      "type": "text_region",
+      "value": "04-11-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          390,
+          139,
+          408
+        ]
+      },
+      "confidence": 0.9938644170761108,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9938644170761108
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_4d1c3aab8d5a0172",
+      "type": "text_region",
+      "value": "",
+      "geometry": {
+        "bbox": [
+          153,
+          391,
+          172,
+          408
+        ]
+      },
+      "confidence": 0.0,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.0
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b0ab2cb5ea54d4a7",
+      "type": "text_region",
+      "value": "History of East Asia (China and Japan 1840-1970 A.D.)",
+      "geometry": {
+        "bbox": [
+          218,
+          390,
+          464,
+          408
+        ]
+      },
+      "confidence": 0.942703902721405,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.942703902721405
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b7d3618153e9bda5",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          391,
+          544,
+          408
+        ]
+      },
+      "confidence": 0.9958432912826538,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9958432912826538
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_acabce57af4a17b2",
+      "type": "text_region",
+      "value": "Friday",
+      "geometry": {
+        "bbox": [
+          77,
+          401,
+          119,
+          423
+        ]
+      },
+      "confidence": 0.8955307006835938,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.8955307006835938
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_e5e46c02ed59ac2e",
+      "type": "text_region",
+      "value": "08-11-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          421,
+          138,
+          439
+        ]
+      },
+      "confidence": 0.9805377125740051,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9805377125740051
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_1fa468e4bba7a77c",
+      "type": "text_region",
+      "value": "Tuesday",
+      "geometry": {
+        "bbox": [
+          77,
+          432,
+          129,
+          457
+        ]
+      },
+      "confidence": 0.9715206027030945,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9715206027030945
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d54116c501767e59",
+      "type": "text_region",
+      "value": "IV",
+      "geometry": {
+        "bbox": [
+          154,
+          424,
+          172,
+          438
+        ]
+      },
+      "confidence": 0.9432477951049805,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9432477951049805
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_a0f6b56e94a37c99",
+      "type": "text_region",
+      "value": "Historical Method & Historiogra phy",
+      "geometry": {
+        "bbox": [
+          219,
+          423,
+          385,
+          440
+        ]
+      },
+      "confidence": 0.9638119339942932,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9638119339942932
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_24fe5dfc6a6ed1bb",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          423,
+          544,
+          439
+        ]
+      },
+      "confidence": 0.9931832551956177,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9931832551956177
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_64e03917fd2dfbff",
+      "type": "text_region",
+      "value": "10-11-2011",
+      "geometry": {
+        "bbox": [
+          77,
+          450,
+          139,
+          472
+        ]
+      },
+      "confidence": 0.9934480786323547,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9934480786323547
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b267616953894372",
+      "type": "text_region",
+      "value": "W",
+      "geometry": {
+        "bbox": [
+          154,
+          455,
+          167,
+          469
+        ]
+      },
+      "confidence": 0.4171728789806366,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.4171728789806366
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_a10f10c87126dc0d",
+      "type": "text_region",
+      "value": "Soelal and Cultural History of Indlia up to 1206 A.D.",
+      "geometry": {
+        "bbox": [
+          221,
+          454,
+          450,
+          469
+        ]
+      },
+      "confidence": 0.9284998774528503,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9284998774528503
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_94def4afc4e4e539",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          453,
+          544,
+          471
+        ]
+      },
+      "confidence": 0.9916462302207947,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9916462302207947
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_2a15b3aef70bd202",
+      "type": "text_region",
+      "value": "Thursday",
+      "geometry": {
+        "bbox": [
+          77,
+          465,
+          132,
+          488
+        ]
+      },
+      "confidence": 0.9891260862350464,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9891260862350464
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_50eb3ce887a18326",
+      "type": "text_region",
+      "value": "Branch: M.Sc., Mathematics",
+      "geometry": {
+        "bbox": [
+          79,
+          499,
+          229,
+          519
+        ]
+      },
+      "confidence": 0.9183078408241272,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9183078408241272
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_ef94b9e9299e63b8",
+      "type": "text_region",
+      "value": "Time:2.00pm to5.00pm",
+      "geometry": {
+        "bbox": [
+          351,
+          499,
+          480,
+          519
+        ]
+      },
+      "confidence": 0.9278333783149719,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9278333783149719
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_ec86c40f98e6ed3e",
+      "type": "text_region",
+      "value": "Date & Day",
+      "geometry": {
+        "bbox": [
+          76,
+          516,
+          141,
+          537
+        ]
+      },
+      "confidence": 0.9198196530342102,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9198196530342102
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d6f2d9f52f6fab3c",
+      "type": "text_region",
+      "value": "Paper",
+      "geometry": {
+        "bbox": [
+          148,
+          518,
+          189,
+          536
+        ]
+      },
+      "confidence": 0.9865058660507202,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9865058660507202
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_282a5948fdb053a1",
+      "type": "text_region",
+      "value": "Titles",
+      "geometry": {
+        "bbox": [
+          216,
+          517,
+          252,
+          536
+        ]
+      },
+      "confidence": 0.8928804993629456,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.8928804993629456
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_8d9ae6b494f0afab",
+      "type": "text_region",
+      "value": "Marks",
+      "geometry": {
+        "bbox": [
+          521,
+          518,
+          561,
+          536
+        ]
+      },
+      "confidence": 0.9961568713188171,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9961568713188171
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_aa71b847ffafe843",
+      "type": "text_region",
+      "value": "31-10-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          533,
+          139,
+          552
+        ]
+      },
+      "confidence": 0.9960028529167175,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9960028529167175
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_a39acff0f22432b9",
+      "type": "text_region",
+      "value": "Algelbra",
+      "geometry": {
+        "bbox": [
+          217,
+          533,
+          262,
+          553
+        ]
+      },
+      "confidence": 0.9193021059036255,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9193021059036255
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_8f3cc5454e744f64",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          534,
+          545,
+          553
+        ]
+      },
+      "confidence": 0.989028811454773,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.989028811454773
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_76b666a71cc4341e",
+      "type": "text_region",
+      "value": "Monday",
+      "geometry": {
+        "bbox": [
+          79,
+          547,
+          126,
+          567
+        ]
+      },
+      "confidence": 0.8945707678794861,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.8945707678794861
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_82f8a40358ef7f54",
+      "type": "text_region",
+      "value": "02-11-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          565,
+          140,
+          583
+        ]
+      },
+      "confidence": 0.953108012676239,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.953108012676239
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_f78e79f8dfb112ec",
+      "type": "text_region",
+      "value": "II",
+      "geometry": {
+        "bbox": [
+          154,
+          568,
+          168,
+          581
+        ]
+      },
+      "confidence": 0.30304813385009766,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.30304813385009766
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d7377e50e7db8a6c",
+      "type": "text_region",
+      "value": "Real An alysls",
+      "geometry": {
+        "bbox": [
+          218,
+          566,
+          286,
+          583
+        ]
+      },
+      "confidence": 0.9022575616836548,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9022575616836548
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_f3e738b85bb3a772",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          566,
+          544,
+          584
+        ]
+      },
+      "confidence": 0.9877703189849854,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9877703189849854
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_52170d43e36ed4e6",
+      "type": "text_region",
+      "value": "Wednesday",
+      "geometry": {
+        "bbox": [
+          79,
+          580,
+          141,
+          598
+        ]
+      },
+      "confidence": 0.9454978108406067,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9454978108406067
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b8ddab62ef906108",
+      "type": "text_region",
+      "value": "04-11-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          597,
+          137,
+          611
+        ]
+      },
+      "confidence": 0.9385536313056946,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9385536313056946
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_a504deba52f912dd",
+      "type": "text_region",
+      "value": "",
+      "geometry": {
+        "bbox": [
+          150,
+          594,
+          173,
+          617
+        ]
+      },
+      "confidence": 0.0,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.0
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_abb52cccf8d29757",
+      "type": "text_region",
+      "value": "Friday",
+      "geometry": {
+        "bbox": [
+          77,
+          607,
+          119,
+          632
+        ]
+      },
+      "confidence": 0.9204971194267273,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9204971194267273
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_72174058a3c2cbe3",
+      "type": "text_region",
+      "value": "Differential Equations",
+      "geometry": {
+        "bbox": [
+          219,
+          598,
+          324,
+          612
+        ]
+      },
+      "confidence": 0.9393537044525146,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9393537044525146
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_2a4914b3173d60b3",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          598,
+          544,
+          615
+        ]
+      },
+      "confidence": 0.997174859046936,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.997174859046936
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_89ba816f7f2e7cd1",
+      "type": "text_region",
+      "value": "08-11-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          627,
+          138,
+          646
+        ]
+      },
+      "confidence": 0.9440135955810547,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9440135955810547
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_ce85d9685b1d8ed4",
+      "type": "text_region",
+      "value": "Tuesday",
+      "geometry": {
+        "bbox": [
+          78,
+          638,
+          128,
+          663
+        ]
+      },
+      "confidence": 0.932148814201355,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.932148814201355
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_ad34f94bb113b4e9",
+      "type": "text_region",
+      "value": "IV",
+      "geometry": {
+        "bbox": [
+          154,
+          630,
+          172,
+          645
+        ]
+      },
+      "confidence": 0.8332338333129883,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.8332338333129883
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_9df819f23ac70205",
+      "type": "text_region",
+      "value": "this paper)",
+      "geometry": {
+        "bbox": [
+          216,
+          639,
+          275,
+          663
+        ]
+      },
+      "confidence": 0.9770898222923279,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9770898222923279
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_bf60ced2a4bca5ba",
+      "type": "text_region",
+      "value": "Computing Techniques (There Is no Practical Examinations for",
+      "geometry": {
+        "bbox": [
+          220,
+          630,
+          520,
+          645
+        ]
+      },
+      "confidence": 0.954651951789856,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.954651951789856
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_c05e70498659fbc3",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          524,
+          630,
+          542,
+          644
+        ]
+      },
+      "confidence": 0.9945793151855469,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9945793151855469
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_54856d848be19934",
+      "type": "text_region",
+      "value": "10-11-2011",
+      "geometry": {
+        "bbox": [
+          77,
+          657,
+          137,
+          675
+        ]
+      },
+      "confidence": 0.9913265109062195,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9913265109062195
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_90dcff47d281687c",
+      "type": "text_region",
+      "value": "V",
+      "geometry": {
+        "bbox": [
+          154,
+          661,
+          167,
+          674
+        ]
+      },
+      "confidence": 0.6262004971504211,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.6262004971504211
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_219bced3df40895b",
+      "type": "text_region",
+      "value": "Complex Analysls",
+      "geometry": {
+        "bbox": [
+          219,
+          660,
+          304,
+          677
+        ]
+      },
+      "confidence": 0.9311017394065857,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9311017394065857
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b753d669112dd555",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          660,
+          544,
+          677
+        ]
+      },
+      "confidence": 0.978676438331604,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.978676438331604
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_6e0d44b86e96305c",
+      "type": "text_region",
+      "value": "Thursday",
+      "geometry": {
+        "bbox": [
+          78,
+          672,
+          132,
+          693
+        ]
+      },
+      "confidence": 0.9990864396095276,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9990864396095276
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_86bbfbc49e19ed4e",
+      "type": "text_region",
+      "value": "Branch:M.A.,Hindi",
+      "geometry": {
+        "bbox": [
+          79,
+          708,
+          185,
+          726
+        ]
+      },
+      "confidence": 0.9603201746940613,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9603201746940613
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_a0a89275c73be038",
+      "type": "text_region",
+      "value": "Time:2.00pm to5.00pm",
+      "geometry": {
+        "bbox": [
+          315,
+          707,
+          440,
+          725
+        ]
+      },
+      "confidence": 0.9403676986694336,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9403676986694336
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_c1cd6e7c703c5a13",
+      "type": "text_region",
+      "value": "Date & Day",
+      "geometry": {
+        "bbox": [
+          77,
+          725,
+          140,
+          742
+        ]
+      },
+      "confidence": 0.9683762788772583,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9683762788772583
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_05be37435dca8780",
+      "type": "text_region",
+      "value": "Paper",
+      "geometry": {
+        "bbox": [
+          149,
+          726,
+          189,
+          744
+        ]
+      },
+      "confidence": 0.9090468287467957,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9090468287467957
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_58fec78cb6320d7c",
+      "type": "text_region",
+      "value": "Titles",
+      "geometry": {
+        "bbox": [
+          216,
+          725,
+          252,
+          743
+        ]
+      },
+      "confidence": 0.8764854073524475,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.8764854073524475
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_3ab739d62580bbf8",
+      "type": "text_region",
+      "value": "Marks",
+      "geometry": {
+        "bbox": [
+          521,
+          726,
+          560,
+          744
+        ]
+      },
+      "confidence": 0.9962908625602722,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9962908625602722
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_20492f431cb1d725",
+      "type": "text_region",
+      "value": "31-10-2011",
+      "geometry": {
+        "bbox": [
+          76,
+          737,
+          140,
+          761
+        ]
+      },
+      "confidence": 0.985231876373291,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.985231876373291
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_36327909e511679c",
+      "type": "text_region",
+      "value": "1.",
+      "geometry": {
+        "bbox": [
+          155,
+          746,
+          164,
+          755
+        ]
+      },
+      "confidence": 0.5397025942802429,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.5397025942802429
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_c9a90f1b49083cd8",
+      "type": "text_region",
+      "value": "Audhunik Hind Kavya",
+      "geometry": {
+        "bbox": [
+          218,
+          740,
+          324,
+          759
+        ]
+      },
+      "confidence": 0.94130939245224,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.94130939245224
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_e0245135e984304b",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          742,
+          544,
+          759
+        ]
+      },
+      "confidence": 0.9877389669418335,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9877389669418335
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d91711e65ecbbffc",
+      "type": "text_region",
+      "value": "Monday",
+      "geometry": {
+        "bbox": [
+          78,
+          754,
+          127,
+          775
+        ]
+      },
+      "confidence": 0.9958071112632751,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9958071112632751
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_7015d5962bbea823",
+      "type": "text_region",
+      "value": "02-11-2011",
+      "geometry": {
+        "bbox": [
+          78,
+          772,
+          139,
+          789
+        ]
+      },
+      "confidence": 0.9642674326896667,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9642674326896667
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_7fff832dae2c35d0",
+      "type": "text_region",
+      "value": "1I",
+      "geometry": {
+        "bbox": [
+          154,
+          774,
+          168,
+          788
+        ]
+      },
+      "confidence": 0.4470983147621155,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.4470983147621155
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_aed20019705b667e",
+      "type": "text_region",
+      "value": "Hindi Gadhya Vidhayen",
+      "geometry": {
+        "bbox": [
+          218,
+          772,
+          331,
+          790
+        ]
+      },
+      "confidence": 0.9726095795631409,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9726095795631409
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d2d828a6fb606a38",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          773,
+          544,
+          791
+        ]
+      },
+      "confidence": 0.9859794974327087,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9859794974327087
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_f26b3e770f19a35b",
+      "type": "text_region",
+      "value": "Wedtrialy",
+      "geometry": {
+        "bbox": [
+          78,
+          784,
+          134,
+          806
+        ]
+      },
+      "confidence": 0.9628609418869019,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9628609418869019
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_8adccde22cb7a64a",
+      "type": "text_region",
+      "value": "04-11-2011",
+      "geometry": {
+        "bbox": [
+          77,
+          803,
+          138,
+          821
+        ]
+      },
+      "confidence": 0.9965980648994446,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9965980648994446
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_e8051b8091c8881f",
+      "type": "text_region",
+      "value": "Ⅲ",
+      "geometry": {
+        "bbox": [
+          154,
+          806,
+          171,
+          820
+        ]
+      },
+      "confidence": 0.2081790417432785,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.2081790417432785
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_3aee4001fcb8429d",
+      "type": "text_region",
+      "value": "Bhasha Vignan aur Hindi Bhasha ka Itihas",
+      "geometry": {
+        "bbox": [
+          220,
+          806,
+          410,
+          820
+        ]
+      },
+      "confidence": 0.9750527143478394,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9750527143478394
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_1996704f8dc6f85b",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          522,
+          804,
+          544,
+          822
+        ]
+      },
+      "confidence": 0.9961279630661011,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9961279630661011
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_cf7b8076404059b6",
+      "type": "text_region",
+      "value": "Friday",
+      "geometry": {
+        "bbox": [
+          78,
+          818,
+          118,
+          837
+        ]
+      },
+      "confidence": 0.9812033772468567,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9812033772468567
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_8548235e3a964411",
+      "type": "text_region",
+      "value": "08-11-2011",
+      "geometry": {
+        "bbox": [
+          77,
+          834,
+          138,
+          852
+        ]
+      },
+      "confidence": 0.9893547296524048,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9893547296524048
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b863a5fdba07d621",
+      "type": "text_region",
+      "value": "IN",
+      "geometry": {
+        "bbox": [
+          154,
+          837,
+          172,
+          851
+        ]
+      },
+      "confidence": 0.7433780431747437,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.7433780431747437
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_f8937c5acaea176a",
+      "type": "text_region",
+      "value": "Hindi Sahitya ka Itihas",
+      "geometry": {
+        "bbox": [
+          220,
+          837,
+          324,
+          851
+        ]
+      },
+      "confidence": 0.9417572021484375,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9417572021484375
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_e4d1b89822f1d927",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          836,
+          544,
+          853
+        ]
+      },
+      "confidence": 0.9835917949676514,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9835917949676514
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_c85192fb98dab58c",
+      "type": "text_region",
+      "value": "Tuesday",
+      "geometry": {
+        "bbox": [
+          78,
+          847,
+          127,
+          869
+        ]
+      },
+      "confidence": 0.9944717288017273,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9944717288017273
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_b841426a7a545511",
+      "type": "text_region",
+      "value": "10-11-2011",
+      "geometry": {
+        "bbox": [
+          79,
+          865,
+          138,
+          883
+        ]
+      },
+      "confidence": 0.9829031229019165,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9829031229019165
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_14a104e845918bad",
+      "type": "text_region",
+      "value": "V",
+      "geometry": {
+        "bbox": [
+          154,
+          868,
+          168,
+          882
+        ]
+      },
+      "confidence": 0.6842281818389893,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.6842281818389893
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_e819f203b2da8c89",
+      "type": "text_region",
+      "value": "Telugu Bhasha aur Sahitya ka Iti has",
+      "geometry": {
+        "bbox": [
+          220,
+          868,
+          382,
+          882
+        ]
+      },
+      "confidence": 0.9564386010169983,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9564386010169983
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_171bae779d2ef7d8",
+      "type": "text_region",
+      "value": "80",
+      "geometry": {
+        "bbox": [
+          523,
+          867,
+          544,
+          883
+        ]
+      },
+      "confidence": 0.9932239651679993,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9932239651679993
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_4fd21165399be00e",
+      "type": "text_region",
+      "value": "Thursday",
+      "geometry": {
+        "bbox": [
+          78,
+          878,
+          131,
+          900
+        ]
+      },
+      "confidence": 0.9983055591583252,
+      "evidence": [
+        {
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "confidence": 0.9983055591583252
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/tmp/ocr-cand-005.png",
+          "size_bytes": 229473,
+          "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+        },
+        "provider": "paddleocr",
+        "model_version": "pp-ocrv5-mobile",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9631450176239014
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9569627046585083
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9372197389602661
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9925295114517212
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9866443276405334
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9978458285331726
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9582969546318054
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.8961195349693298
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9211397171020508
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9966332912445068
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9399160742759705
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9939864873886108
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.5537502765655518
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.918804943561554
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9888366460800171
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9972255229949951
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9891767501831055
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.2755102515220642
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9294931292533875
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9710710048675537
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9909138679504395
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9818248748779297
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9235807061195374
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9505348205566406
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9981452226638794
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.996073842048645
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9595271348953247
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.6836206912994385
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.959541916847229
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9945040941238403
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9976416826248169
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9549356698989868
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9720239639282227
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9601834416389465
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9725452661514282
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9977843165397644
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9985309839248657
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.943304181098938
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.6371955871582031
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9791173338890076
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9946680068969727
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9951226711273193
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9888180494308472
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.3928302526473999
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9462125897407532
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.975522518157959
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9114052057266235
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9938644170761108
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.0
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.942703902721405
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9958432912826538
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.8955307006835938
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9805377125740051
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9715206027030945
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9432477951049805
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9638119339942932
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9931832551956177
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9934480786323547
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.4171728789806366
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9284998774528503
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9916462302207947
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9891260862350464
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9183078408241272
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9278333783149719
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9198196530342102
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9865058660507202
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.8928804993629456
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9961568713188171
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9960028529167175
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9193021059036255
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.989028811454773
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.8945707678794861
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.953108012676239
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.30304813385009766
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9022575616836548
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9877703189849854
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9454978108406067
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9385536313056946
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9204971194267273
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9393537044525146
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.997174859046936
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9440135955810547
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.932148814201355
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.8332338333129883
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9770898222923279
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.954651951789856
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9945793151855469
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9913265109062195
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.6262004971504211
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9311017394065857
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.978676438331604
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9990864396095276
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9603201746940613
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9403676986694336
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9683762788772583
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9090468287467957
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.8764854073524475
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9962908625602722
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.985231876373291
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.5397025942802429
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.94130939245224
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9877389669418335
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9958071112632751
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9642674326896667
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.4470983147621155
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9726095795631409
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9859794974327087
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9628609418869019
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9965980648994446
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.2081790417432785
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9750527143478394
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9961279630661011
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9812033772468567
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9893547296524048
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.7433780431747437
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9417572021484375
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9835917949676514
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9944717288017273
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9829031229019165
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.6842281818389893
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9564386010169983
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9932239651679993
+    },
+    {
+      "provider": "paddleocr",
+      "model": "pp-ocrv5-mobile",
+      "confidence": 0.9983055591583252
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 19446,
+    "device": "cpu",
+    "memory_mb": 190.6,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 124,
+    "artifact_count": 0,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "/tmp/ocr-cand-005.png",
+      "size_bytes": 229473,
+      "sha256": "f0938cf98a784f8277d8a5dfc4242be437135263ec7bec871c477b931cb7830e"
+    },
+    "provider": "paddleocr",
+    "model_version": "pp-ocrv5-mobile",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": 0.899747,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.ocr",
+        "options": {
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.ocr",
+          "provider": "paddleocr",
+          "model": "pp-ocrv5-mobile",
+          "quality": 0.82,
+          "estimated_latency_ms": 81,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.6802,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.ocr",
+        "provider": "paddleocr",
+        "model": "pp-ocrv5-mobile",
+        "quality": 0.82,
+        "estimated_latency_ms": 81,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.6802,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    }
+  ]
+}

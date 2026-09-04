@@ -1,0 +1,888 @@
+{
+  "capability": "document.parse",
+  "provider": "mineru",
+  "model": "mineru-2",
+  "input": {
+    "type": "document",
+    "path": "docs/assets/e2e/brief-input.pdf",
+    "size_bytes": 433192,
+    "sha256": "7fa1e7e571b093a671c5daff7c1d4838144114ceca80fd57c127537f4da3a5c2"
+  },
+  "result": {
+    "markdown": "# TABLEFORMER: Robust Transformer Modeling for Table-Text Encoding\n\nJingfeng Yang Aditya Gupta<sup>†</sup> Shyam Upadhyay<sup>†</sup> ∗ Luheng He<sup>†</sup> Rahul Goel<sup>†</sup> Shachi Paul <sup>†</sup>\n\n<sup>?</sup>Georgia Institute of Technology <sup>†</sup>Google Assistant jingfengyangpku@gmail.com tableformer@google.com\n\n## Abstract\n\nUnderstanding tables is an important aspect of natural language understanding. Existing models for table understanding require linearization of the table structure, where row or column order is encoded as an unwanted bias. Such spurious biases make the model vulnerable to row and column order perturbations. Additionally, prior work has not thoroughly modeled the table structures or table-text alignments, hindering the table-text understanding ability. In this work, we propose a robust and structurally aware table-text encoding architecture TABLEFORMER, where tabular structural biases are incorporated completely through learnable attention biases. TABLEFORMER is (1) strictly invariant to row and column orders, and, (2) could understand tables better due to its tabular inductive biases. Our evaluations showed that TABLEFORMER outperforms strong baselines in all settings on SQA, WTQ and TABFACT table reasoning datasets, and achieves state-of-the-art performance on SQA, especially when facing answer-invariant row and column order perturbations (6% improvement over the best baseline), because previous SOTA models’ performance drops by 4% - 6% when facing such perturbations while TABLEFORMER is not affected.<sup>1</sup>\n\n## 1 Introduction\n\nRecently, semi-structured data (e.g. variable length tables without a fixed data schema) has attracted more attention because of its ubiquitous presence on the web. On a wide range of various table reasoning tasks, Transformer based architecture along with pretraining has shown to perform well (Eisenschlos et al., 2021; Liu et al., 2021).\n\nIn a nutshell, prior work used the Transformer architecture in a BERT like fashion by serializing\n\n<table><tr><td>Title</td><td>Length</td></tr><tr><td>Screwed Up</td><td>5:02</td></tr><tr><td>Ghetto Queen</td><td>5:00</td></tr></table>\n\nQuestion: Of all song lengths, which one is the longest?   \nGold Answer: 5:02   \nTAPAS: 5:00   \nTAPAS after row order perturbation: 5:02   \nT F : 5:02\n\n(a) TAPAS predicts incorrect answer based on the original table, while it gives the correct answer if the first row is moved to the end of the table.\n\n<table><tr><td rowspan=1 colspan=1>Nation</td><td rowspan=1 colspan=1>Gold</td><td rowspan=1 colspan=1>Silver</td><td rowspan=1 colspan=1>Bronze</td></tr><tr><td rowspan=1 colspan=1>Great Britain</td><td rowspan=1 colspan=1>2</td><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>2</td></tr><tr><td rowspan=1 colspan=1>Spain</td><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>2</td><td rowspan=1 colspan=1>0</td></tr><tr><td rowspan=1 colspan=1>Ukraine</td><td rowspan=1 colspan=1>0</td><td rowspan=1 colspan=1>2</td><td rowspan=1 colspan=1>0</td></tr></table>\n\nQuestion: Which nation received 2 silver medals? Gold Answer: Spain, Ukraine TAPAS: Spain TABLEFORMER: Spain, Ukraine TABLEFORMER w/o a proposed structural bias: Spain\n\n(b) TAPAS gives incomplete answer due to its limited cell grounding ability.\n\nFigure 1: Examples showing the limitations of existing models (a) vulnerable to perturbations, and (b) lacking structural biases. In contrast, our proposed TABLE-FORMER predicts correct answers for both questions.\n\ntables or rows into word sequences (Yu et al., 2020; Liu et al., 2021), where original position ids are used as positional information. Due to the usage of row/column ids and global position ids, prior strategies to linearize table structures introduced spurious row and column order biases (Herzig et al., 2020; Eisenschlos et al., 2020, 2021; Zhang et al., 2020; Yin et al., 2020). Therefore, those models are vulnerable to row or column order perturbations. But, ideally, the model should make consistent predictions regardless of the row or column ordering for all practical purposes. For instance, in Figure 1, the predicted answer of TAPAS model (Herzig et al., 2020) for Question (a) “Ofall song lengths, which one is the longest?” based on the original table is “5:00”, which is incorrect. However, if the first row is adjusted to the end of the table during inference, the model gives the correct length $\" 5 . 0 2 \"$ as answer. This probing example shows that the model being aware of row order information is inclined to select length values to the end of the table due to spurious training data bias. In our experiments on the SQA dataset, TAPAS models exhibit a 4% - 6% (Section 5.2) absolute performance drop when facing such answer-invariant perturbations.\n\nBesides, most prior work (Chen et al., 2020; Yin et al., 2020) did not incorporate enough structural biases to models to address the limitation of sequential Transformer architecture, while others inductive biases which are either too strict (Zhang et al., 2020; Eisenschlos et al., 2021) or computationally expensive (Yin et al., 2020).\n\nTo this end, we propose TABLEFORMER, a Transformer architecture that is robust to row and column order perturbations, by incorporating structural biases more naturally. TABLEFORMER relies on 13 types of task-independent table↔text attention biases that respect the table structure and table-text relations. For Question (a) in Figure 1, TABLEFORMER could predict the correct answer regardless of perturbation, because the model could identify the same row information with our “same row” bias, avoiding spurious biases introduced by row and global positional embeddings. For Question (b), TAPAS predicted only partially correct answer, while TABLEFORMER could correctly predict “Spain, Ukraine” as answers. That’s because our “cell to sentence” bias could help table cells ground to the paired sentence. Detailed attention bias types are discussed in Section 5.2.\n\nExperiments on 3 table reasoning datasets show that TABLEFORMER consistently outperforms original TAPAS in all pretraining and intermediate pretraining settings with fewer parameters. Also, TABLEFORMER’s invariance to row and column perturbations, leads to even larger improvement over those strong baselines when tested on perturbations. Our contributions are as follows:\n\n• We identified the limitation of current tabletext encoding models when facing row or column perturbation.\n\n• We propose TABLEFORMER, which is guaranteed to be invariant to row and column order perturbations, unlike current models.\n\n• TABLEFORMER encodes table-text structures better, leading to SoTA performance on SQA dataset, and ablation studies show the effectiveness of the introduced inductive biases.\n\n## 2 Preliminaries: TAPAS for Table Encoding\n\nIn this section, we discuss TAPAS which serves as the backbone of the recent state-of-the-art tabletext encoding architectures. TAPAS (Herzig et al., 2020) uses Transformer architecture in a BERT like fashion to pretrain and finetune on tabular data for table-text understanding tasks. This is achieved by using linearized table and texts for masked language model pre-training. In the finetuning stage, texts in the linearized table and text pairs are queries or statements in table QA or tabletext entailment tasks, respectively.\n\nSpecifically, TAPAS uses the tokenized and flattened text and table as input, separated by [SEP] token, and prefixed by [CLS]. Besides token, segment, and global positional embedding introduced in BERT (Devlin et al., 2019), it also uses rank embedding for better numerical understanding. Moreover, it uses column and row embedding to encode table structures.\n\nConcretely, for any table-text linearized sequence $\\textit { S } = \\ \\{ v _ { 1 } , v _ { 2 } , \\cdot \\cdot \\cdot , v _ { n } \\}$ , where n is the length of table-text sequence, the input to TAPAS is summation of embedding of the following:\n\n$$\n\\mathrm { t o k e n i d s } \\left( W \\right) = \\left\\{ w _ { v _ { 1 } } , w _ { v _ { 2 } } , \\cdot \\cdot \\cdot , w _ { v _ { n } } \\right\\}\n$$\n\n$$\n\\mathrm { p o s i t i o n a l i d s } \\left( { B } \\right) = \\left\\{ { b } _ { 1 } , { b } _ { 2 } , \\cdot \\cdot \\cdot , { b } _ { n } \\right\\}\n$$\n\n$$\n\\operatorname { s e g m e n t i d s } \\left( G \\right) = \\left\\{ g _ { s e g _ { 1 } } , g _ { s e g _ { 2 } } , \\cdot \\cdot \\cdot , g _ { s e g _ { n } } \\right\\}\n$$\n\n$$\n\\mathrm { c o l u m n i d s } \\left( { C } \\right) = \\left\\{ { c _ { c o l } } _ { 1 } , { c _ { c o l } } _ { 2 } , \\cdot \\cdot \\cdot , { c _ { c o l } } _ { n } \\right\\}\n$$\n\n$$\n\\mathrm { r o w i d s } \\left( R \\right) = \\{ r _ { r o w _ { 1 } } , r _ { r o w _ { 2 } } , \\cdot \\cdot \\cdot , r _ { r o w _ { n } } \\}\n$$\n\n$$\n\\operatorname { r a n k } \\operatorname { i d s } \\left( Z \\right) = \\left\\{ z _ { r a n k _ { 1 } } , z _ { r a n k _ { 2 } } , \\cdot \\cdot \\cdot , z _ { r a n k _ { n } } \\right\\}\n$$\n\nwhere seg<sub>i</sub>, col<sub>i</sub>, row<sub>i</sub>, rank<sub>i</sub> correspond to the segment, column, row, and rank id for the ith token, respectively.\n\nAs for the model, TAPAS uses BERT’s selfattention architecture (Vaswani et al., 2017) offthe-shelf. Each Transformer layer includes a multihead self-attention sub-layer, where each token attends to all the tokens. Let the layer input $H = [ h _ { 1 } , h _ { 2 } , \\cdot \\cdot \\cdot , h _ { n } ] ^ { \\top } \\in \\mathbb { R } ^ { n \\times d }$ corresponding to S, where d is the hidden dimension, and $h _ { i } \\in \\mathbb { R } ^ { d \\times 1 }$ is the hidden representation at position i. For a single-head self-attention sub-layer, the input H is projected by three matrices $\\bar { W } ^ { Q } \\in \\mathbb { R } ^ { d \\times \\bar { d } _ { K } }$ $W ^ { K } \\in \\bar { \\mathbb { R } } ^ { d \\times d _ { K } }$ , and $W ^ { V } \\in \\mathbb { R } ^ { d \\times d _ { V } }$ to the corresponding representations $Q , K ,$ and V:\n\n![](images/3d1fa4656e559a4dc0f9b87a09848ecfb7e812a6ebb520ba6e4bf97e2fa02668.jpg)  \nFigure 2: TABLEFORMER input and attention biases in the self attention module. This example corresponds to table (a) in Figure 1 and its paired question “query”. Different colors in the attention bias matrix denote different types of task independent biases derived based on the table structure and the associated text.\n\n$$\nQ = H W ^ { Q } , \\quad V = H W ^ { V } , \\quad K = H W ^ { K }\\tag{1}\n$$\n\nThen, the output of this single-head selfattention sub-layer is calculated as:\n\n$$\n\\mathrm { A t t n } ( H ) = \\mathrm { s o f t m a x } ( \\frac { Q K ^ { \\top } } { \\sqrt { d _ { K } } } ) V\\tag{2}\n$$\n\n## 3 TABLEFORMER: Robust Structural Table Encoding\n\nAs shown in Figure 2, TABLEFORMER encodes the general table structure along with the associated text by introducing task-independent relative attention biases for table-text encoding to facilitate the following: (a) structural inductive bias for better table understanding and table-text alignment, (b) robustness to table row/column perturbation.\n\nInput of TABLEFORMER. TABLEFORMER uses the same token embeddings W, segment embeddings G, and rank embeddings Z as TAPAS. However, we make 2 major modifications:\n\n1) No row or column ids. We do not use row embeddings R or column embeddings C to avoid any potential spurious row and column order biases.\n\n2) Per cell positional ids. To further remove any inter-cell order information, global positional embeddings B are replaced by per cell positional embeddings $P = \\{ p _ { p o s _ { 1 } } , p _ { p o s _ { 2 } } , \\cdot \\cdot \\cdot , p _ { p o s _ { n } } \\}$ , where we follow Eisenschlos et al. (2021) to reset the index of positional embeddings at the beginning of each cell, and pos<sub>i</sub> correspond to the per cell positional id for the ith token.\n\nPositional Encoding in TABLEFORMER. Note that the Transformer model either needs to specify different positions in the input (i.e. absolute positional encoding of Vaswani et al. (2017)) or encode the positional dependency in the layers (i.e. relative positional encoding of Shaw et al. (2018)).\n\nTABLEFORMER does not consume any sort of column and row order information in the input. The main intuition is that, for cells in the table, the only useful positional information is whether two cells are in the same row or column and the column header of each cell, instead of the absolute order of the row and column containing them. Thus, inspired by relative positional encoding (Shaw et al., 2018) and graph encoding (Ying et al., 2021), we capture this with a same column/row relation as one kind of relative position between two linearized tokens. Similarly, we uses 12 such table-text structure relevant relations (including same cell, cell to header and so on) and one extra type representing all other relations not explicitly defined. All of them are introduced in the form of learnable attention bias scalars.\n\nFormally, we consider a function $\\phi ( v _ { i } , v _ { j } ) : V \\times$ $V  \\mathbb { N } .$ , which measures the relation between $v _ { i }$ and $v _ { j }$ in the sequence $( v _ { i } , v _ { j } \\in S )$ . The function φ can be defined by any relations between the tokens in the table-text pair.\n\nAttention Biases in TABLEFORMER. In our work, $\\phi ( v _ { i } , v _ { j } )$ is chosen from 13 bias types, corresponding to 13 table-text structural biases. The attention biases are applicable to any table-text pair and can be used for any downstream task:\n\n• “same row” identifies the same row information without ordered row id embedding or global positional embedding, which help the model to be invariant to row perturbations,\n\n• “same column”, “header to column cell”, and “cell to column header” incorporates the same column information without ordered column id embedding,\n\n• “cell to column header” makes each cell aware of its column header without repeated column header as features,\n\n• “header to sentence” and “cell to sentence” help column grounding and cell grounding of the paired text,\n\n• “sentence to header”, “sentence to cell”, and “sentence to sentence” helps to understand the sentence with the table as context,\n\n• “header to same header” and “header to other header” for better understanding of table schema, and “same cell bias” for cell content understanding.\n\nNote that, each cell can still attend to other cells in the different columns or rows through “others” instead of masking them out strictly.\n\nWe assign each bias type a learnable scalar, which will serve as a bias term in the self-attention module. Specifically, each self-attention head in each layer have a set of learnable scalars $\\{ b _ { 1 } , b _ { 2 } , \\cdots , b _ { 1 3 } \\}$ corresponding to all types of introduced biases. For one head in one self-attention sub-layer of TABLEFORMER, Equation 2 in the Transformer is replaced by:\n\n$$\n\\bar { A } = \\frac { Q K ^ { \\top } } { \\sqrt { d _ { K } } } , \\quad A = \\bar { A } + \\hat { A }\\tag{3}\n$$\n\n$$\n\\operatorname { A t t n } ( H ) = \\operatorname { s o f t m a x } ( A ) V\\tag{4}\n$$\n\nwhere $\\bar { A }$ is a matrix capturing the similarity between queries and keys, A<sup>ˆ</sup> is the Attention Bias Matrix, and $\\hat { A } _ { i , j } = b _ { \\phi ( v _ { i } , v _ { j } ) }$\n\nRelation between TABLEFORMER and ETC. ETC (Ainslie et al., 2020) uses vectors to represent relative position labels, although not directly applied to table-text pairs due to its large computational overhead (Eisenschlos et al., 2021). TABLE-FORMER differs from ETC in the following aspects (1) ETC uses relative positional embeddings while TABLEFORMER uses attention bias scalars. In practice, we observed that using relative positional embeddings increases training time by more than 7x, (2) ETC uses global memory and local attention, while TABLEFORMER uses pairwise attention without any global memory overhead, (3) ETC uses local sparse attention with masking, limiting its ability to attend to all tokens, (4) ETC did not explore table-text attention bias types exhaustively. Another table encoding model MATE (Eisenschlos et al., 2021) is vulnerable to row and column perturbations, and shares limitation (3) and (4).\n\n## 4 Experimental Setup\n\n## 4.1 Datasets and Evaluation\n\nWe use the following datasets in our experiments.\n\nTable Question Answering. For the table QA task, we conducted experiments on WikiTableQuestions (WTQ) (Pasupat and Liang, 2015) and Sequential QA (SQA) (Iyyer et al., 2017) datasets. WTQ was crowd-sourced based on complex questions on Wikipedia tables. SQA is composed of 6, 066 question sequences (2.9 question per sequence on average), constructed by decomposing a subset of highly compositional WTQ questions.\n\nTable-Text Entailment. For the table-text entailment task, we used TABFACT dataset (Chen et al., 2020), where the tables were extracted from Wikipedia and the sentences were written by crowd workers. Among total 118, 000 sentences, each one is a positive (entailed) or negative sentence.\n\nPerturbation Evaluation Set. For SQA and TABFACT, we also created new test sets to measure models’ robustness to answer-invariant row and column perturbations during inference. Specifically, row and column orders are randomly perturbed for all tables in the standard test sets.<sup>2</sup>\n\nPre-training All the models are first tuned on the Wikipidia text-table pretraining dataset (Herzig et al., 2020), optionally tuned on synthetic dataset at an intermediate stage $( ^ { \\circ } \\mathrm { { \\dot { \\ m u e r } } } ^ { \\prime \\prime } )$ (Eisenschlos et al., 2020), and finally fine-tuned on the target dataset. To get better performance on WTQ, we follow Herzig et al. (2020) to further pretrain on SQA dataset after the intermediate pretraining stage in the “inter-sqa” setting.\n\nEvaluation For SQA, we report the cell selection accuracy for all questions (ALL) using the official evaluation script, cell selection accuracy for all sequences (SEQ), and the denotation accuracy for all questions $( \\mathrm { A L L } _ { \\mathrm { d } } )$ . To evaluate the models’ robustness in the instance level after perturbations, we also report a lower bound of example prediction variation percentage:\n\n$$\nV P = { \\frac { \\left( { \\mathrm { t } } 2 { \\mathrm { f } } + { \\mathrm { f } } 2 { \\mathrm { t } } \\right) } { \\left( { \\mathrm { t } } 2 { \\mathrm { t } } + { \\mathrm { t } } 2 { \\mathrm { f } } + { \\mathrm { f } } 2 { \\mathrm { t } } + { \\mathrm { f } } 2 { \\mathrm { f } } \\right) } }\\tag{5}\n$$\n\nwhere t2t, t2f, f2t, and f2f represents how many example predictions turning from correct to correct, from correct to incorrect, from incorrect to correct and from incorrect to incorrect, respectively, after perturbation. We report denotation accuracy on WTQ and binary classification accuracy on TAB-FACT respectively.\n\n## 4.2 Baselines\n\nWe use $\\mathrm { T A P A S _ { B A S E } }$ and $\\mathrm { T A P A S } _ { \\mathrm { L A R G E } }$ as baselines, where Transformer architectures are exactly same as BERT<sub>BASE</sub> and $\\mathbf { B E R T _ { L A R G E } }$ (Devlin et al., 2019), and parameters are initialized from BERT<sub>BASE</sub> and $\\mathbf { B E R T _ { L A R G E } }$ respectively. Correspondingly, we have our TABLEFORMER<sub>BASE</sub> and TABLEFORMER<sub>LARGE</sub>, where attention bias scalars are initialized to zero, and all other parameters are initialized from BERT<sub>BASE</sub> and $\\mathbf { B E R T _ { L A R G E } }$\n\n## 4.3 Perturbing Tables as Augmented Data\n\nCould we alleviate the spurious ordering biases by data augmentation alone, without making any modeling changes? To answer this, we train another set of models by augmenting the training data for TAPAS through random row and column order perturbations.<sup>3</sup>\n\n<table><tr><td></td><td colspan=\"3\">Before Perturb</td><td colspan=\"2\">After Perturb</td></tr><tr><td></td><td>ALL</td><td>SEQ</td><td>ALLd</td><td>ALL</td><td>VP</td></tr><tr><td>Herzig et al. (2020)</td><td>67.2</td><td>40.4</td><td></td><td>一</td><td></td></tr><tr><td>Eisenschlos et al. (2020)</td><td>71.0</td><td>44.8</td><td></td><td></td><td></td></tr><tr><td>Eisenschlos et al. (2021)</td><td>71.7</td><td>46.1</td><td></td><td></td><td></td></tr><tr><td>Liu et al. (2021)</td><td></td><td></td><td>74.5</td><td></td><td></td></tr><tr><td>TAPASBASE</td><td>61.1</td><td>31.3</td><td>一</td><td>57.4</td><td>14.0%</td></tr><tr><td>TABLEFORMERBASE</td><td>66.7</td><td>39.7</td><td></td><td>66.7</td><td>0.2%</td></tr><tr><td>TAPASLARGE</td><td>66.8</td><td>39.9</td><td>一</td><td>60.5</td><td>15.1%</td></tr><tr><td>TABLEFORMERLARGE</td><td>70.3</td><td>44.8</td><td></td><td>70.3</td><td>0.1%</td></tr><tr><td>TAPASBASE inter</td><td>67.5</td><td>38.8</td><td>一</td><td>61.0</td><td>14.3%</td></tr><tr><td>TABLEFORMERBASE inter</td><td>69.4</td><td>43.5</td><td>一</td><td>69.3</td><td>0.1%</td></tr><tr><td>TAPASLARGE inter</td><td>70.6</td><td>43.9</td><td></td><td>66.1</td><td>10.8%</td></tr><tr><td>TABLEFORMERLARGE inter</td><td>72.4</td><td>47.5</td><td>75.9</td><td>72.3</td><td>0.1%</td></tr></table>\n\nTable 1: Results on SQA test set before and after perturbation during inference (median of 5 runs). ALL is cell selection accuracy, SEQ is cell selection accuracy for all question sequences, $\\mathrm { { A L L } _ { d } }$ is denotation accuracy for all questions (reported to compare with Liu et al. (2021)). VP is model prediction variation percentage after perturbation. Missing values are those not reported in the original paper.\n\nFor each table in the training set, we randomly shuffle all rows and columns (including corresponding column headers), creating a new table with the same content but different orders of rows and columns. Multiple perturbed versions of the same table were created by repeating this process {1, 2, 4, 8, 16} times with different random seeds. For table QA tasks, selected cell positions are also adjusted as final answers according to the perturbed table. The perturbed table-text pairs are then used to augment the data used to train the model. During training, the model takes data created by one specific random seed in one epoch in a cyclic manner.\n\n## 5 Experiments and Results\n\nBesides standard testing results to compare TABLE-FORMER and baselines, we also answer the following questions through experiments:\n\n• How robust are existing (near) state-of-theart table-text encoding models to semantic preserving perturbations in the input?\n\n• How does TABLEFORMER compare with existing table-text encoding models when tested\n\n<table><tr><td></td><td colspan=\"5\">Before Perturb</td><td colspan=\"4\">After Perturb</td></tr><tr><td></td><td>dev</td><td>test</td><td>testsimple</td><td>testcomplex</td><td>testsmall</td><td>test</td><td>testsimple</td><td>testcomplex</td><td>testsmall</td></tr><tr><td>Eisenschlos et al. (2020) Eisenschlos et al. (2021)</td><td>81.0</td><td>81.0</td><td>92.3</td><td>75.6</td><td>83.9</td><td>一</td><td>一</td><td>一</td><td>一</td></tr><tr><td>TAPASBASE</td><td>一 72.8</td><td>81.4</td><td>一 84.8</td><td>一</td><td>一</td><td>一</td><td>1</td><td>一</td><td>一 72.5</td></tr><tr><td>TABLEFORMERBASE</td><td>75.1</td><td>72.3 75.0</td><td>88.2</td><td>66.2 68.5</td><td>74.4 77.1</td><td>71.2 75.0</td><td>83.4 88.2</td><td>65.2 68.5</td><td>77.1</td></tr><tr><td>TAPASLARGE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>76.1</td></tr><tr><td>TABLEFORMERLARGE</td><td>74.7 77.2</td><td>74.5 77.0</td><td>86.6 90.2</td><td>68.6 70.5</td><td>76.8 80.3</td><td>73.7 77.0</td><td>86.0 90.2</td><td>67.7 70.5</td><td>80.3</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>TAPASBASE inter</td><td>78.4</td><td>77.9</td><td>90.1</td><td>71.9</td><td>80.5</td><td>76.8</td><td>89.5</td><td>70.5</td><td>79.7</td></tr><tr><td>TABLEFORMERBASE inter</td><td>79.7</td><td>79.2</td><td>91.6</td><td>73.1</td><td>81.7</td><td>79.2</td><td>91.6</td><td>73.1</td><td>81.7</td></tr><tr><td>TAPASLARGE inter</td><td>80.6</td><td>80.6</td><td>92.0</td><td>74.9</td><td>83.1</td><td>79.2</td><td>91.7</td><td>73.0</td><td>83.0</td></tr><tr><td>TABLEFORMERLARGE inter</td><td>82.0</td><td>81.6</td><td>93.3</td><td>75.9</td><td>84.6</td><td>81.6</td><td>93.3</td><td>75.9</td><td>84.6</td></tr></table>\n\nTable 2: Binary classification accuracy on TABFACT development and 4 splits of test set, as well as performance on test sets with our perturbation evaluation. Median of 5 independent runs are reported. Missing values are those not reported in the original paper.\n\n<table><tr><td>Model</td><td>dev</td><td>test</td></tr><tr><td>Herzig et al. (2020)</td><td>一</td><td>48.8</td></tr><tr><td>Eisenschlos et al. (2021)</td><td>一</td><td>51.5</td></tr><tr><td>TAPASBASE</td><td>23.6</td><td>24.1</td></tr><tr><td>TABLEFORMERBASE</td><td>34.4</td><td>34.8</td></tr><tr><td>TAPASLARGE</td><td>40.8</td><td>41.7</td></tr><tr><td>TABLEFORMERLARGE</td><td>42.5</td><td>43.9</td></tr><tr><td>TAPASBASE inter-sqa</td><td>44.8</td><td>45.1</td></tr><tr><td>TABLEFORMERBASE inter-sqa</td><td>46.7</td><td>46.5</td></tr><tr><td>TAPASLARGE inter-sqa</td><td>49.9</td><td>50.4</td></tr><tr><td>TABLEFORMERLARGE inter-sqa</td><td>51.3</td><td>52.6</td></tr></table>\n\nTable 3: Denotation accuracy on WTQ development and test set. Median of 5 independent runs are reported. on similar perturbations, both in terms of performance and robustness?\n\n• Can we use perturbation based data augmentation to achieve robustness at test time?\n\n• Which attention biases in TABLEFORMER contribute the most to performance?\n\n## 5.1 Main Results\n\nTable 1, 2, and 3 shows TABLEFORMER performance on SQA, TABFACT, and WTQ, respectively. As can be seen, TABLEFORMER outperforms corresponding TAPAS baseline models in all settings on SQA and WTQ datasets, which shows the general effectiveness of TABLEFORMER’s structural biases in Table QA datasets. Specifically, TABLEFORMER<sub>LARGE</sub> combined with intermediate pretraining achieves new state-of-the-art performance on SQA dataset.\n\nSimilarly, Table 2 shows that TABLEFORMER also outperforms TAPAS baseline models in all settings, which shows the effectiveness of TABLE-FORMER in the table entailment task. Note that, Liu et al. (2021) is not comparable to our results, because they used different pretraining data, different pretraining objectives, and BART NLG model instead of BERT NLU model. But TABLEFORMER attention bias is compatible with BART model.\n\n## 5.2 Perturbation Results\n\nOne of our major contributions is to systematically evaluate models’ performance when facing row and column order perturbation in the testing stage.\n\nIdeally, model predictions should be consistent on table QA and entailment tasks when facing such perturbation, because the table semantics remains the same after perturbation.\n\nHowever, in Table 1 and 2, we can see that in our perturbed test set, performance of all TAPAS models drops significantly in both tasks. TAPAS models drops by at least 3.7% and up to 6.5% in all settings on SQA dataset in terms of ALL accuracy, while our TABLEFORMER being strictly invariant to such row and column order perturbation leads to no drop in performance.<sup>4</sup> Thus, in the perturbation setting, TABLEFORMER outperforms all TAPAS baselines even more significantly, with at least 6.2% and 2.4% improvements on SQA and TABFACT dataset, respectively. In the instance level, we can see that, with TAPAS, there are many example predictions changed due to high V P, while there is nearly no example predictions changed with TABLEFORMER (around zero VP).\n\n<table><tr><td>Model</td><td>Number of parameters</td></tr><tr><td>TAPASBASE</td><td>110 M</td></tr><tr><td>TABLEFORMERBASE</td><td>110 M - 2*512*768 + 12*12*13 = 110 M - 0.8M + 0.002 M</td></tr><tr><td>TAPASLARGE</td><td>340 M</td></tr><tr><td>TABLEFORMERLARGE</td><td>340 M - 2*512*1024 +24*16*13 =  $3 4 0 \\mathrm { M } - 1 . 0 \\mathrm { M } + 0 . 0 0 5 \\mathrm { M }$ </td></tr></table>\n\nTable 4: Model size comparison.\n\n## 5.3 Model Size Comparison\n\nWe compare the model sizes of TABLEFORMER and TAPAS in Table 4. We added only a few attention bias scalar parameters (13 parameters per head per layer) in TABLEFORMER, which is negligible compared with the BERT model size. Meanwhile, we delete two large embedding metrics (512 row ids and 512 column ids). Thus, TABLEFORMER outperforms TAPAS with fewer parameters.\n\n## 5.4 Analysis of TABLEFORMER Submodules\n\nIn this section, we experiment with several variants of TABLEFORMER to understand the effectiveness of its submodules. The performance of all variants of TAPAS and TABLEFORMER that we tried on the SQA development set is shown in Table 5.\n\nLearnable Attention Biases v/s Masking. Instead of adding learnable bias scalars, we mask out some attention scores to restrict attention to those tokens in the same columns and rows, as well as the paired sentence, similar to Zhang et al. (2020) (SAT). We can see that TAPAS<sub>BASE-SAT</sub> performs worse than TAPAS<sub>BASE</sub>, which means that restricting attention to only same columns and rows by masking reduce the modeling capacity. This led to choosing soft bias addition over hard masking.\n\nAttention Bias Scaling. Unlike TABLE-FORMER, we also tried to add attention biases before the scaling operation in the self-attention module (SO). Specifically, we compute pair-wise attention score by:\n\n$$\nA _ { i j } = \\frac { ( h _ { i } ^ { \\top } W ^ { Q } ) ( h _ { j } ^ { \\top } W ^ { K } ) ^ { \\top } + \\hat { A } _ { i j } } { \\sqrt { d _ { K } } }\\tag{6}\n$$\n\n<table><tr><td></td><td>rc-gp</td><td>c-gp</td><td>gp</td><td>pcp</td></tr><tr><td>TAPASBASE</td><td>57.6</td><td>47.4</td><td>46.4</td><td>29.1</td></tr><tr><td>TAPASBASE-SAT</td><td>45.2</td><td>一</td><td>一</td><td></td></tr><tr><td>TABLEFORMERBASE-SO</td><td>60.0</td><td>60.2</td><td>59.8</td><td>60.7</td></tr><tr><td>TABLEFORMERBASE</td><td>62.2</td><td>61.5</td><td>61.7</td><td>61.9</td></tr></table>\n\nTable 5: ALL questions’ cell selection accuracy of TABLEFORMER variants on SQA development set. rcgp represents the setting including row ids, column ids and global positional ids, c-gp represents column ids and global positional ids, gp represents global positional ids, and $p c p$ represents per-cell positional ids. “SAT” represents masking out some attention scores. “SO” represents adding attention bias before scaling.\n\ninstead of using:\n\n$$\nA _ { i j } = \\frac { ( { h _ { i } ^ { \\top } W ^ { Q } } ) ( { h _ { j } ^ { \\top } W ^ { K } } ) ^ { \\top } } { \\sqrt { d _ { K } } } + \\hat { A } _ { i j } ,\\tag{7}\n$$\n\nwhich is the element-wise version of Equation 1 and 3. However, Table 5 shows that TABLEFORMER<sub>BASE-SO</sub> performs worse than TABLEFORMER<sub>BASE</sub>, showing the necessity of adding attention biases after the scaling operation. We think the reason is that the attention bias term does not require scaling, because attention bias scalar magnitude is independent of $d _ { K }$ , while the dot products grow large in magnitude for large values of $d _ { K }$ . Thus, such bias term could play an more important role without scaling, which helps each attention head know clearly what to pay more attention to according to stronger inductive biases.\n\nRow, Column, & Global Positional IDs. With TAPAS<sub>BASE</sub>, TABLEFORMER<sub>BASE-SO</sub>, and TABLEFORMER<sub>BASE</sub>, we first tried the full-version where row ids, column ids, and global positional ids exist as input (rc-gp). Then, we deleted row ids (c-gp), and column ids (gp) sequentially. Finally, we changed global positional ids in gp to per-cell positional ids (pcp). Table 5 shows that TAPAS<sub>BASE</sub> performs significantly worse from rc-$g p  c { - } g p  g p  p c p$ , because table structure information are deleted sequentially during such process. However, with TABLEFORMER<sub>BASE</sub>, there is no obvious performance drop during the same process. That shows the structural inductive biases in TABLEFORMER can provide complete table structure information. Thus, row ids, column ids and global positional ids are not necessary in TABLE-FORMER. We pick TABLEFORMER pcp setting as our final version to conduct all other experiments in this paper. In this way, TABLEFORMER is strictly invariant to row and column order perturbation by avoiding spurious biases in those original ids.\n\n<table><tr><td></td><td>Befor Perturb</td><td>After Perturb</td><td></td></tr><tr><td></td><td>ALL</td><td>SEQ ALL</td><td>VP</td></tr><tr><td>TAPASBASE</td><td>61.1</td><td>31.3</td><td>57.4 14.0%</td></tr><tr><td>TAPASBASE 1p</td><td>63.4</td><td>34.6</td><td>63.4 9.9%</td></tr><tr><td>TAPASBASE 2p</td><td>64.6</td><td>35.6</td><td>64.5 8.4%</td></tr><tr><td>TAPASBASE 4p</td><td>65.1</td><td>37.0 65.0</td><td>8.1%</td></tr><tr><td>TAPASBASE 8p</td><td>65.1</td><td>37.3 64.3 33.6</td><td>7.2%</td></tr><tr><td>TAPASBASE 16p</td><td>62.4</td><td>62.2</td><td>7.0%</td></tr><tr><td>TABLEFORMERBASE</td><td>66.7</td><td>39.7</td><td>66.7 0.1%</td></tr></table>\n\nTable 6: Comparison of TABLEFORMER and perturbed data augmentation on SQA test set, where VP represents model prediction variation percentage after perturbation. Median of 5 independent runs are reported.\n\n## 5.5 Comparison of TABLEFORMER and Perturbed Data Augmentation\n\nAs stated in Section 4.3, perturbing row and column orders as augmented data during training can serve as another possible solution to alleviate the spurious row/column ids bias. Table 6 shows the performance of TABPAS<sub>BASE</sub> model trained with additional {1, 2, 4, 8, 16} perturbed versions of each table as augmented data.\n\nWe can see that the performance of TAPAS<sub>BASE</sub> on SQA dataset improves with such augmentation. Also, as the number of perturbed versions of each table increases, model performance first increases and then decreases, reaching the best results with 8 perturbed versions. We suspect that too many versions of the same table confuse the model about different row and column ids for the same table, leading to decreased performance from 8p to 16p. Despite its usefulness, such data perturbation is still worse than TABLEFORMER, because it could not incorporate other relevant text-table structural inductive biases like TABLEFORMER.\n\nAlthough, such data augmentation makes the model more robust to row and column order perturbation with smaller V P compared to standard TAPAS<sub>BASE</sub>, there is still a significant prediction drift after perturbation. As shown in Table 6, V P decreases from 1p to 16p, however, the best VP (7.0%) is still much higher than (nearly) no variation (0.1%) of TABLEFORMER.\n\nTo sum up, TABLEFORMER is superior to row and column order perturbation augmentation, because of its additional structural biases and strictly consistent predictions after perturbation.\n\n<table><tr><td></td><td>ALL</td><td>SEQ</td></tr><tr><td>TABLEFORMERBASE</td><td>62.1</td><td>38.4</td></tr><tr><td>- Same Row</td><td>32.1</td><td>2.8</td></tr><tr><td>- Same Column</td><td>62.1</td><td>37.7</td></tr><tr><td>- Same Cell</td><td>61.8</td><td>38.4</td></tr><tr><td>- Cell to Column Header</td><td>60.7</td><td>36.6</td></tr><tr><td>- Cell to Sentence</td><td>60.5</td><td>36.4</td></tr><tr><td>- Header to Column Cell</td><td>60.5</td><td>35.8</td></tr><tr><td>- Header to Other Header</td><td>60.6</td><td>35.8</td></tr><tr><td>- Header to Same Header</td><td>61.0</td><td>36.9</td></tr><tr><td>- Header to Sentence</td><td>61.1</td><td>36.3</td></tr><tr><td>- Sentence to Cell</td><td>60.8</td><td>36.2</td></tr><tr><td>- Sentence to Header</td><td>61.0</td><td>37.3</td></tr><tr><td>- Sentence to Sentence</td><td>60.0</td><td>35.3</td></tr><tr><td>- All Column Related (# 2, 4, 6)</td><td>54.5</td><td>29.3</td></tr></table>\n\nTable 7: Ablation study of proposed attention biases.\n\n## 5.6 Attention Bias Ablation Study\n\nWe conduct ablation study to demonstrate the utility of all 12 types of defined attention biases. For each ablation, we set the corresponding attention bias type id to “others” bias id. Table 7 shows TAPAS<sub>BASE</sub>’s performance SQA dev set. Overall, all types of attention biases help the TABLE-FORMER performance to some extent, due to certain performance drop after deleting each bias type.\n\nAmongst all the attention biases, deleting “same row” bias leads to most significant performance drop, showing its crucial role for encoding table row structures. There is little performance drop after deleting “same column” bias, that’s because TABLEFORMER could still infer the same column information through “cell to its column header” and “header to its column cell” biases. After deleting all same column information (“same column”, “cell to column header” and “header to column cell” biases), TABLEFORMER performs significantly worse without encoding column structures. Similarly, there is little performance drop after deleting “same cell” bias, because TABLEFORMER can still infer same cell information through “same row” and “same column” biases.\n\n## 5.7 Limitations of TABLEFORMER\n\nTABLEFORMER increases the training time by around 20%, which might not be ideal for very long tables and would require a scoped approach. Secondly, with the strict row and column order invariant property, TABLEFORMER cannot deal with questions based on absolute orders of rows in tables. This however is not a practical requirement based on the current dataset. Doing a manual study of 1800 questions in SQA dataset, we found that there are 4 questions<sup>5</sup> (0.2% percentage) whose answers depend on orders of rows. Three of them asked “which one is at the top of the table”, another asks “which one is listed first”. However, these questions could be potentially answered by adding back row and column order information based on TABLEFORMER.\n\n## 6 Other Related Work\n\nTransformers for Tabular Data. Yin et al. (2020) prepended corresponding column headers to cells contents, and Chen et al. (2020) used corresponding column headers as features for cells. However, such methods encode each table header multiple times, leading to duplicated computing overhead. Also, tabular structures (e.g. same row information) are not fully incorporated to such models. Meanwhile, Yin et al. (2020) leveraged row encoder and column encoder sequentially, which introduced much computational overhead, thus requiring retrieving some rows as a preprocessing step. Finally, SAT (Zhang et al., 2020), Deng et al. (2021) and Wang et al. (2021) restricted attention to same row or columns with attention mask, where such inductive bias is too strict that cells could not directly attend to those cells in different row and columns, hindering the modeling ability according to Table 5. Liu et al. (2021) used the seq2seq BART generation model with a standard Transformer encoder-decoder architecture. In all models mentioned above, spurious inter-cell or der biases still exist due to global positional ids of Transformer, leading to the vulnerability to row or column order perturbations, while our TABLE-FORMER could avoid such problem. Mueller et al. (2019) and Wang et al. (2020) also used relative positional encoding to encode table structures, but they modeled the relations as learnable relation vectors, whose large overhead prevented pretraining and led to poor performance without pretraining, similarly to ETC (Ainslie et al., 2020) explained in Section 3.\n\nStructural and Relative Attention. Modified attention scores has been used to model relative positions (Shaw et al., 2018), long documents (Dai et al., 2019; Beltagy et al., 2020; Ainslie et al., 2020), and graphs (Ying et al., 2021). But adding learnable attention biases to model tabular structures has been under-explored.\n\n## 7 Conclusion\n\nIn this paper, we identified the vulnerability of prior table encoding models along two axes: (a) capturing the structural bias, and (b) robustness to row and column perturbations. To tackle this, we propose TABLEFORMER, where learnable task-independent learnable structural attention biases are introduced, while making it invariant to row/column order at the same time. Experimental results showed that TABLEFORMER outperforms strong baselines in 3 table reasoning tasks, achieving state-of-the-art performance on SQA dataset, especially when facing row and column order perturbations, because of its invariance to row and column orders.\n\n## Acknowledgments\n\nWe thank Julian Eisenschlos, Ankur Parikh, and the anonymous reviewers for their feedbacks in improving this paper.\n\n## Ethical Considerations\n\nThe authors foresee no ethical concerns with the research presented in this paper.\n\n## References\n\nJoshua Ainslie, Santiago Ontanon, Chris Alberti, Vaclav Cvicek, Zachary Fisher, Philip Pham, Anirudh Ravula, Sumit Sanghai, Qifan Wang, and Li Yang. 2020. ETC: Encoding long and structured inputs in transformers. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 268–284, Online. Association for Computational Linguistics.\n\nIz Beltagy, Matthew E. Peters, and Arman Cohan. 2020. Longformer: The long-document transformer. arXiv:2004.05150.\n\nWenhu Chen, Hongmin Wang, Jianshu Chen, Yunkai Zhang, Hong Wang, Shiyang Li, Xiyou Zhou, and William Yang Wang. 2020. Tabfact : A large-scale dataset for table-based fact verification. In International Conference on Learning Representations (ICLR), Addis Ababa, Ethiopia.\n\nZihang Dai, Zhilin Yang, Yiming Yang, Jaime Carbonell, Quoc Le, and Ruslan Salakhutdinov. 2019. Transformer-XL: Attentive language models beyond a fixed-length context. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics, pages 2978–2988, Florence, Italy. Association for Computational Linguistics.\n\nXiang Deng, Huan Sun, Alyssa Lees, You Wu, and Cong Yu. 2021. TURL: Table Understanding through Representation Learning. In VLDB.\n\nJacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional transformers for language understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), pages 4171–4186, Minneapolis, Minnesota. Association for Computational Linguistics.\n\nJulian Eisenschlos, Maharshi Gor, Thomas Müller, and William Cohen. 2021. MATE: Multi-view attention for table transformer efficiency. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing, pages 7606–7619, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics.\n\nJulian Eisenschlos, Syrine Krichene, and Thomas Müller. 2020. Understanding tables with intermediate pre-training. In Findings of the Association for Computational Linguistics: EMNLP 2020, pages 281–296, Online. Association for Computational Linguistics.\n\nJonathan Herzig, Pawel Krzysztof Nowak, Thomas Müller, Francesco Piccinno, and Julian Eisenschlos. 2020. TaPas: Weakly supervised table parsing via pre-training. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 4320–4333, Online. Association for Computational Linguistics.\n\nMohit Iyyer, Wen-tau Yih, and Ming-Wei Chang. 2017. Search-based neural structured learning for sequential question answering. In Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 1821–1831, Vancouver, Canada. Association for Computational Linguistics.\n\nQian Liu, Bei Chen, Jiaqi Guo, Zeqi Lin, and Jianguang Lou. 2021. Tapex: Table pre-training via learning a neural sql executor. arXiv preprint arXiv:2107.07653.\n\nThomas Mueller, Francesco Piccinno, Peter Shaw, Massimo Nicosia, and Yasemin Altun. 2019. Answering conversational questions on structured data without logical forms. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages 5902–5910, Hong Kong, China. Association for Computational Linguistics.\n\nPanupong Pasupat and Percy Liang. 2015. Compositional semantic parsing on semi-structured tables. In Proceedings of the 53rd Annual Meeting of the Association for Computational Linguistics and the 7th International Joint Conference on Natural Language Processing (Volume 1: Long Papers), pages\n\n1470–1480, Beijing, China. Association for Computational Linguistics.\n\nPeter Shaw, Jakob Uszkoreit, and Ashish Vaswani. 2018. Self-attention with relative position representations. In Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 2 (Short Papers), pages 464–468, New Orleans, Louisiana. Association for Computational Linguistics.\n\nAshish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. In Advances in neural information processing systems, pages 5998–6008.\n\nBailin Wang, Richard Shin, Xiaodong Liu, Oleksandr Polozov, and Matthew Richardson. 2020. RAT-SQL: Relation-aware schema encoding and linking for text-to-SQL parsers. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 7567–7578, Online. Association for Computational Linguistics.\n\nZhiruo Wang, Haoyu Dong, Ran Jia, Jia Li, Zhiyi Fu, Shi Han, and Dongmei Zhang. 2021. TUTA: Tree-based Transformers for Generally Structured Table Pre-training. In Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining, pages 1780–1790.\n\nPengcheng Yin, Graham Neubig, Wen-tau Yih, and Sebastian Riedel. 2020. TaBERT: Pretraining for joint understanding of textual and tabular data. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 8413– 8426, Online. Association for Computational Linguistics.\n\nChengxuan Ying, Tianle Cai, Shengjie Luo, Shuxin Zheng, Guolin Ke, Di He, Yanming Shen, and Tie-Yan Liu. 2021. Do Transformers Really Perform Bad for Graph Representation? arXiv preprint arXiv:2106.05234.\n\nTao Yu, Chien-Sheng Wu, Xi Victoria Lin, Bailin Wang, Yi Chern Tan, Xinyi Yang, Dragomir Radev, Richard Socher, and Caiming Xiong. 2020. GraPPa: Grammar-Augmented Pre-Training for Table Semantic Parsing. arXiv preprint arXiv:2009.13845.\n\nHongzhi Zhang, Yingyao Wang, Sirui Wang, Xuezhi Cao, Fuzheng Zhang, and Zhongyuan Wang. 2020. Table fact verification with structure-aware transformer. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 1624–1629, Online. Association for Computational Linguistics.",
+    "pages": 10,
+    "tables": [
+      {
+        "page": 0,
+        "bbox": [
+          611,
+          263,
+          781,
+          303
+        ],
+        "html": "<table><tr><td>Title</td><td>Length</td></tr><tr><td>Screwed Up</td><td>5:02</td></tr><tr><td>Ghetto Queen</td><td>5:00</td></tr></table>",
+        "caption": [],
+        "footnote": [],
+        "image": "images/531e9ed05886e3ab1e302027d9cc020407e9deec59e362e53a17d09399c5a642.jpg"
+      },
+      {
+        "page": 0,
+        "bbox": [
+          559,
+          422,
+          833,
+          473
+        ],
+        "html": "<table><tr><td rowspan=1 colspan=1>Nation</td><td rowspan=1 colspan=1>Gold</td><td rowspan=1 colspan=1>Silver</td><td rowspan=1 colspan=1>Bronze</td></tr><tr><td rowspan=1 colspan=1>Great Britain</td><td rowspan=1 colspan=1>2</td><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>2</td></tr><tr><td rowspan=1 colspan=1>Spain</td><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>2</td><td rowspan=1 colspan=1>0</td></tr><tr><td rowspan=1 colspan=1>Ukraine</td><td rowspan=1 colspan=1>0</td><td rowspan=1 colspan=1>2</td><td rowspan=1 colspan=1>0</td></tr></table>",
+        "caption": [],
+        "footnote": [
+          "Question: Which nation received 2 silver medals? Gold Answer: Spain, Ukraine TAPAS: Spain TABLEFORMER: Spain, Ukraine TABLEFORMER w/o a proposed structural bias: Spain"
+        ],
+        "image": "images/1a88b3a1e7a8bd0c6e1e919885a995ea4baa8cf243106f319952fed469cd5cc8.jpg"
+      },
+      {
+        "page": 4,
+        "bbox": [
+          524,
+          82,
+          867,
+          263
+        ],
+        "html": "<table><tr><td></td><td colspan=\"3\">Before Perturb</td><td colspan=\"2\">After Perturb</td></tr><tr><td></td><td>ALL</td><td>SEQ</td><td>ALLd</td><td>ALL</td><td>VP</td></tr><tr><td>Herzig et al. (2020)</td><td>67.2</td><td>40.4</td><td></td><td>一</td><td></td></tr><tr><td>Eisenschlos et al. (2020)</td><td>71.0</td><td>44.8</td><td></td><td></td><td></td></tr><tr><td>Eisenschlos et al. (2021)</td><td>71.7</td><td>46.1</td><td></td><td></td><td></td></tr><tr><td>Liu et al. (2021)</td><td></td><td></td><td>74.5</td><td></td><td></td></tr><tr><td>TAPASBASE</td><td>61.1</td><td>31.3</td><td>一</td><td>57.4</td><td>14.0%</td></tr><tr><td>TABLEFORMERBASE</td><td>66.7</td><td>39.7</td><td></td><td>66.7</td><td>0.2%</td></tr><tr><td>TAPASLARGE</td><td>66.8</td><td>39.9</td><td>一</td><td>60.5</td><td>15.1%</td></tr><tr><td>TABLEFORMERLARGE</td><td>70.3</td><td>44.8</td><td></td><td>70.3</td><td>0.1%</td></tr><tr><td>TAPASBASE inter</td><td>67.5</td><td>38.8</td><td>一</td><td>61.0</td><td>14.3%</td></tr><tr><td>TABLEFORMERBASE inter</td><td>69.4</td><td>43.5</td><td>一</td><td>69.3</td><td>0.1%</td></tr><tr><td>TAPASLARGE inter</td><td>70.6</td><td>43.9</td><td></td><td>66.1</td><td>10.8%</td></tr><tr><td>TABLEFORMERLARGE inter</td><td>72.4</td><td>47.5</td><td>75.9</td><td>72.3</td><td>0.1%</td></tr></table>",
+        "caption": [
+          "Table 1: Results on SQA test set before and after perturbation during inference (median of 5 runs). ALL is cell selection accuracy, SEQ is cell selection accuracy for all question sequences, $\\mathrm { { A L L } _ { d } }$ is denotation accuracy for all questions (reported to compare with Liu et al. (2021)). VP is model prediction variation percentage after perturbation. Missing values are those not reported in the original paper."
+        ],
+        "footnote": [],
+        "image": "images/b0ba2af8c2ef0ef11260adbcd72dd4293a26fe6564718e5928f3eafbf18e24d3.jpg"
+      },
+      {
+        "page": 5,
+        "bbox": [
+          124,
+          82,
+          872,
+          273
+        ],
+        "html": "<table><tr><td></td><td colspan=\"5\">Before Perturb</td><td colspan=\"4\">After Perturb</td></tr><tr><td></td><td>dev</td><td>test</td><td>testsimple</td><td>testcomplex</td><td>testsmall</td><td>test</td><td>testsimple</td><td>testcomplex</td><td>testsmall</td></tr><tr><td>Eisenschlos et al. (2020) Eisenschlos et al. (2021)</td><td>81.0</td><td>81.0</td><td>92.3</td><td>75.6</td><td>83.9</td><td>一</td><td>一</td><td>一</td><td>一</td></tr><tr><td>TAPASBASE</td><td>一 72.8</td><td>81.4</td><td>一 84.8</td><td>一</td><td>一</td><td>一</td><td>1</td><td>一</td><td>一 72.5</td></tr><tr><td>TABLEFORMERBASE</td><td>75.1</td><td>72.3 75.0</td><td>88.2</td><td>66.2 68.5</td><td>74.4 77.1</td><td>71.2 75.0</td><td>83.4 88.2</td><td>65.2 68.5</td><td>77.1</td></tr><tr><td>TAPASLARGE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>76.1</td></tr><tr><td>TABLEFORMERLARGE</td><td>74.7 77.2</td><td>74.5 77.0</td><td>86.6 90.2</td><td>68.6 70.5</td><td>76.8 80.3</td><td>73.7 77.0</td><td>86.0 90.2</td><td>67.7 70.5</td><td>80.3</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>TAPASBASE inter</td><td>78.4</td><td>77.9</td><td>90.1</td><td>71.9</td><td>80.5</td><td>76.8</td><td>89.5</td><td>70.5</td><td>79.7</td></tr><tr><td>TABLEFORMERBASE inter</td><td>79.7</td><td>79.2</td><td>91.6</td><td>73.1</td><td>81.7</td><td>79.2</td><td>91.6</td><td>73.1</td><td>81.7</td></tr><tr><td>TAPASLARGE inter</td><td>80.6</td><td>80.6</td><td>92.0</td><td>74.9</td><td>83.1</td><td>79.2</td><td>91.7</td><td>73.0</td><td>83.0</td></tr><tr><td>TABLEFORMERLARGE inter</td><td>82.0</td><td>81.6</td><td>93.3</td><td>75.9</td><td>84.6</td><td>81.6</td><td>93.3</td><td>75.9</td><td>84.6</td></tr></table>",
+        "caption": [
+          "Table 2: Binary classification accuracy on TABFACT development and 4 splits of test set, as well as performance on test sets with our perturbation evaluation. Median of 5 independent runs are reported. Missing values are those not reported in the original paper."
+        ],
+        "footnote": [],
+        "image": "images/64d36b02479fe068f44c944d5e9226bad814737aa194be2f4aba96444bd43290.jpg"
+      },
+      {
+        "page": 5,
+        "bbox": [
+          147,
+          350,
+          455,
+          524
+        ],
+        "html": "<table><tr><td>Model</td><td>dev</td><td>test</td></tr><tr><td>Herzig et al. (2020)</td><td>一</td><td>48.8</td></tr><tr><td>Eisenschlos et al. (2021)</td><td>一</td><td>51.5</td></tr><tr><td>TAPASBASE</td><td>23.6</td><td>24.1</td></tr><tr><td>TABLEFORMERBASE</td><td>34.4</td><td>34.8</td></tr><tr><td>TAPASLARGE</td><td>40.8</td><td>41.7</td></tr><tr><td>TABLEFORMERLARGE</td><td>42.5</td><td>43.9</td></tr><tr><td>TAPASBASE inter-sqa</td><td>44.8</td><td>45.1</td></tr><tr><td>TABLEFORMERBASE inter-sqa</td><td>46.7</td><td>46.5</td></tr><tr><td>TAPASLARGE inter-sqa</td><td>49.9</td><td>50.4</td></tr><tr><td>TABLEFORMERLARGE inter-sqa</td><td>51.3</td><td>52.6</td></tr></table>",
+        "caption": [
+          "Table 3: Denotation accuracy on WTQ development and test set. Median of 5 independent runs are reported. on similar perturbations, both in terms of performance and robustness?"
+        ],
+        "footnote": [],
+        "image": "images/9c1df146ef65ad7a2e2c156ec9d40f32f1f756fdc8e2910fc1c09a3f8b8a1c3f.jpg"
+      },
+      {
+        "page": 6,
+        "bbox": [
+          134,
+          80,
+          467,
+          231
+        ],
+        "html": "<table><tr><td>Model</td><td>Number of parameters</td></tr><tr><td>TAPASBASE</td><td>110 M</td></tr><tr><td>TABLEFORMERBASE</td><td>110 M - 2*512*768 + 12*12*13 = 110 M - 0.8M + 0.002 M</td></tr><tr><td>TAPASLARGE</td><td>340 M</td></tr><tr><td>TABLEFORMERLARGE</td><td>340 M - 2*512*1024 +24*16*13 =  $3 4 0 \\mathrm { M } - 1 . 0 \\mathrm { M } + 0 . 0 0 5 \\mathrm { M }$ </td></tr></table>",
+        "caption": [
+          "Table 4: Model size comparison."
+        ],
+        "footnote": [],
+        "image": "images/53f61db7898eb4e44ab944ef7b3abcad67db82644782816b275012f96ef78723.jpg"
+      },
+      {
+        "page": 6,
+        "bbox": [
+          517,
+          82,
+          877,
+          156
+        ],
+        "html": "<table><tr><td></td><td>rc-gp</td><td>c-gp</td><td>gp</td><td>pcp</td></tr><tr><td>TAPASBASE</td><td>57.6</td><td>47.4</td><td>46.4</td><td>29.1</td></tr><tr><td>TAPASBASE-SAT</td><td>45.2</td><td>一</td><td>一</td><td></td></tr><tr><td>TABLEFORMERBASE-SO</td><td>60.0</td><td>60.2</td><td>59.8</td><td>60.7</td></tr><tr><td>TABLEFORMERBASE</td><td>62.2</td><td>61.5</td><td>61.7</td><td>61.9</td></tr></table>",
+        "caption": [
+          "Table 5: ALL questions’ cell selection accuracy of TABLEFORMER variants on SQA development set. rcgp represents the setting including row ids, column ids and global positional ids, c-gp represents column ids and global positional ids, gp represents global positional ids, and $p c p$ represents per-cell positional ids. “SAT” represents masking out some attention scores. “SO” represents adding attention bias before scaling."
+        ],
+        "footnote": [],
+        "image": "images/d728afd75d8358b1d0ad629f27a1d30aa4dea16581e7b4613388d206a7702059.jpg"
+      },
+      {
+        "page": 7,
+        "bbox": [
+          115,
+          82,
+          485,
+          224
+        ],
+        "html": "<table><tr><td></td><td>Befor Perturb</td><td>After Perturb</td><td></td></tr><tr><td></td><td>ALL</td><td>SEQ ALL</td><td>VP</td></tr><tr><td>TAPASBASE</td><td>61.1</td><td>31.3</td><td>57.4 14.0%</td></tr><tr><td>TAPASBASE 1p</td><td>63.4</td><td>34.6</td><td>63.4 9.9%</td></tr><tr><td>TAPASBASE 2p</td><td>64.6</td><td>35.6</td><td>64.5 8.4%</td></tr><tr><td>TAPASBASE 4p</td><td>65.1</td><td>37.0 65.0</td><td>8.1%</td></tr><tr><td>TAPASBASE 8p</td><td>65.1</td><td>37.3 64.3 33.6</td><td>7.2%</td></tr><tr><td>TAPASBASE 16p</td><td>62.4</td><td>62.2</td><td>7.0%</td></tr><tr><td>TABLEFORMERBASE</td><td>66.7</td><td>39.7</td><td>66.7 0.1%</td></tr></table>",
+        "caption": [
+          "Table 6: Comparison of TABLEFORMER and perturbed data augmentation on SQA test set, where VP represents model prediction variation percentage after perturbation. Median of 5 independent runs are reported."
+        ],
+        "footnote": [],
+        "image": "images/8485e55ca9e7dd8bf661b73c36ffd0bb95d7f825b2be1a146ca68f36e893a97a.jpg"
+      },
+      {
+        "page": 7,
+        "bbox": [
+          510,
+          82,
+          882,
+          282
+        ],
+        "html": "<table><tr><td></td><td>ALL</td><td>SEQ</td></tr><tr><td>TABLEFORMERBASE</td><td>62.1</td><td>38.4</td></tr><tr><td>- Same Row</td><td>32.1</td><td>2.8</td></tr><tr><td>- Same Column</td><td>62.1</td><td>37.7</td></tr><tr><td>- Same Cell</td><td>61.8</td><td>38.4</td></tr><tr><td>- Cell to Column Header</td><td>60.7</td><td>36.6</td></tr><tr><td>- Cell to Sentence</td><td>60.5</td><td>36.4</td></tr><tr><td>- Header to Column Cell</td><td>60.5</td><td>35.8</td></tr><tr><td>- Header to Other Header</td><td>60.6</td><td>35.8</td></tr><tr><td>- Header to Same Header</td><td>61.0</td><td>36.9</td></tr><tr><td>- Header to Sentence</td><td>61.1</td><td>36.3</td></tr><tr><td>- Sentence to Cell</td><td>60.8</td><td>36.2</td></tr><tr><td>- Sentence to Header</td><td>61.0</td><td>37.3</td></tr><tr><td>- Sentence to Sentence</td><td>60.0</td><td>35.3</td></tr><tr><td>- All Column Related (# 2, 4, 6)</td><td>54.5</td><td>29.3</td></tr></table>",
+        "caption": [
+          "Table 7: Ablation study of proposed attention biases."
+        ],
+        "footnote": [],
+        "image": "images/d563ded8d52211d7c5fad7d626491f5375ae9be19f22a864d0051111ea5107f6.jpg"
+      }
+    ],
+    "figures": [
+      {
+        "page": 2,
+        "bbox": [
+          136,
+          87,
+          872,
+          395
+        ],
+        "caption": [
+          "Figure 2: TABLEFORMER input and attention biases in the self attention module. This example corresponds to table (a) in Figure 1 and its paired question “query”. Different colors in the attention bias matrix denote different types of task independent biases derived based on the table structure and the associated text."
+        ],
+        "footnote": [],
+        "image": "images/3d1fa4656e559a4dc0f9b87a09848ecfb7e812a6ebb520ba6e4bf97e2fa02668.jpg"
+      }
+    ],
+    "formulas": [
+      {
+        "page": 1,
+        "bbox": [
+          534,
+          563,
+          826,
+          580
+        ],
+        "text": "$$\n\\mathrm { t o k e n i d s } \\left( W \\right) = \\left\\{ w _ { v _ { 1 } } , w _ { v _ { 2 } } , \\cdot \\cdot \\cdot , w _ { v _ { n } } \\right\\}\n$$",
+        "format": "latex",
+        "image": "images/7817b8078b1ad0a29ebf708394bf28dd64ed64ec89270d02a853b7680c23cf7b.jpg"
+      },
+      {
+        "page": 1,
+        "bbox": [
+          509,
+          582,
+          791,
+          600
+        ],
+        "text": "$$\n\\mathrm { p o s i t i o n a l i d s } \\left( { B } \\right) = \\left\\{ { b } _ { 1 } , { b } _ { 2 } , \\cdot \\cdot \\cdot , { b } _ { n } \\right\\}\n$$",
+        "format": "latex",
+        "image": "images/d2998cf15fc73812672113944ff4daca100c3ddd1cc1668691af4c0cc24dfe38.jpg"
+      },
+      {
+        "page": 1,
+        "bbox": [
+          521,
+          602,
+          853,
+          621
+        ],
+        "text": "$$\n\\operatorname { s e g m e n t i d s } \\left( G \\right) = \\left\\{ g _ { s e g _ { 1 } } , g _ { s e g _ { 2 } } , \\cdot \\cdot \\cdot , g _ { s e g _ { n } } \\right\\}\n$$",
+        "format": "latex",
+        "image": "images/ad1844ae4f63a3290158f6e92f411d30eacfbb8dd3d39b9bdd4d0118864ce9f7.jpg"
+      },
+      {
+        "page": 1,
+        "bbox": [
+          526,
+          623,
+          843,
+          639
+        ],
+        "text": "$$\n\\mathrm { c o l u m n i d s } \\left( { C } \\right) = \\left\\{ { c _ { c o l } } _ { 1 } , { c _ { c o l } } _ { 2 } , \\cdot \\cdot \\cdot , { c _ { c o l } } _ { n } \\right\\}\n$$",
+        "format": "latex",
+        "image": "images/11e5614ad1072f50e5ee6f57c327a173ee0cb019fdf5c03b2f896aeb269f825e.jpg"
+      },
+      {
+        "page": 1,
+        "bbox": [
+          552,
+          642,
+          867,
+          661
+        ],
+        "text": "$$\n\\mathrm { r o w i d s } \\left( R \\right) = \\{ r _ { r o w _ { 1 } } , r _ { r o w _ { 2 } } , \\cdot \\cdot \\cdot , r _ { r o w _ { n } } \\}\n$$",
+        "format": "latex",
+        "image": "images/7f384dbf6f28216e4e3f281aae9766eec59c50a35c47500e384449f968ca3f14.jpg"
+      },
+      {
+        "page": 1,
+        "bbox": [
+          549,
+          662,
+          884,
+          680
+        ],
+        "text": "$$\n\\operatorname { r a n k } \\operatorname { i d s } \\left( Z \\right) = \\left\\{ z _ { r a n k _ { 1 } } , z _ { r a n k _ { 2 } } , \\cdot \\cdot \\cdot , z _ { r a n k _ { n } } \\right\\}\n$$",
+        "format": "latex",
+        "image": "images/a12e19e62524d43dd4a2d5909e2abb863cde4698b8b43750e93f9ff22eed2285.jpg"
+      },
+      {
+        "page": 2,
+        "bbox": [
+          124,
+          517,
+          452,
+          536
+        ],
+        "text": "$$\nQ = H W ^ { Q } , \\quad V = H W ^ { V } , \\quad K = H W ^ { K }\\tag{1}\n$$",
+        "format": "latex",
+        "image": "images/4682bf53037111118080c2a9dff8499922c529a06a965a990b12714e367f8a42.jpg"
+      },
+      {
+        "page": 2,
+        "bbox": [
+          184,
+          590,
+          416,
+          626
+        ],
+        "text": "$$\n\\mathrm { A t t n } ( H ) = \\mathrm { s o f t m a x } ( \\frac { Q K ^ { \\top } } { \\sqrt { d _ { K } } } ) V\\tag{2}\n$$",
+        "format": "latex",
+        "image": "images/cefd2383fc5a8ecd861bba49561133db148216ad336e8077ef8f3b550be33d2a.jpg"
+      },
+      {
+        "page": 3,
+        "bbox": [
+          591,
+          129,
+          801,
+          167
+        ],
+        "text": "$$\n\\bar { A } = \\frac { Q K ^ { \\top } } { \\sqrt { d _ { K } } } , \\quad A = \\bar { A } + \\hat { A }\\tag{3}\n$$",
+        "format": "latex",
+        "image": "images/578527d6f7e12e40a4b5b8bc3e8b01acf893394d1ecb5c7b0cf6ae5222c6f60a.jpg"
+      },
+      {
+        "page": 3,
+        "bbox": [
+          596,
+          184,
+          794,
+          200
+        ],
+        "text": "$$\n\\operatorname { A t t n } ( H ) = \\operatorname { s o f t m a x } ( A ) V\\tag{4}\n$$",
+        "format": "latex",
+        "image": "images/7be0702d5c9f72f530b504c14e0c8a9a27edb39c395be1d9084ed274f2d160fe.jpg"
+      },
+      {
+        "page": 4,
+        "bbox": [
+          186,
+          479,
+          413,
+          513
+        ],
+        "text": "$$\nV P = { \\frac { \\left( { \\mathrm { t } } 2 { \\mathrm { f } } + { \\mathrm { f } } 2 { \\mathrm { t } } \\right) } { \\left( { \\mathrm { t } } 2 { \\mathrm { t } } + { \\mathrm { t } } 2 { \\mathrm { f } } + { \\mathrm { f } } 2 { \\mathrm { t } } + { \\mathrm { f } } 2 { \\mathrm { f } } \\right) } }\\tag{5}\n$$",
+        "format": "latex",
+        "image": "images/d8bdb4fa4976163bca7727311f73d09421208804cf4d608d15d73923059d4673.jpg"
+      },
+      {
+        "page": 6,
+        "bbox": [
+          169,
+          885,
+          431,
+          925
+        ],
+        "text": "$$\nA _ { i j } = \\frac { ( h _ { i } ^ { \\top } W ^ { Q } ) ( h _ { j } ^ { \\top } W ^ { K } ) ^ { \\top } + \\hat { A } _ { i j } } { \\sqrt { d _ { K } } }\\tag{6}\n$$",
+        "format": "latex",
+        "image": "images/ca99dfb851bb4948257872d2ef3a2e35b5c7db35a840da1093d49781ee7c8370.jpg"
+      },
+      {
+        "page": 6,
+        "bbox": [
+          563,
+          332,
+          828,
+          372
+        ],
+        "text": "$$\nA _ { i j } = \\frac { ( { h _ { i } ^ { \\top } W ^ { Q } } ) ( { h _ { j } ^ { \\top } W ^ { K } } ) ^ { \\top } } { \\sqrt { d _ { K } } } + \\hat { A } _ { i j } ,\\tag{7}\n$$",
+        "format": "latex",
+        "image": "images/19a7225acca8fe7fd42568f688245dd3ae5fb3bf31ef7c0c8418d4d3d5f00715.jpg"
+      }
+    ],
+    "files": [
+      "artifact://2792ddc4f92afd366e69638fcecfd902761c1c6e569901da855618c5badf2292",
+      "artifact://6f14e526bb0864cb397f6ef47e18c10e2d51ac162544c387b95e72fbbc4ab414",
+      "artifact://683e6477b7f56d2ea71a58f2df9a405e0759301032d4f7e106901fccbd82fd97",
+      "artifact://552de42494151dfdbc044cad02d68090444eb331e61360c7f73f7836ecdaa2a4",
+      "artifact://21832d9fcb8c6142b28cb54056256de0a9d7e7accb9f29fbcd3033229ae563dd",
+      "artifact://d49f4519e82435057ccc31bd0a0c84f99d98f86ac6c086e770790e91dbb3baca",
+      "artifact://e28b71cc8d80e7df88de6951a21674ce46e9274066e09fe1bf66fc8fbf7042dd",
+      "artifact://e018761aeb44db27125aa60fcc8231999d15cd75f5cfd1977393be053eaa5911",
+      "artifact://566e3d5dafad8201ff8c880c8fbaad315e73a47942f18f8cb0636afddb54b41a",
+      "artifact://b099699f4c9a416d672e25b95bcf6e52be5145571721c53242d1b5cabe59ea83",
+      "artifact://7596a14ba387c5687fc785eb4895365414f1b90cd0a42dc3a897547993f30cff",
+      "artifact://9ec75a5953f0a9a9d155b5e390b72bd79380ef24b9c30cc3befe04672c332e36",
+      "artifact://7f55835490b16edbb69ea85f13f7c306a5e61eb7e874e89ab2394f018512de18",
+      "artifact://b03881866743fc2c4230aaec31866c7d739efd348df54b79a57e17b08af2c931",
+      "artifact://bfe5609fe526cf5d0cac13bede115ae287b3844876c8abbc2537f99666eefaf4",
+      "artifact://f1043bc3275bfad66693598bf331e9a1837de9b73b81b33ffa0e85dfc5c00697",
+      "artifact://8d642d4de32c03f8bbd378786a17974821fd8f577130de5397280c587081ee0e",
+      "artifact://784f54c65ca51850f97118ac863c6757f4565160def337ffb06ea8f2e1137a3f",
+      "artifact://d0ae234d041305cf9ae17a77538bdfd94cd30a12b47c198a156a8383dd0e3754",
+      "artifact://00ecf56fb1154330cc7b64295015909dcd45b6e1cb95b8f5b83a16c513e9d2ac",
+      "artifact://cb6c04ac493ac3bedd553f6d16dbdaf45f1f1b511288cf4b2dd58c119fa2e726",
+      "artifact://174dd396201769a77124a74fb2608b28fb8e1b134a8ee248fb1c4d8e73d8c564",
+      "artifact://99dbbb614e3b70bb64cd1989f985a454031d5311beec3499773f87a6e08d20c2",
+      "artifact://d5ea92a2fed379210ae13209016fd93996f923ec5241fccda66fd859421b50aa",
+      "artifact://da907367f06a1caa872aca7942bce95e5093bebf0c4abeb9ee3fb163053bdd55",
+      "artifact://8344781608a61f17d20dc15a70c9746432d7de23b86df5c0a25f1c7e4bda1693",
+      "artifact://e489c22a9b489ed081ce454204ddf652cd72323d3102b77e84430edfdab02307",
+      "artifact://32fe6d43ac26bbdf812841a4208e8566d558c21bf4a4b2a21d951dc01d8fb8be",
+      "artifact://b1a165e0cc56de86bc474d9da7b4a9fbe0a179662b6cd94c94cc4f7807b99bb9",
+      "artifact://827c1099574a38eb510fa544af015a172c8420b9d9fc23e2ecdd8a4232e9bd9d",
+      "artifact://26fb01c41b838a971cc00188e78f3c53a31fe65f41addcf99bb29d9677664547"
+    ],
+    "artifacts_path": "/tmp/specialist-gallery-home.E6RTAM/cache/results/document-7fa1e7e571b093a6"
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 197.2,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_37dc3a90bfc536df",
+      "type": "document",
+      "value": {
+        "pages": 10,
+        "markdown_chars": 46799
+      },
+      "evidence": [
+        {
+          "provider": "mineru",
+          "model": "mineru-2"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "document",
+          "path": "docs/assets/e2e/brief-input.pdf",
+          "size_bytes": 433192,
+          "sha256": "7fa1e7e571b093a671c5daff7c1d4838144114ceca80fd57c127537f4da3a5c2"
+        },
+        "provider": "mineru",
+        "model_version": "mineru-2",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "mineru",
+      "model": "mineru-2"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_2792ddc4f92afd366e69638fcecfd902761c1c6e569901da855618c5badf2292",
+      "mime": "text/markdown",
+      "size_bytes": 47083,
+      "sha256": "2792ddc4f92afd366e69638fcecfd902761c1c6e569901da855618c5badf2292",
+      "uri": "artifact://2792ddc4f92afd366e69638fcecfd902761c1c6e569901da855618c5badf2292",
+      "metadata": {
+        "source_name": "brief-input.md",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_6f14e526bb0864cb397f6ef47e18c10e2d51ac162544c387b95e72fbbc4ab414",
+      "mime": "application/json",
+      "size_bytes": 77556,
+      "sha256": "6f14e526bb0864cb397f6ef47e18c10e2d51ac162544c387b95e72fbbc4ab414",
+      "uri": "artifact://6f14e526bb0864cb397f6ef47e18c10e2d51ac162544c387b95e72fbbc4ab414",
+      "metadata": {
+        "source_name": "brief-input_content_list.json",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_683e6477b7f56d2ea71a58f2df9a405e0759301032d4f7e106901fccbd82fd97",
+      "mime": "application/json",
+      "size_bytes": 121985,
+      "sha256": "683e6477b7f56d2ea71a58f2df9a405e0759301032d4f7e106901fccbd82fd97",
+      "uri": "artifact://683e6477b7f56d2ea71a58f2df9a405e0759301032d4f7e106901fccbd82fd97",
+      "metadata": {
+        "source_name": "brief-input_content_list_v2.json",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_552de42494151dfdbc044cad02d68090444eb331e61360c7f73f7836ecdaa2a4",
+      "mime": "application/pdf",
+      "size_bytes": 567718,
+      "sha256": "552de42494151dfdbc044cad02d68090444eb331e61360c7f73f7836ecdaa2a4",
+      "uri": "artifact://552de42494151dfdbc044cad02d68090444eb331e61360c7f73f7836ecdaa2a4",
+      "metadata": {
+        "source_name": "brief-input_layout.pdf",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_21832d9fcb8c6142b28cb54056256de0a9d7e7accb9f29fbcd3033229ae563dd",
+      "mime": "application/json",
+      "size_bytes": 1674241,
+      "sha256": "21832d9fcb8c6142b28cb54056256de0a9d7e7accb9f29fbcd3033229ae563dd",
+      "uri": "artifact://21832d9fcb8c6142b28cb54056256de0a9d7e7accb9f29fbcd3033229ae563dd",
+      "metadata": {
+        "source_name": "brief-input_middle.json",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_d49f4519e82435057ccc31bd0a0c84f99d98f86ac6c086e770790e91dbb3baca",
+      "mime": "application/json",
+      "size_bytes": 302344,
+      "sha256": "d49f4519e82435057ccc31bd0a0c84f99d98f86ac6c086e770790e91dbb3baca",
+      "uri": "artifact://d49f4519e82435057ccc31bd0a0c84f99d98f86ac6c086e770790e91dbb3baca",
+      "metadata": {
+        "source_name": "brief-input_model.json",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_e28b71cc8d80e7df88de6951a21674ce46e9274066e09fe1bf66fc8fbf7042dd",
+      "mime": "application/pdf",
+      "size_bytes": 402800,
+      "sha256": "e28b71cc8d80e7df88de6951a21674ce46e9274066e09fe1bf66fc8fbf7042dd",
+      "uri": "artifact://e28b71cc8d80e7df88de6951a21674ce46e9274066e09fe1bf66fc8fbf7042dd",
+      "metadata": {
+        "source_name": "brief-input_origin.pdf",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_e018761aeb44db27125aa60fcc8231999d15cd75f5cfd1977393be053eaa5911",
+      "mime": "application/pdf",
+      "size_bytes": 574451,
+      "sha256": "e018761aeb44db27125aa60fcc8231999d15cd75f5cfd1977393be053eaa5911",
+      "uri": "artifact://e018761aeb44db27125aa60fcc8231999d15cd75f5cfd1977393be053eaa5911",
+      "metadata": {
+        "source_name": "brief-input_span.pdf",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_566e3d5dafad8201ff8c880c8fbaad315e73a47942f18f8cb0636afddb54b41a",
+      "mime": "image/jpeg",
+      "size_bytes": 5218,
+      "sha256": "566e3d5dafad8201ff8c880c8fbaad315e73a47942f18f8cb0636afddb54b41a",
+      "uri": "artifact://566e3d5dafad8201ff8c880c8fbaad315e73a47942f18f8cb0636afddb54b41a",
+      "metadata": {
+        "source_name": "11e5614ad1072f50e5ee6f57c327a173ee0cb019fdf5c03b2f896aeb269f825e.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_b099699f4c9a416d672e25b95bcf6e52be5145571721c53242d1b5cabe59ea83",
+      "mime": "image/jpeg",
+      "size_bytes": 6479,
+      "sha256": "b099699f4c9a416d672e25b95bcf6e52be5145571721c53242d1b5cabe59ea83",
+      "uri": "artifact://b099699f4c9a416d672e25b95bcf6e52be5145571721c53242d1b5cabe59ea83",
+      "metadata": {
+        "source_name": "19a7225acca8fe7fd42568f688245dd3ae5fb3bf31ef7c0c8418d4d3d5f00715.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_7596a14ba387c5687fc785eb4895365414f1b90cd0a42dc3a897547993f30cff",
+      "mime": "image/jpeg",
+      "size_bytes": 12581,
+      "sha256": "7596a14ba387c5687fc785eb4895365414f1b90cd0a42dc3a897547993f30cff",
+      "uri": "artifact://7596a14ba387c5687fc785eb4895365414f1b90cd0a42dc3a897547993f30cff",
+      "metadata": {
+        "source_name": "1a88b3a1e7a8bd0c6e1e919885a995ea4baa8cf243106f319952fed469cd5cc8.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_9ec75a5953f0a9a9d155b5e390b72bd79380ef24b9c30cc3befe04672c332e36",
+      "mime": "image/jpeg",
+      "size_bytes": 115886,
+      "sha256": "9ec75a5953f0a9a9d155b5e390b72bd79380ef24b9c30cc3befe04672c332e36",
+      "uri": "artifact://9ec75a5953f0a9a9d155b5e390b72bd79380ef24b9c30cc3befe04672c332e36",
+      "metadata": {
+        "source_name": "3d1fa4656e559a4dc0f9b87a09848ecfb7e812a6ebb520ba6e4bf97e2fa02668.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_7f55835490b16edbb69ea85f13f7c306a5e61eb7e874e89ab2394f018512de18",
+      "mime": "image/jpeg",
+      "size_bytes": 5080,
+      "sha256": "7f55835490b16edbb69ea85f13f7c306a5e61eb7e874e89ab2394f018512de18",
+      "uri": "artifact://7f55835490b16edbb69ea85f13f7c306a5e61eb7e874e89ab2394f018512de18",
+      "metadata": {
+        "source_name": "4682bf53037111118080c2a9dff8499922c529a06a965a990b12714e367f8a42.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_b03881866743fc2c4230aaec31866c7d739efd348df54b79a57e17b08af2c931",
+      "mime": "image/jpeg",
+      "size_bytes": 7633,
+      "sha256": "b03881866743fc2c4230aaec31866c7d739efd348df54b79a57e17b08af2c931",
+      "uri": "artifact://b03881866743fc2c4230aaec31866c7d739efd348df54b79a57e17b08af2c931",
+      "metadata": {
+        "source_name": "531e9ed05886e3ab1e302027d9cc020407e9deec59e362e53a17d09399c5a642.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_bfe5609fe526cf5d0cac13bede115ae287b3844876c8abbc2537f99666eefaf4",
+      "mime": "image/jpeg",
+      "size_bytes": 30786,
+      "sha256": "bfe5609fe526cf5d0cac13bede115ae287b3844876c8abbc2537f99666eefaf4",
+      "uri": "artifact://bfe5609fe526cf5d0cac13bede115ae287b3844876c8abbc2537f99666eefaf4",
+      "metadata": {
+        "source_name": "53f61db7898eb4e44ab944ef7b3abcad67db82644782816b275012f96ef78723.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_f1043bc3275bfad66693598bf331e9a1837de9b73b81b33ffa0e85dfc5c00697",
+      "mime": "image/jpeg",
+      "size_bytes": 4497,
+      "sha256": "f1043bc3275bfad66693598bf331e9a1837de9b73b81b33ffa0e85dfc5c00697",
+      "uri": "artifact://f1043bc3275bfad66693598bf331e9a1837de9b73b81b33ffa0e85dfc5c00697",
+      "metadata": {
+        "source_name": "578527d6f7e12e40a4b5b8bc3e8b01acf893394d1ecb5c7b0cf6ae5222c6f60a.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_8d642d4de32c03f8bbd378786a17974821fd8f577130de5397280c587081ee0e",
+      "mime": "image/jpeg",
+      "size_bytes": 95122,
+      "sha256": "8d642d4de32c03f8bbd378786a17974821fd8f577130de5397280c587081ee0e",
+      "uri": "artifact://8d642d4de32c03f8bbd378786a17974821fd8f577130de5397280c587081ee0e",
+      "metadata": {
+        "source_name": "64d36b02479fe068f44c944d5e9226bad814737aa194be2f4aba96444bd43290.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_784f54c65ca51850f97118ac863c6757f4565160def337ffb06ea8f2e1137a3f",
+      "mime": "image/jpeg",
+      "size_bytes": 4529,
+      "sha256": "784f54c65ca51850f97118ac863c6757f4565160def337ffb06ea8f2e1137a3f",
+      "uri": "artifact://784f54c65ca51850f97118ac863c6757f4565160def337ffb06ea8f2e1137a3f",
+      "metadata": {
+        "source_name": "7817b8078b1ad0a29ebf708394bf28dd64ed64ec89270d02a853b7680c23cf7b.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_d0ae234d041305cf9ae17a77538bdfd94cd30a12b47c198a156a8383dd0e3754",
+      "mime": "image/jpeg",
+      "size_bytes": 3669,
+      "sha256": "d0ae234d041305cf9ae17a77538bdfd94cd30a12b47c198a156a8383dd0e3754",
+      "uri": "artifact://d0ae234d041305cf9ae17a77538bdfd94cd30a12b47c198a156a8383dd0e3754",
+      "metadata": {
+        "source_name": "7be0702d5c9f72f530b504c14e0c8a9a27edb39c395be1d9084ed274f2d160fe.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_00ecf56fb1154330cc7b64295015909dcd45b6e1cb95b8f5b83a16c513e9d2ac",
+      "mime": "image/jpeg",
+      "size_bytes": 4725,
+      "sha256": "00ecf56fb1154330cc7b64295015909dcd45b6e1cb95b8f5b83a16c513e9d2ac",
+      "uri": "artifact://00ecf56fb1154330cc7b64295015909dcd45b6e1cb95b8f5b83a16c513e9d2ac",
+      "metadata": {
+        "source_name": "7f384dbf6f28216e4e3f281aae9766eec59c50a35c47500e384449f968ca3f14.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_cb6c04ac493ac3bedd553f6d16dbdaf45f1f1b511288cf4b2dd58c119fa2e726",
+      "mime": "image/jpeg",
+      "size_bytes": 40232,
+      "sha256": "cb6c04ac493ac3bedd553f6d16dbdaf45f1f1b511288cf4b2dd58c119fa2e726",
+      "uri": "artifact://cb6c04ac493ac3bedd553f6d16dbdaf45f1f1b511288cf4b2dd58c119fa2e726",
+      "metadata": {
+        "source_name": "8485e55ca9e7dd8bf661b73c36ffd0bb95d7f825b2be1a146ca68f36e893a97a.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_174dd396201769a77124a74fb2608b28fb8e1b134a8ee248fb1c4d8e73d8c564",
+      "mime": "image/jpeg",
+      "size_bytes": 41255,
+      "sha256": "174dd396201769a77124a74fb2608b28fb8e1b134a8ee248fb1c4d8e73d8c564",
+      "uri": "artifact://174dd396201769a77124a74fb2608b28fb8e1b134a8ee248fb1c4d8e73d8c564",
+      "metadata": {
+        "source_name": "9c1df146ef65ad7a2e2c156ec9d40f32f1f756fdc8e2910fc1c09a3f8b8a1c3f.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_99dbbb614e3b70bb64cd1989f985a454031d5311beec3499773f87a6e08d20c2",
+      "mime": "image/jpeg",
+      "size_bytes": 5486,
+      "sha256": "99dbbb614e3b70bb64cd1989f985a454031d5311beec3499773f87a6e08d20c2",
+      "uri": "artifact://99dbbb614e3b70bb64cd1989f985a454031d5311beec3499773f87a6e08d20c2",
+      "metadata": {
+        "source_name": "a12e19e62524d43dd4a2d5909e2abb863cde4698b8b43750e93f9ff22eed2285.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_d5ea92a2fed379210ae13209016fd93996f923ec5241fccda66fd859421b50aa",
+      "mime": "image/jpeg",
+      "size_bytes": 5469,
+      "sha256": "d5ea92a2fed379210ae13209016fd93996f923ec5241fccda66fd859421b50aa",
+      "uri": "artifact://d5ea92a2fed379210ae13209016fd93996f923ec5241fccda66fd859421b50aa",
+      "metadata": {
+        "source_name": "ad1844ae4f63a3290158f6e92f411d30eacfbb8dd3d39b9bdd4d0118864ce9f7.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_da907367f06a1caa872aca7942bce95e5093bebf0c4abeb9ee3fb163053bdd55",
+      "mime": "image/jpeg",
+      "size_bytes": 51429,
+      "sha256": "da907367f06a1caa872aca7942bce95e5093bebf0c4abeb9ee3fb163053bdd55",
+      "uri": "artifact://da907367f06a1caa872aca7942bce95e5093bebf0c4abeb9ee3fb163053bdd55",
+      "metadata": {
+        "source_name": "b0ba2af8c2ef0ef11260adbcd72dd4293a26fe6564718e5928f3eafbf18e24d3.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_8344781608a61f17d20dc15a70c9746432d7de23b86df5c0a25f1c7e4bda1693",
+      "mime": "image/jpeg",
+      "size_bytes": 6530,
+      "sha256": "8344781608a61f17d20dc15a70c9746432d7de23b86df5c0a25f1c7e4bda1693",
+      "uri": "artifact://8344781608a61f17d20dc15a70c9746432d7de23b86df5c0a25f1c7e4bda1693",
+      "metadata": {
+        "source_name": "ca99dfb851bb4948257872d2ef3a2e35b5c7db35a840da1093d49781ee7c8370.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_e489c22a9b489ed081ce454204ddf652cd72323d3102b77e84430edfdab02307",
+      "mime": "image/jpeg",
+      "size_bytes": 5698,
+      "sha256": "e489c22a9b489ed081ce454204ddf652cd72323d3102b77e84430edfdab02307",
+      "uri": "artifact://e489c22a9b489ed081ce454204ddf652cd72323d3102b77e84430edfdab02307",
+      "metadata": {
+        "source_name": "cefd2383fc5a8ecd861bba49561133db148216ad336e8077ef8f3b550be33d2a.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_32fe6d43ac26bbdf812841a4208e8566d558c21bf4a4b2a21d951dc01d8fb8be",
+      "mime": "image/jpeg",
+      "size_bytes": 4830,
+      "sha256": "32fe6d43ac26bbdf812841a4208e8566d558c21bf4a4b2a21d951dc01d8fb8be",
+      "uri": "artifact://32fe6d43ac26bbdf812841a4208e8566d558c21bf4a4b2a21d951dc01d8fb8be",
+      "metadata": {
+        "source_name": "d2998cf15fc73812672113944ff4daca100c3ddd1cc1668691af4c0cc24dfe38.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_b1a165e0cc56de86bc474d9da7b4a9fbe0a179662b6cd94c94cc4f7807b99bb9",
+      "mime": "image/jpeg",
+      "size_bytes": 51292,
+      "sha256": "b1a165e0cc56de86bc474d9da7b4a9fbe0a179662b6cd94c94cc4f7807b99bb9",
+      "uri": "artifact://b1a165e0cc56de86bc474d9da7b4a9fbe0a179662b6cd94c94cc4f7807b99bb9",
+      "metadata": {
+        "source_name": "d563ded8d52211d7c5fad7d626491f5375ae9be19f22a864d0051111ea5107f6.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_827c1099574a38eb510fa544af015a172c8420b9d9fc23e2ecdd8a4232e9bd9d",
+      "mime": "image/jpeg",
+      "size_bytes": 19732,
+      "sha256": "827c1099574a38eb510fa544af015a172c8420b9d9fc23e2ecdd8a4232e9bd9d",
+      "uri": "artifact://827c1099574a38eb510fa544af015a172c8420b9d9fc23e2ecdd8a4232e9bd9d",
+      "metadata": {
+        "source_name": "d728afd75d8358b1d0ad629f27a1d30aa4dea16581e7b4613388d206a7702059.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    },
+    {
+      "id": "artifact_26fb01c41b838a971cc00188e78f3c53a31fe65f41addcf99bb29d9677664547",
+      "mime": "image/jpeg",
+      "size_bytes": 6009,
+      "sha256": "26fb01c41b838a971cc00188e78f3c53a31fe65f41addcf99bb29d9677664547",
+      "uri": "artifact://26fb01c41b838a971cc00188e78f3c53a31fe65f41addcf99bb29d9677664547",
+      "metadata": {
+        "source_name": "d8bdb4fa4976163bca7727311f73d09421208804cf4d608d15d73923059d4673.jpg",
+        "capability": "document.parse",
+        "result_key": "files"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 102945,
+    "device": "cpu",
+    "memory_mb": 197.2,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 31,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "document",
+      "path": "docs/assets/e2e/brief-input.pdf",
+      "size_bytes": 433192,
+      "sha256": "7fa1e7e571b093a671c5daff7c1d4838144114ceca80fd57c127537f4da3a5c2"
+    },
+    "provider": "mineru",
+    "model_version": "mineru-2",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "document.parse",
+        "options": {
+          "backend": "pipeline",
+          "method": "txt",
+          "formula": true,
+          "table": true,
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "document.parse",
+          "provider": "mineru",
+          "model": "mineru-2",
+          "quality": 0.82,
+          "estimated_latency_ms": 327,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": false,
+          "available": true,
+          "allowed": true,
+          "score": 0.4834,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "document.parse",
+        "provider": "mineru",
+        "model": "mineru-2",
+        "quality": 0.82,
+        "estimated_latency_ms": 327,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": false,
+        "available": true,
+        "allowed": true,
+        "score": 0.4834,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

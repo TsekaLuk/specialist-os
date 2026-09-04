@@ -1,0 +1,406 @@
+{
+  "capability": "vision.measure",
+  "provider": "composite",
+  "model": "runtime-composite-1",
+  "input": {
+    "type": "image",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+    "size_bytes": 137419,
+    "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+  },
+  "result": {
+    "detections": [
+      {
+        "label": "bus",
+        "bbox": [
+          3.83,
+          229.36,
+          796.19,
+          728.41
+        ],
+        "confidence": 0.940152
+      },
+      {
+        "label": "person",
+        "bbox": [
+          671.02,
+          394.83,
+          809.81,
+          878.71
+        ],
+        "confidence": 0.88822
+      },
+      {
+        "label": "person",
+        "bbox": [
+          47.4,
+          399.57,
+          239.3,
+          904.2
+        ],
+        "confidence": 0.878255
+      },
+      {
+        "label": "person",
+        "bbox": [
+          223.06,
+          408.69,
+          344.47,
+          860.44
+        ],
+        "confidence": 0.855773
+      },
+      {
+        "label": "person",
+        "bbox": [
+          0.02,
+          556.07,
+          68.89,
+          872.36
+        ],
+        "confidence": 0.62192
+      }
+    ],
+    "depth": {
+      "width": 810,
+      "height": 1080,
+      "depth_map": null,
+      "preview": "artifact://e8ec4d9a9c78e6c9c01c61f0058b5ba711df8f8f420b2d619080227b1bb47d5a",
+      "mode": "relative",
+      "unit": null,
+      "estimated": false
+    },
+    "measurement": {
+      "distance": 375.2375744111988,
+      "dimensions": 2,
+      "deterministic": true
+    },
+    "mode": "relative",
+    "estimated": false,
+    "status": "completed"
+  },
+  "performance": {
+    "latency_ms": 5423,
+    "device": "cpu",
+    "memory_mb": 198.1,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_46765583084544db",
+      "type": "operator_result",
+      "value": {
+        "detections": [
+          {
+            "label": "bus",
+            "bbox": [
+              3.83,
+              229.36,
+              796.19,
+              728.41
+            ],
+            "confidence": 0.940152
+          },
+          {
+            "label": "person",
+            "bbox": [
+              671.02,
+              394.83,
+              809.81,
+              878.71
+            ],
+            "confidence": 0.88822
+          },
+          {
+            "label": "person",
+            "bbox": [
+              47.4,
+              399.57,
+              239.3,
+              904.2
+            ],
+            "confidence": 0.878255
+          },
+          {
+            "label": "person",
+            "bbox": [
+              223.06,
+              408.69,
+              344.47,
+              860.44
+            ],
+            "confidence": 0.855773
+          },
+          {
+            "label": "person",
+            "bbox": [
+              0.02,
+              556.07,
+              68.89,
+              872.36
+            ],
+            "confidence": 0.62192
+          }
+        ],
+        "depth": {
+          "width": 810,
+          "height": 1080,
+          "depth_map": null,
+          "preview": "artifact://e8ec4d9a9c78e6c9c01c61f0058b5ba711df8f8f420b2d619080227b1bb47d5a",
+          "mode": "relative",
+          "unit": null,
+          "estimated": false
+        },
+        "measurement": {
+          "distance": 375.2375744111988,
+          "dimensions": 2,
+          "deterministic": true
+        },
+        "mode": "relative",
+        "estimated": false,
+        "status": "completed"
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "composite",
+      "model": "runtime-composite-1"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_e8ec4d9a9c78e6c9c01c61f0058b5ba711df8f8f420b2d619080227b1bb47d5a",
+      "mime": "image/png",
+      "size_bytes": 62208,
+      "sha256": "e8ec4d9a9c78e6c9c01c61f0058b5ba711df8f8f420b2d619080227b1bb47d5a",
+      "uri": "artifact://e8ec4d9a9c78e6c9c01c61f0058b5ba711df8f8f420b2d619080227b1bb47d5a",
+      "metadata": {
+        "source_name": "c02019c4979c191e-depth.png",
+        "capability": "vision.depth",
+        "result_key": "preview"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 5423,
+    "device": "cpu",
+    "memory_mb": 198.1,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 1,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+      "size_bytes": 137419,
+      "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "provider": "composite",
+    "model_version": "runtime-composite-1",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": [
+      {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "yolo",
+        "model_version": "yolo11n",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      },
+      {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "depth-anything",
+        "model_version": "depth-anything-v2-small",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      },
+      {
+        "source": {
+          "type": "geometry",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "opencv",
+        "model_version": "opencv-5",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": true,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      }
+    ]
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.measure",
+        "options": {
+          "points": [
+            [
+              400.01000000000005,
+              478.885
+            ],
+            [
+              740.415,
+              636.77
+            ]
+          ],
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.measure",
+          "provider": "composite",
+          "model": "runtime-composite-1",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.measure",
+        "provider": "composite",
+        "model": "runtime-composite-1",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "capability": "vision.detect",
+      "provider": "yolo",
+      "model": "yolo11n",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "capability": "vision.depth",
+      "provider": "depth-anything",
+      "model": "depth-anything-v2-small",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "capability": "vision.geometry.distance",
+      "provider": "opencv",
+      "model": "opencv-5",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

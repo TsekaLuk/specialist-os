@@ -1,0 +1,183 @@
+{
+  "capability": "media.audio.extract",
+  "provider": "ffmpeg",
+  "model": "ffmpeg-9",
+  "input": {
+    "type": "media",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+    "size_bytes": 573929,
+    "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+  },
+  "result": {
+    "audio_path": "artifact://1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+    "mime": "audio/wav",
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 190.4,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_f009f4236c28b0e7",
+      "type": "operator_result",
+      "value": {
+        "audio_path": "artifact://1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+        "mime": "audio/wav",
+        "deterministic": true
+      },
+      "evidence": [
+        {
+          "provider": "ffmpeg",
+          "model": "ffmpeg-9"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "media",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+          "size_bytes": 573929,
+          "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+        },
+        "provider": "ffmpeg",
+        "model_version": "ffmpeg-9",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+      "mime": "audio/wav",
+      "size_bytes": 481358,
+      "sha256": "1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+      "uri": "artifact://1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+      "metadata": {
+        "source_name": "video-input-87de9f0742db5a8d.wav",
+        "capability": "media.audio.extract",
+        "result_key": "audio_path"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 115,
+    "device": "cpu",
+    "memory_mb": 190.4,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 1,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "media",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+      "size_bytes": 573929,
+      "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "provider": "ffmpeg",
+    "model_version": "ffmpeg-9",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "media.audio.extract",
+        "options": {
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "media.audio.extract",
+          "provider": "ffmpeg",
+          "model": "ffmpeg-9",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "media.audio.extract",
+        "provider": "ffmpeg",
+        "model": "ffmpeg-9",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

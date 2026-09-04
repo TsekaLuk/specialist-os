@@ -1,0 +1,138 @@
+{
+  "capability": "vision.similarity",
+  "provider": "openclip",
+  "model": "siglip2-balanced",
+  "input": {
+    "type": "image",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+    "size_bytes": 137419,
+    "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+  },
+  "result": {
+    "score": 0.49401595544986254,
+    "metric": "cosine",
+    "model": "siglip2-balanced"
+  },
+  "performance": {
+    "latency_ms": 13231,
+    "device": "cpu",
+    "memory_mb": 198.8,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [],
+  "evidence": [],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 13231,
+    "device": "cpu",
+    "memory_mb": 198.8,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 0,
+    "artifact_count": 0,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+      "size_bytes": 137419,
+      "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "provider": "openclip",
+    "model_version": "siglip2-balanced",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.similarity",
+        "options": {
+          "other_input": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/person-input.jpg",
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.similarity",
+          "provider": "openclip",
+          "model": "siglip2-balanced",
+          "quality": 0.82,
+          "estimated_latency_ms": 327,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.4834,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.similarity",
+        "provider": "openclip",
+        "model": "siglip2-balanced",
+        "quality": 0.82,
+        "estimated_latency_ms": 327,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.4834,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

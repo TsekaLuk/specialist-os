@@ -1,0 +1,185 @@
+{
+  "capability": "vision.transform.resize",
+  "provider": "opencv",
+  "model": "opencv-5",
+  "input": {
+    "type": "image",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/boats-input.jpg",
+    "size_bytes": 194872,
+    "sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+  },
+  "result": {
+    "image_path": "artifact://18d1f1ace9d2402f53db51ca7d015f3bb1386ecaa06de4e0f69fd349c680ade3",
+    "operation": "resize",
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 190.4,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_02d8609377a7aa93",
+      "type": "operator_result",
+      "value": {
+        "image_path": "artifact://18d1f1ace9d2402f53db51ca7d015f3bb1386ecaa06de4e0f69fd349c680ade3",
+        "operation": "resize",
+        "deterministic": true
+      },
+      "evidence": [
+        {
+          "provider": "opencv",
+          "model": "opencv-5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/boats-input.jpg",
+          "size_bytes": 194872,
+          "sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+        },
+        "provider": "opencv",
+        "model_version": "opencv-5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "opencv",
+      "model": "opencv-5"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_18d1f1ace9d2402f53db51ca7d015f3bb1386ecaa06de4e0f69fd349c680ade3",
+      "mime": "image/png",
+      "size_bytes": 879287,
+      "sha256": "18d1f1ace9d2402f53db51ca7d015f3bb1386ecaa06de4e0f69fd349c680ade3",
+      "uri": "artifact://18d1f1ace9d2402f53db51ca7d015f3bb1386ecaa06de4e0f69fd349c680ade3",
+      "metadata": {
+        "source_name": "transform-8c5ada657cf8110a-resize.png",
+        "capability": "vision.transform.resize",
+        "result_key": "image_path"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 254,
+    "device": "cpu",
+    "memory_mb": 190.4,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 1,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/boats-input.jpg",
+      "size_bytes": 194872,
+      "sha256": "8c5ada657cf8110a9f8aaac954c1dd96cde0187315b581276c32b0d1863e756f"
+    },
+    "provider": "opencv",
+    "model_version": "opencv-5",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.transform.resize",
+        "options": {
+          "width": 960,
+          "height": 640,
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.transform.resize",
+          "provider": "opencv",
+          "model": "opencv-5",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.transform.resize",
+        "provider": "opencv",
+        "model": "opencv-5",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

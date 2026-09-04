@@ -1,0 +1,248 @@
+{
+  "capability": "media.video.extract_frames",
+  "provider": "ffmpeg",
+  "model": "ffmpeg-9",
+  "input": {
+    "type": "video",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+    "size_bytes": 573929,
+    "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+  },
+  "result": {
+    "frames": [
+      "artifact://fe688d5dd80faeab86e02b547613a06125dbc91d1be74a4f4021b86d84dbba9b",
+      "artifact://a27bde301663369eacb71ee0656618a5c9e92a771be5682142f3fca480b86d1e",
+      "artifact://68b7defb04f47386a2e757fc6bea40ccb104862efcd45c129f08deae46e1d157",
+      "artifact://9da59049479b787adcf15cc512c2b9e10cbff8a7befdce27079d82a2ad3953cb",
+      "artifact://318911a0024ff66a3bb9345ea5f3207fc9b33ee7bfe57c3bbcc22bb78d825819"
+    ],
+    "fps": 1.0,
+    "timestamps": null,
+    "count": 5,
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 190.2,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_4fe5fa3b972023f2",
+      "type": "operator_result",
+      "value": {
+        "frames": [
+          "artifact://fe688d5dd80faeab86e02b547613a06125dbc91d1be74a4f4021b86d84dbba9b",
+          "artifact://a27bde301663369eacb71ee0656618a5c9e92a771be5682142f3fca480b86d1e",
+          "artifact://68b7defb04f47386a2e757fc6bea40ccb104862efcd45c129f08deae46e1d157",
+          "artifact://9da59049479b787adcf15cc512c2b9e10cbff8a7befdce27079d82a2ad3953cb",
+          "artifact://318911a0024ff66a3bb9345ea5f3207fc9b33ee7bfe57c3bbcc22bb78d825819"
+        ],
+        "fps": 1.0,
+        "timestamps": null,
+        "count": 5,
+        "deterministic": true
+      },
+      "evidence": [
+        {
+          "provider": "ffmpeg",
+          "model": "ffmpeg-9"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "video",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+          "size_bytes": 573929,
+          "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+        },
+        "provider": "ffmpeg",
+        "model_version": "ffmpeg-9",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_fe688d5dd80faeab86e02b547613a06125dbc91d1be74a4f4021b86d84dbba9b",
+      "mime": "image/png",
+      "size_bytes": 205290,
+      "sha256": "fe688d5dd80faeab86e02b547613a06125dbc91d1be74a4f4021b86d84dbba9b",
+      "uri": "artifact://fe688d5dd80faeab86e02b547613a06125dbc91d1be74a4f4021b86d84dbba9b",
+      "metadata": {
+        "source_name": "frame-000001.png",
+        "capability": "media.video.extract_frames",
+        "result_key": "frames"
+      }
+    },
+    {
+      "id": "artifact_a27bde301663369eacb71ee0656618a5c9e92a771be5682142f3fca480b86d1e",
+      "mime": "image/png",
+      "size_bytes": 41687,
+      "sha256": "a27bde301663369eacb71ee0656618a5c9e92a771be5682142f3fca480b86d1e",
+      "uri": "artifact://a27bde301663369eacb71ee0656618a5c9e92a771be5682142f3fca480b86d1e",
+      "metadata": {
+        "source_name": "frame-000002.png",
+        "capability": "media.video.extract_frames",
+        "result_key": "frames"
+      }
+    },
+    {
+      "id": "artifact_68b7defb04f47386a2e757fc6bea40ccb104862efcd45c129f08deae46e1d157",
+      "mime": "image/png",
+      "size_bytes": 43996,
+      "sha256": "68b7defb04f47386a2e757fc6bea40ccb104862efcd45c129f08deae46e1d157",
+      "uri": "artifact://68b7defb04f47386a2e757fc6bea40ccb104862efcd45c129f08deae46e1d157",
+      "metadata": {
+        "source_name": "frame-000003.png",
+        "capability": "media.video.extract_frames",
+        "result_key": "frames"
+      }
+    },
+    {
+      "id": "artifact_9da59049479b787adcf15cc512c2b9e10cbff8a7befdce27079d82a2ad3953cb",
+      "mime": "image/png",
+      "size_bytes": 381240,
+      "sha256": "9da59049479b787adcf15cc512c2b9e10cbff8a7befdce27079d82a2ad3953cb",
+      "uri": "artifact://9da59049479b787adcf15cc512c2b9e10cbff8a7befdce27079d82a2ad3953cb",
+      "metadata": {
+        "source_name": "frame-000004.png",
+        "capability": "media.video.extract_frames",
+        "result_key": "frames"
+      }
+    },
+    {
+      "id": "artifact_318911a0024ff66a3bb9345ea5f3207fc9b33ee7bfe57c3bbcc22bb78d825819",
+      "mime": "image/png",
+      "size_bytes": 588949,
+      "sha256": "318911a0024ff66a3bb9345ea5f3207fc9b33ee7bfe57c3bbcc22bb78d825819",
+      "uri": "artifact://318911a0024ff66a3bb9345ea5f3207fc9b33ee7bfe57c3bbcc22bb78d825819",
+      "metadata": {
+        "source_name": "frame-000005.png",
+        "capability": "media.video.extract_frames",
+        "result_key": "frames"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 217,
+    "device": "cpu",
+    "memory_mb": 190.2,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 5,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "video",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+      "size_bytes": 573929,
+      "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "provider": "ffmpeg",
+    "model_version": "ffmpeg-9",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "media.video.extract_frames",
+        "options": {
+          "fps": 1,
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "media.video.extract_frames",
+          "provider": "ffmpeg",
+          "model": "ffmpeg-9",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "media.video.extract_frames",
+        "provider": "ffmpeg",
+        "model": "ffmpeg-9",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

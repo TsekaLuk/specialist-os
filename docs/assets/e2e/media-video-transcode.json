@@ -1,0 +1,184 @@
+{
+  "capability": "media.video.transcode",
+  "provider": "ffmpeg",
+  "model": "ffmpeg-9",
+  "input": {
+    "type": "video",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+    "size_bytes": 573929,
+    "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+  },
+  "result": {
+    "media_path": "artifact://f8867393c8a230ca757297024421cf76c3b611dcc97f31c538b1e8703197e30c",
+    "format": "mp4",
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 191.1,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_72bd4df5c9482092",
+      "type": "operator_result",
+      "value": {
+        "media_path": "artifact://f8867393c8a230ca757297024421cf76c3b611dcc97f31c538b1e8703197e30c",
+        "format": "mp4",
+        "deterministic": true
+      },
+      "evidence": [
+        {
+          "provider": "ffmpeg",
+          "model": "ffmpeg-9"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "video",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+          "size_bytes": 573929,
+          "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+        },
+        "provider": "ffmpeg",
+        "model_version": "ffmpeg-9",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_f8867393c8a230ca757297024421cf76c3b611dcc97f31c538b1e8703197e30c",
+      "mime": "video/mp4",
+      "size_bytes": 541045,
+      "sha256": "f8867393c8a230ca757297024421cf76c3b611dcc97f31c538b1e8703197e30c",
+      "uri": "artifact://f8867393c8a230ca757297024421cf76c3b611dcc97f31c538b1e8703197e30c",
+      "metadata": {
+        "source_name": "video-input-335f9fb47a0f91fc.mp4",
+        "capability": "media.video.transcode",
+        "result_key": "media_path"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 600,
+    "device": "cpu",
+    "memory_mb": 191.1,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 1,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "video",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+      "size_bytes": 573929,
+      "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "provider": "ffmpeg",
+    "model_version": "ffmpeg-9",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "media.video.transcode",
+        "options": {
+          "format": "mp4",
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "media.video.transcode",
+          "provider": "ffmpeg",
+          "model": "ffmpeg-9",
+          "quality": 0.82,
+          "estimated_latency_ms": 40,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.778625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "media.video.transcode",
+        "provider": "ffmpeg",
+        "model": "ffmpeg-9",
+        "quality": 0.82,
+        "estimated_latency_ms": 40,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.778625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

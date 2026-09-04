@@ -1,0 +1,299 @@
+{
+  "capability": "speech.diarize",
+  "provider": "pyannote",
+  "model": "pyannote-community-1",
+  "input": {
+    "type": "audio",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+    "size_bytes": 640932,
+    "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+  },
+  "result": {
+    "segments": [
+      {
+        "speaker": "SPEAKER_01",
+        "start": 0.03096875,
+        "end": 4.232843750000001,
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_00",
+        "start": 4.469093750000001,
+        "end": 9.700343750000002,
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_01",
+        "start": 10.10534375,
+        "end": 13.294718750000001,
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_00",
+        "start": 13.699718750000002,
+        "end": 20.09534375,
+        "confidence": null
+      }
+    ],
+    "speakers": 2,
+    "exclusive": true
+  },
+  "performance": {
+    "latency_ms": 16403,
+    "device": "cpu",
+    "memory_mb": 198.0,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_9614235f821bafa2",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_01",
+        "start": 0.03096875,
+        "end": 4.232843750000001,
+        "confidence": null
+      },
+      "geometry": {
+        "start": 0.03096875,
+        "end": 4.232843750000001
+      },
+      "evidence": [
+        {
+          "provider": "pyannote",
+          "model": "pyannote-community-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "pyannote",
+        "model_version": "pyannote-community-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_482f943cac1a0713",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_00",
+        "start": 4.469093750000001,
+        "end": 9.700343750000002,
+        "confidence": null
+      },
+      "geometry": {
+        "start": 4.469093750000001,
+        "end": 9.700343750000002
+      },
+      "evidence": [
+        {
+          "provider": "pyannote",
+          "model": "pyannote-community-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "pyannote",
+        "model_version": "pyannote-community-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_74c329ead2e05a25",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_01",
+        "start": 10.10534375,
+        "end": 13.294718750000001,
+        "confidence": null
+      },
+      "geometry": {
+        "start": 10.10534375,
+        "end": 13.294718750000001
+      },
+      "evidence": [
+        {
+          "provider": "pyannote",
+          "model": "pyannote-community-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "pyannote",
+        "model_version": "pyannote-community-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_bad2464c4d167e2c",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_00",
+        "start": 13.699718750000002,
+        "end": 20.09534375,
+        "confidence": null
+      },
+      "geometry": {
+        "start": 13.699718750000002,
+        "end": 20.09534375
+      },
+      "evidence": [
+        {
+          "provider": "pyannote",
+          "model": "pyannote-community-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "pyannote",
+        "model_version": "pyannote-community-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "pyannote",
+      "model": "pyannote-community-1"
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 16403,
+    "device": "cpu",
+    "memory_mb": 198.0,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 4,
+    "artifact_count": 0,
+    "deterministic": false,
+    "privacy_level": "sensitive"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+      "size_bytes": 640932,
+      "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "provider": "pyannote",
+    "model_version": "pyannote-community-1",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "sensitive",
+    "cache": {
+      "enabled": false,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "speech.diarize",
+        "options": {
+          "min_speakers": 2,
+          "max_speakers": 2,
+          "exclusive": true,
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "speech.diarize",
+          "provider": "pyannote",
+          "model": "pyannote-community-1",
+          "quality": 0.82,
+          "estimated_latency_ms": 327,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.4834,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "speech.diarize",
+        "provider": "pyannote",
+        "model": "pyannote-community-1",
+        "quality": 0.82,
+        "estimated_latency_ms": 327,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.4834,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

@@ -1,0 +1,396 @@
+{
+  "capability": "speech.align_transcript",
+  "provider": "composite",
+  "model": "runtime-composite-1",
+  "input": {
+    "type": "audio",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+    "size_bytes": 640932,
+    "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+  },
+  "result": {
+    "segments": [
+      {
+        "speaker": "SPEAKER_01",
+        "start": 0.0,
+        "end": 4.52,
+        "text": "The customer reported an intermittent checkout failure after the morning release.",
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_00",
+        "start": 4.52,
+        "end": 10.28,
+        "text": "I traced it to the payment callback, error rates peaked at 9% for 6 minutes.",
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_01",
+        "start": 10.28,
+        "end": 13.76,
+        "text": "Can we roll back safely and preserve the successful orders?",
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_00",
+        "start": 13.76,
+        "end": 17.4,
+        "text": "Yes, the database migration is backward compatible.",
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_00",
+        "start": 17.4,
+        "end": 20.0,
+        "text": "I will start the roll back and monitor recovery.",
+        "confidence": null
+      }
+    ],
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 2,
+    "device": "cpu",
+    "memory_mb": 198.4,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_928833226ac00926",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_01",
+        "start": 0.0,
+        "end": 4.52,
+        "text": "The customer reported an intermittent checkout failure after the morning release.",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 0.0,
+        "end": 4.52
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_09e0fb0aa66df27e",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_00",
+        "start": 4.52,
+        "end": 10.28,
+        "text": "I traced it to the payment callback, error rates peaked at 9% for 6 minutes.",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 4.52,
+        "end": 10.28
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_5a385df0638b749e",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_01",
+        "start": 10.28,
+        "end": 13.76,
+        "text": "Can we roll back safely and preserve the successful orders?",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 10.28,
+        "end": 13.76
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_111777acc875a025",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_00",
+        "start": 13.76,
+        "end": 17.4,
+        "text": "Yes, the database migration is backward compatible.",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 13.76,
+        "end": 17.4
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_880d1a869cd9d914",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_00",
+        "start": 17.4,
+        "end": 20.0,
+        "text": "I will start the roll back and monitor recovery.",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 17.4,
+        "end": 20.0
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "composite",
+      "model": "runtime-composite-1"
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 2,
+    "device": "cpu",
+    "memory_mb": 198.4,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 5,
+    "artifact_count": 0,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/meeting-two-speaker.wav",
+      "size_bytes": 640932,
+      "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "provider": "composite",
+    "model_version": "runtime-composite-1",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "speech.align_transcript",
+        "options": {
+          "transcript": [
+            {
+              "start": 0.0,
+              "end": 4.52,
+              "text": "The customer reported an intermittent checkout failure after the morning release."
+            },
+            {
+              "start": 4.52,
+              "end": 10.28,
+              "text": "I traced it to the payment callback, error rates peaked at 9% for 6 minutes."
+            },
+            {
+              "start": 10.28,
+              "end": 13.76,
+              "text": "Can we roll back safely and preserve the successful orders?"
+            },
+            {
+              "start": 13.76,
+              "end": 17.4,
+              "text": "Yes, the database migration is backward compatible."
+            },
+            {
+              "start": 17.4,
+              "end": 20.0,
+              "text": "I will start the roll back and monitor recovery."
+            }
+          ],
+          "diarization": [
+            {
+              "speaker": "SPEAKER_01",
+              "start": 0.03096875,
+              "end": 4.232843750000001,
+              "confidence": null
+            },
+            {
+              "speaker": "SPEAKER_00",
+              "start": 4.469093750000001,
+              "end": 9.700343750000002,
+              "confidence": null
+            },
+            {
+              "speaker": "SPEAKER_01",
+              "start": 10.10534375,
+              "end": 13.294718750000001,
+              "confidence": null
+            },
+            {
+              "speaker": "SPEAKER_00",
+              "start": 13.699718750000002,
+              "end": 20.09534375,
+              "confidence": null
+            }
+          ],
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "speech.align_transcript",
+          "provider": "composite",
+          "model": "runtime-composite-1",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "speech.align_transcript",
+        "provider": "composite",
+        "model": "runtime-composite-1",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

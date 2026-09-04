@@ -1,0 +1,204 @@
+{
+  "capability": "vision.face_compare",
+  "provider": "composite",
+  "model": "runtime-composite-1",
+  "input": {
+    "type": "image",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/person-input.jpg",
+    "size_bytes": 28379,
+    "sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+  },
+  "result": {
+    "match": true,
+    "similarity": 1.0,
+    "threshold": 0.63,
+    "profile": "balanced",
+    "status": "verified",
+    "source_capability": "identity.face.verify",
+    "source_result": {
+      "match": true,
+      "similarity": 1.0,
+      "threshold": 0.63,
+      "profile": "balanced",
+      "status": "verified"
+    }
+  },
+  "performance": {
+    "latency_ms": 3387,
+    "device": "cpu",
+    "memory_mb": 197.7,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_87487a22e8dbec5d",
+      "type": "face_verification",
+      "value": {
+        "match": true,
+        "similarity": 1.0,
+        "threshold": 0.63,
+        "profile": "balanced"
+      },
+      "confidence": 1.0,
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1",
+          "confidence": 1.0
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/person-input.jpg",
+          "size_bytes": 28379,
+          "sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "composite",
+      "model": "runtime-composite-1",
+      "confidence": 1.0
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 3387,
+    "device": "cpu",
+    "memory_mb": 197.7,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 0,
+    "deterministic": false,
+    "privacy_level": "restricted"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/person-input.jpg",
+      "size_bytes": 28379,
+      "sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+    },
+    "provider": "composite",
+    "model_version": "runtime-composite-1",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "restricted",
+    "cache": {
+      "enabled": false,
+      "sensitive_override": false
+    },
+    "children": [
+      {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/person-input.jpg",
+          "size_bytes": 28379,
+          "sha256": "e24a2435684fee028b4ff7a7c94c8b3e0052f5e19e0bcba4f03bee8d6407a113"
+        },
+        "provider": "insightface",
+        "model_version": "buffalo_l",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "restricted",
+        "cache": {
+          "enabled": false,
+          "sensitive_override": false
+        },
+        "children": []
+      }
+    ]
+  },
+  "confidence": 1.0,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.face_compare",
+        "options": {
+          "other_input": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/person-input.jpg",
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.face_compare",
+          "provider": "composite",
+          "model": "runtime-composite-1",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.face_compare",
+        "provider": "composite",
+        "model": "runtime-composite-1",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "capability": "identity.face.verify",
+      "provider": "insightface",
+      "model": "buffalo_l",
+      "error": null,
+      "status": "completed"
+    }
+  ]
+}

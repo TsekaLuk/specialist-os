@@ -1,0 +1,390 @@
+{
+  "capability": "vision.detect",
+  "provider": "yolo",
+  "model": "yolo11n",
+  "input": {
+    "type": "image",
+    "path": "docs/assets/e2e/bus-input.jpg",
+    "size_bytes": 137419,
+    "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+  },
+  "result": {
+    "items": [
+      {
+        "label": "bus",
+        "bbox": [
+          3.83,
+          229.36,
+          796.19,
+          728.41
+        ],
+        "confidence": 0.940153
+      },
+      {
+        "label": "person",
+        "bbox": [
+          671.02,
+          394.83,
+          809.81,
+          878.71
+        ],
+        "confidence": 0.88822
+      },
+      {
+        "label": "person",
+        "bbox": [
+          47.4,
+          399.57,
+          239.3,
+          904.2
+        ],
+        "confidence": 0.878255
+      },
+      {
+        "label": "person",
+        "bbox": [
+          223.06,
+          408.69,
+          344.47,
+          860.44
+        ],
+        "confidence": 0.855773
+      },
+      {
+        "label": "person",
+        "bbox": [
+          0.02,
+          556.07,
+          68.89,
+          872.36
+        ],
+        "confidence": 0.62192
+      }
+    ]
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 408.3,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_b8be5c5bdca9cbee",
+      "type": "entity",
+      "value": "bus",
+      "geometry": {
+        "bbox": [
+          3.83,
+          229.36,
+          796.19,
+          728.41
+        ]
+      },
+      "confidence": 0.940153,
+      "evidence": [
+        {
+          "provider": "yolo",
+          "model": "yolo11n",
+          "confidence": 0.940153
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "yolo",
+        "model_version": "yolo11n",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_61b97b557641f6a5",
+      "type": "entity",
+      "value": "person",
+      "geometry": {
+        "bbox": [
+          671.02,
+          394.83,
+          809.81,
+          878.71
+        ]
+      },
+      "confidence": 0.88822,
+      "evidence": [
+        {
+          "provider": "yolo",
+          "model": "yolo11n",
+          "confidence": 0.88822
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "yolo",
+        "model_version": "yolo11n",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d9892de1607735f1",
+      "type": "entity",
+      "value": "person",
+      "geometry": {
+        "bbox": [
+          47.4,
+          399.57,
+          239.3,
+          904.2
+        ]
+      },
+      "confidence": 0.878255,
+      "evidence": [
+        {
+          "provider": "yolo",
+          "model": "yolo11n",
+          "confidence": 0.878255
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "yolo",
+        "model_version": "yolo11n",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_4a5752dafab84dc8",
+      "type": "entity",
+      "value": "person",
+      "geometry": {
+        "bbox": [
+          223.06,
+          408.69,
+          344.47,
+          860.44
+        ]
+      },
+      "confidence": 0.855773,
+      "evidence": [
+        {
+          "provider": "yolo",
+          "model": "yolo11n",
+          "confidence": 0.855773
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "yolo",
+        "model_version": "yolo11n",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_01512eabad0b5344",
+      "type": "entity",
+      "value": "person",
+      "geometry": {
+        "bbox": [
+          0.02,
+          556.07,
+          68.89,
+          872.36
+        ]
+      },
+      "confidence": 0.62192,
+      "evidence": [
+        {
+          "provider": "yolo",
+          "model": "yolo11n",
+          "confidence": 0.62192
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "yolo",
+        "model_version": "yolo11n",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "yolo",
+      "model": "yolo11n",
+      "confidence": 0.940153
+    },
+    {
+      "provider": "yolo",
+      "model": "yolo11n",
+      "confidence": 0.88822
+    },
+    {
+      "provider": "yolo",
+      "model": "yolo11n",
+      "confidence": 0.878255
+    },
+    {
+      "provider": "yolo",
+      "model": "yolo11n",
+      "confidence": 0.855773
+    },
+    {
+      "provider": "yolo",
+      "model": "yolo11n",
+      "confidence": 0.62192
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 49376,
+    "device": "cpu",
+    "memory_mb": 408.3,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 5,
+    "artifact_count": 0,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "docs/assets/e2e/bus-input.jpg",
+      "size_bytes": 137419,
+      "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "provider": "yolo",
+    "model_version": "yolo11n",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": 0.836864,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.detect",
+        "options": {
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.detect",
+          "provider": "yolo",
+          "model": "yolo11n",
+          "quality": 0.82,
+          "estimated_latency_ms": 81,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": false,
+          "available": true,
+          "allowed": true,
+          "score": 0.6802,
+          "reasons": [
+            "verified model artifact will be installed lazily"
+          ]
+        },
+        {
+          "capability": "vision.detect",
+          "provider": "yolo",
+          "model": "yolo11s",
+          "quality": 0.8,
+          "estimated_latency_ms": 163,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": false,
+          "available": true,
+          "allowed": true,
+          "score": 0.5946,
+          "reasons": [
+            "verified model artifact will be installed lazily"
+          ]
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.detect",
+        "provider": "yolo",
+        "model": "yolo11n",
+        "quality": 0.82,
+        "estimated_latency_ms": 81,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": false,
+        "available": true,
+        "allowed": true,
+        "score": 0.6802,
+        "reasons": [
+          "verified model artifact will be installed lazily"
+        ]
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    }
+  ]
+}

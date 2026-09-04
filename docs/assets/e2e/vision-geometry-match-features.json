@@ -1,0 +1,380 @@
+{
+  "capability": "vision.geometry.match_features",
+  "provider": "opencv",
+  "model": "opencv-5",
+  "input": {
+    "type": "image",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+    "size_bytes": 137419,
+    "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+  },
+  "result": {
+    "algorithm": "ORB",
+    "keypoints_a": 1000,
+    "keypoints_b": 1000,
+    "match_count": 9,
+    "matches": [
+      {
+        "a": [
+          657.0,
+          711.0
+        ],
+        "b": [
+          803.0,
+          859.0
+        ],
+        "distance": 33.0
+      },
+      {
+        "a": [
+          122.6880111694336,
+          810.4320678710938
+        ],
+        "b": [
+          335.9232482910156,
+          408.499267578125
+        ],
+        "distance": 37.0
+      },
+      {
+        "a": [
+          99.5328140258789,
+          777.60009765625
+        ],
+        "b": [
+          758.9378051757812,
+          761.4260864257812
+        ],
+        "distance": 39.0
+      },
+      {
+        "a": [
+          149.29922485351562,
+          470.707275390625
+        ],
+        "b": [
+          1704.4993896484375,
+          675.9937133789062
+        ],
+        "distance": 47.0
+      },
+      {
+        "a": [
+          265.7526550292969,
+          510.6033935546875
+        ],
+        "b": [
+          547.4304809570312,
+          850.1761474609375
+        ],
+        "distance": 48.0
+      },
+      {
+        "a": [
+          110.48143768310547,
+          235.89279174804688
+        ],
+        "b": [
+          1515.0,
+          316.0
+        ],
+        "distance": 48.0
+      },
+      {
+        "a": [
+          731.0,
+          446.0
+        ],
+        "b": [
+          1200.6146240234375,
+          188.6976318359375
+        ],
+        "distance": 49.0
+      },
+      {
+        "a": [
+          661.8240356445312,
+          705.0240478515625
+        ],
+        "b": [
+          715.39208984375,
+          922.7520751953125
+        ],
+        "distance": 50.0
+      },
+      {
+        "a": [
+          318.9031982421875,
+          494.4790954589844
+        ],
+        "b": [
+          1314.66259765625,
+          661.478515625
+        ],
+        "distance": 51.0
+      }
+    ],
+    "ratio": 0.75,
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 260,
+    "device": "cpu",
+    "memory_mb": 198.0,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_7eb347506393b253",
+      "type": "operator_result",
+      "value": {
+        "algorithm": "ORB",
+        "keypoints_a": 1000,
+        "keypoints_b": 1000,
+        "match_count": 9,
+        "matches": [
+          {
+            "a": [
+              657.0,
+              711.0
+            ],
+            "b": [
+              803.0,
+              859.0
+            ],
+            "distance": 33.0
+          },
+          {
+            "a": [
+              122.6880111694336,
+              810.4320678710938
+            ],
+            "b": [
+              335.9232482910156,
+              408.499267578125
+            ],
+            "distance": 37.0
+          },
+          {
+            "a": [
+              99.5328140258789,
+              777.60009765625
+            ],
+            "b": [
+              758.9378051757812,
+              761.4260864257812
+            ],
+            "distance": 39.0
+          },
+          {
+            "a": [
+              149.29922485351562,
+              470.707275390625
+            ],
+            "b": [
+              1704.4993896484375,
+              675.9937133789062
+            ],
+            "distance": 47.0
+          },
+          {
+            "a": [
+              265.7526550292969,
+              510.6033935546875
+            ],
+            "b": [
+              547.4304809570312,
+              850.1761474609375
+            ],
+            "distance": 48.0
+          },
+          {
+            "a": [
+              110.48143768310547,
+              235.89279174804688
+            ],
+            "b": [
+              1515.0,
+              316.0
+            ],
+            "distance": 48.0
+          },
+          {
+            "a": [
+              731.0,
+              446.0
+            ],
+            "b": [
+              1200.6146240234375,
+              188.6976318359375
+            ],
+            "distance": 49.0
+          },
+          {
+            "a": [
+              661.8240356445312,
+              705.0240478515625
+            ],
+            "b": [
+              715.39208984375,
+              922.7520751953125
+            ],
+            "distance": 50.0
+          },
+          {
+            "a": [
+              318.9031982421875,
+              494.4790954589844
+            ],
+            "b": [
+              1314.66259765625,
+              661.478515625
+            ],
+            "distance": 51.0
+          }
+        ],
+        "ratio": 0.75,
+        "deterministic": true
+      },
+      "evidence": [
+        {
+          "provider": "opencv",
+          "model": "opencv-5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "opencv",
+        "model_version": "opencv-5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "opencv",
+      "model": "opencv-5"
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 260,
+    "device": "cpu",
+    "memory_mb": 198.0,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 0,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+      "size_bytes": 137419,
+      "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "provider": "opencv",
+    "model_version": "opencv-5",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.geometry.match_features",
+        "options": {
+          "image_a": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "image_b": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/boats-input.jpg",
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.geometry.match_features",
+          "provider": "opencv",
+          "model": "opencv-5",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.geometry.match_features",
+        "provider": "opencv",
+        "model": "opencv-5",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

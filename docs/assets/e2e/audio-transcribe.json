@@ -1,0 +1,303 @@
+{
+  "capability": "audio.transcribe",
+  "provider": "whisper.cpp",
+  "model": "ggml-base.en",
+  "input": {
+    "type": "audio",
+    "path": "docs/assets/e2e/meeting-two-speaker.wav",
+    "size_bytes": 640932,
+    "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+  },
+  "result": {
+    "text": "The customer reported an intermittent checkout failure after the morning release. I traced it to the payment callback, error rates peaked at 9% for 6 minutes. Can we roll back safely and preserve the successful orders? Yes, the database migration is backward compatible. I will start the roll back and monitor recovery.",
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 4.52,
+        "text": "The customer reported an intermittent checkout failure after the morning release."
+      },
+      {
+        "start": 4.52,
+        "end": 10.28,
+        "text": "I traced it to the payment callback, error rates peaked at 9% for 6 minutes."
+      },
+      {
+        "start": 10.28,
+        "end": 13.76,
+        "text": "Can we roll back safely and preserve the successful orders?"
+      },
+      {
+        "start": 13.76,
+        "end": 17.4,
+        "text": "Yes, the database migration is backward compatible."
+      },
+      {
+        "start": 17.4,
+        "end": 20.0,
+        "text": "I will start the roll back and monitor recovery."
+      }
+    ]
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 198.2,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_2eeeb372fac4c23a",
+      "type": "speech_segment",
+      "value": "The customer reported an intermittent checkout failure after the morning release.",
+      "geometry": {
+        "start": 0.0,
+        "end": 4.52
+      },
+      "evidence": [
+        {
+          "provider": "whisper.cpp",
+          "model": "ggml-base.en"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "whisper.cpp",
+        "model_version": "ggml-base.en",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_e0189fde8bc70133",
+      "type": "speech_segment",
+      "value": "I traced it to the payment callback, error rates peaked at 9% for 6 minutes.",
+      "geometry": {
+        "start": 4.52,
+        "end": 10.28
+      },
+      "evidence": [
+        {
+          "provider": "whisper.cpp",
+          "model": "ggml-base.en"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "whisper.cpp",
+        "model_version": "ggml-base.en",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d707a3edc93a476c",
+      "type": "speech_segment",
+      "value": "Can we roll back safely and preserve the successful orders?",
+      "geometry": {
+        "start": 10.28,
+        "end": 13.76
+      },
+      "evidence": [
+        {
+          "provider": "whisper.cpp",
+          "model": "ggml-base.en"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "whisper.cpp",
+        "model_version": "ggml-base.en",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_71059a28be635a62",
+      "type": "speech_segment",
+      "value": "Yes, the database migration is backward compatible.",
+      "geometry": {
+        "start": 13.76,
+        "end": 17.4
+      },
+      "evidence": [
+        {
+          "provider": "whisper.cpp",
+          "model": "ggml-base.en"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "whisper.cpp",
+        "model_version": "ggml-base.en",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_d988ea7a8df46209",
+      "type": "speech_segment",
+      "value": "I will start the roll back and monitor recovery.",
+      "geometry": {
+        "start": 17.4,
+        "end": 20.0
+      },
+      "evidence": [
+        {
+          "provider": "whisper.cpp",
+          "model": "ggml-base.en"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "whisper.cpp",
+        "model_version": "ggml-base.en",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "whisper.cpp",
+      "model": "ggml-base.en"
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 1330,
+    "device": "cpu",
+    "memory_mb": 198.2,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 5,
+    "artifact_count": 0,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "docs/assets/e2e/meeting-two-speaker.wav",
+      "size_bytes": 640932,
+      "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "provider": "whisper.cpp",
+    "model_version": "ggml-base.en",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "audio.transcribe",
+        "options": {
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "audio.transcribe",
+          "provider": "whisper.cpp",
+          "model": "ggml-base.en",
+          "quality": 0.82,
+          "estimated_latency_ms": 81,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.6802,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "audio.transcribe",
+        "provider": "whisper.cpp",
+        "model": "ggml-base.en",
+        "quality": 0.82,
+        "estimated_latency_ms": 81,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.6802,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

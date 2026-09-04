@@ -1,0 +1,288 @@
+{
+  "capability": "vision.geometry.solve_pnp",
+  "provider": "opencv",
+  "model": "opencv-5",
+  "input": {
+    "type": "geometry",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+    "size_bytes": 137419,
+    "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+  },
+  "result": {
+    "rotation_vector": [
+      -0.5187370069490757,
+      -0.004148728182480375,
+      -0.0016625408377539596
+    ],
+    "translation_vector": [
+      -0.5078380947328709,
+      -0.610366951675563,
+      1.579232963778231
+    ],
+    "rotation_matrix": [
+      [
+        0.999990233994082,
+        0.002641104289940164,
+        -0.0035435130295801026
+      ],
+      [
+        -0.0005368368603671455,
+        0.868444912197359,
+        0.49578538329070054
+      ],
+      [
+        0.0043867667645425875,
+        -0.49577863915930376,
+        0.8684378488013419
+      ]
+    ],
+    "reprojection_error": 86.01398654386958,
+    "point_count": 4,
+    "deterministic": true
+  },
+  "performance": {
+    "latency_ms": 153,
+    "device": "cpu",
+    "memory_mb": 197.6,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_2ff9ec4fb6a7069c",
+      "type": "operator_result",
+      "value": {
+        "rotation_vector": [
+          -0.5187370069490757,
+          -0.004148728182480375,
+          -0.0016625408377539596
+        ],
+        "translation_vector": [
+          -0.5078380947328709,
+          -0.610366951675563,
+          1.579232963778231
+        ],
+        "rotation_matrix": [
+          [
+            0.999990233994082,
+            0.002641104289940164,
+            -0.0035435130295801026
+          ],
+          [
+            -0.0005368368603671455,
+            0.868444912197359,
+            0.49578538329070054
+          ],
+          [
+            0.0043867667645425875,
+            -0.49577863915930376,
+            0.8684378488013419
+          ]
+        ],
+        "reprojection_error": 86.01398654386958,
+        "point_count": 4,
+        "deterministic": true
+      },
+      "evidence": [
+        {
+          "provider": "opencv",
+          "model": "opencv-5"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "geometry",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+          "size_bytes": 137419,
+          "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+        },
+        "provider": "opencv",
+        "model_version": "opencv-5",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "opencv",
+      "model": "opencv-5"
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 153,
+    "device": "cpu",
+    "memory_mb": 197.6,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 0,
+    "deterministic": true,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "geometry",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/bus-input.jpg",
+      "size_bytes": 137419,
+      "sha256": "c02019c4979c191eb739ddd944445ef408dad5679acab6fd520ef9d434bfbc63"
+    },
+    "provider": "opencv",
+    "model_version": "opencv-5",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": true,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "vision.geometry.solve_pnp",
+        "options": {
+          "object_points": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              1,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ],
+          "image_points": [
+            [
+              3.83,
+              229.36
+            ],
+            [
+              796.19,
+              229.36
+            ],
+            [
+              796.19,
+              728.41
+            ],
+            [
+              3.83,
+              728.41
+            ]
+          ],
+          "camera_matrix": [
+            [
+              900,
+              0,
+              405.0
+            ],
+            [
+              0,
+              900,
+              540.0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "distortion": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "vision.geometry.solve_pnp",
+          "provider": "opencv",
+          "model": "opencv-5",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "vision.geometry.solve_pnp",
+        "provider": "opencv",
+        "model": "opencv-5",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

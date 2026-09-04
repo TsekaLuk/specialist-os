@@ -1,0 +1,287 @@
+{
+  "capability": "media.transcribe_video",
+  "provider": "composite",
+  "model": "runtime-composite-1",
+  "input": {
+    "type": "video",
+    "path": "docs/assets/e2e/video-input.mp4",
+    "size_bytes": 573929,
+    "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+  },
+  "result": {
+    "text": "Thank you.",
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 4.88,
+        "text": "Thank you."
+      }
+    ],
+    "status": "completed"
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 198.8,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_0da9235e40e059d3",
+      "type": "timeline_segment",
+      "value": {
+        "start": 0.0,
+        "end": 4.88,
+        "text": "Thank you."
+      },
+      "geometry": {
+        "start": 0.0,
+        "end": 4.88
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "video",
+          "path": "docs/assets/e2e/video-input.mp4",
+          "size_bytes": 573929,
+          "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "composite",
+      "model": "runtime-composite-1"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+      "mime": "audio/wav",
+      "size_bytes": 481358,
+      "sha256": "1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+      "uri": "artifact://1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+      "metadata": {
+        "source_name": "video-input-87de9f0742db5a8d.wav",
+        "capability": "media.audio.extract",
+        "result_key": "audio_path"
+      }
+    },
+    {
+      "id": "artifact_46b6bf5318ffcb1495ca1746cbd553f4828ccad00578e0ed754afffdb0407599",
+      "mime": "audio/wav",
+      "size_bytes": 481324,
+      "sha256": "46b6bf5318ffcb1495ca1746cbd553f4828ccad00578e0ed754afffdb0407599",
+      "uri": "artifact://46b6bf5318ffcb1495ca1746cbd553f4828ccad00578e0ed754afffdb0407599",
+      "metadata": {
+        "source_name": "denoised-1fdd8891f2c4507d-balanced.wav",
+        "capability": "audio.denoise",
+        "result_key": "audio"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 1857,
+    "device": "cpu",
+    "memory_mb": 198.8,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 2,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "video",
+      "path": "docs/assets/e2e/video-input.mp4",
+      "size_bytes": 573929,
+      "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+    },
+    "provider": "composite",
+    "model_version": "runtime-composite-1",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": [
+      {
+        "source": {
+          "type": "media",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/video-input.mp4",
+          "size_bytes": 573929,
+          "sha256": "d6f25017dad9d8f86e6a0f613f2a40c194fa006725ad8ee7edc866a622f1b437"
+        },
+        "provider": "ffmpeg",
+        "model_version": "ffmpeg-9",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": true,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      },
+      {
+        "source": {
+          "type": "audio",
+          "path": "/private/tmp/specialist-gallery-home.E6RTAM/artifacts/1f/dd/1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a",
+          "size_bytes": 481358,
+          "sha256": "1fdd8891f2c4507d061c4d460b976f69ff7150342eda351d900a062b2e7be70a"
+        },
+        "provider": "deepfilternet",
+        "model_version": "deepfilternet-2",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      },
+      {
+        "source": {
+          "type": "audio",
+          "path": "/private/tmp/specialist-gallery-home.E6RTAM/artifacts/46/b6/46b6bf5318ffcb1495ca1746cbd553f4828ccad00578e0ed754afffdb0407599",
+          "size_bytes": 481324,
+          "sha256": "46b6bf5318ffcb1495ca1746cbd553f4828ccad00578e0ed754afffdb0407599"
+        },
+        "provider": "whisper.cpp",
+        "model_version": "ggml-base.en",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      }
+    ]
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "media.transcribe_video",
+        "options": {
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "media.transcribe_video",
+          "provider": "composite",
+          "model": "runtime-composite-1",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "media.transcribe_video",
+        "provider": "composite",
+        "model": "runtime-composite-1",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "capability": "media.audio.extract",
+      "provider": "ffmpeg",
+      "model": "ffmpeg-9",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "capability": "audio.denoise",
+      "provider": "deepfilternet",
+      "model": "deepfilternet-2",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "capability": "audio.transcribe",
+      "provider": "whisper.cpp",
+      "model": "ggml-base.en",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

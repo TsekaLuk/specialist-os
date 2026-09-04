@@ -1,0 +1,202 @@
+{
+  "capability": "speech.synthesize",
+  "provider": "fish_audio",
+  "model": "s2-pro",
+  "input": {
+    "type": "audio",
+    "path": "/var/folders/2m/38rs30f92qz1jf45xm8gghjr0000gn/T/specialist-speech-0ho4fomo.txt",
+    "size_bytes": 72,
+    "sha256": "3d911d7e077d8ae090eb764d9962a23dfeb5fb6d1ebc9b3db97ab6d3f7c3c542"
+  },
+  "result": {
+    "audio": {
+      "mime": "audio/wav",
+      "sample_rate": 44100,
+      "duration_ms": 4598,
+      "artifact": "artifact://9e43ccf442b7abbfcad3b6cdb6dd742fd27f0c59af85e940d90d6d2eef00e8ce"
+    },
+    "voice": null,
+    "server": "http://127.0.0.1:18080"
+  },
+  "performance": {
+    "latency_ms": 166218,
+    "device": "cpu",
+    "memory_mb": 197.2,
+    "cached": false,
+    "cold_start": true,
+    "audio_duration_ms": 4598.0,
+    "generation_latency_ms": 166218,
+    "rtf": 36.150065
+  },
+  "warnings": [],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_b3798d77a5cadad2",
+      "type": "audio_artifact",
+      "value": {
+        "artifact": "artifact://9e43ccf442b7abbfcad3b6cdb6dd742fd27f0c59af85e940d90d6d2eef00e8ce",
+        "mime": "audio/wav",
+        "duration_ms": 4598,
+        "sample_rate": 44100,
+        "voice": null
+      },
+      "confidence": 1.0,
+      "evidence": [
+        {
+          "provider": "fish_audio",
+          "model": "s2-pro",
+          "confidence": 1.0
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/var/folders/2m/38rs30f92qz1jf45xm8gghjr0000gn/T/specialist-speech-0ho4fomo.txt",
+          "size_bytes": 72,
+          "sha256": "3d911d7e077d8ae090eb764d9962a23dfeb5fb6d1ebc9b3db97ab6d3f7c3c542"
+        },
+        "provider": "fish_audio",
+        "model_version": "s2-pro",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "fish_audio",
+      "model": "s2-pro",
+      "confidence": 1.0
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_9e43ccf442b7abbfcad3b6cdb6dd742fd27f0c59af85e940d90d6d2eef00e8ce",
+      "mime": "audio/wav",
+      "size_bytes": 405548,
+      "sha256": "9e43ccf442b7abbfcad3b6cdb6dd742fd27f0c59af85e940d90d6d2eef00e8ce",
+      "uri": "artifact://9e43ccf442b7abbfcad3b6cdb6dd742fd27f0c59af85e940d90d6d2eef00e8ce",
+      "metadata": {
+        "source_name": "fish-audio-65e_5992.wav",
+        "capability": "speech.synthesize",
+        "result_key": "audio"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 166218,
+    "device": "cpu",
+    "memory_mb": 197.2,
+    "cached": false,
+    "cold_start": true,
+    "audio_duration_ms": 4598.0,
+    "generation_latency_ms": 166218,
+    "rtf": 36.150065,
+    "observation_count": 1,
+    "artifact_count": 1,
+    "deterministic": false,
+    "privacy_level": "sensitive"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "/var/folders/2m/38rs30f92qz1jf45xm8gghjr0000gn/T/specialist-speech-0ho4fomo.txt",
+      "size_bytes": 72,
+      "sha256": "3d911d7e077d8ae090eb764d9962a23dfeb5fb6d1ebc9b3db97ab6d3f7c3c542"
+    },
+    "provider": "fish_audio",
+    "model_version": "s2-pro",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "sensitive",
+    "cache": {
+      "enabled": false,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": 1.0,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "speech.synthesize",
+        "options": {
+          "format": "wav",
+          "provider": "fish_audio",
+          "style": {
+            "instruction": "calm, precise product voice"
+          },
+          "provider_options": {
+            "fish_audio": {
+              "max_new_tokens": 128
+            }
+          },
+          "text": "Specialist OS has finished the inspection. All production checks passed.",
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "speech.synthesize",
+          "provider": "fish_audio",
+          "model": "s2-pro",
+          "quality": 0.98,
+          "estimated_latency_ms": 500,
+          "memory_mb": 24576,
+          "local": true,
+          "commercial": false,
+          "available": true,
+          "allowed": true,
+          "score": -1.219999,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "speech.synthesize",
+        "provider": "fish_audio",
+        "model": "s2-pro",
+        "quality": 0.98,
+        "estimated_latency_ms": 500,
+        "memory_mb": 24576,
+        "local": true,
+        "commercial": false,
+        "available": true,
+        "allowed": true,
+        "score": -1.219999,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    }
+  ]
+}

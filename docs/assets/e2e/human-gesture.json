@@ -1,0 +1,171 @@
+{
+  "capability": "human.gesture",
+  "provider": "mediapipe",
+  "model": "mediapipe-tasks",
+  "input": {
+    "type": "image",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/hand-input.jpg",
+    "size_bytes": 22147,
+    "sha256": "197f8a11cb74a2ecff8aa106271e5d3088a64c8fea691dc081385fb8ba4a6aa0"
+  },
+  "result": {
+    "gesture": "open_hand",
+    "confidence": null,
+    "gestures": [
+      {
+        "gesture": "open_hand",
+        "confidence": null
+      }
+    ]
+  },
+  "performance": {
+    "latency_ms": 731,
+    "device": "cpu",
+    "memory_mb": 197.9,
+    "cached": false,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_c0d8557fdbf691c1",
+      "type": "gesture",
+      "value": "open_hand",
+      "evidence": [
+        {
+          "provider": "mediapipe",
+          "model": "mediapipe-tasks"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "image",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/hand-input.jpg",
+          "size_bytes": 22147,
+          "sha256": "197f8a11cb74a2ecff8aa106271e5d3088a64c8fea691dc081385fb8ba4a6aa0"
+        },
+        "provider": "mediapipe",
+        "model_version": "mediapipe-tasks",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "mediapipe",
+      "model": "mediapipe-tasks"
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "latency_ms": 731,
+    "device": "cpu",
+    "memory_mb": 197.9,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 1,
+    "artifact_count": 0,
+    "deterministic": false,
+    "privacy_level": "sensitive"
+  },
+  "provenance": {
+    "source": {
+      "type": "image",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/hand-input.jpg",
+      "size_bytes": 22147,
+      "sha256": "197f8a11cb74a2ecff8aa106271e5d3088a64c8fea691dc081385fb8ba4a6aa0"
+    },
+    "provider": "mediapipe",
+    "model_version": "mediapipe-tasks",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "sensitive",
+    "cache": {
+      "enabled": false,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "human.gesture",
+        "options": {
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "human.gesture",
+          "provider": "mediapipe",
+          "model": "mediapipe-tasks",
+          "quality": 0.82,
+          "estimated_latency_ms": 40,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.713,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "human.gesture",
+        "provider": "mediapipe",
+        "model": "mediapipe-tasks",
+        "quality": 0.82,
+        "estimated_latency_ms": 40,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.713,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

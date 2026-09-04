@@ -1,0 +1,159 @@
+{
+  "capability": "audio.denoise",
+  "provider": "deepfilternet",
+  "model": "deepfilternet-2",
+  "input": {
+    "type": "audio",
+    "path": "docs/assets/e2e/meeting-two-speaker-noisy.wav",
+    "size_bytes": 640932,
+    "sha256": "b0568536cee74548de620c3196c46695c6f19e650c377ffc5389fd4a54ec42ba"
+  },
+  "result": {
+    "audio": {
+      "mime": "audio/wav",
+      "duration_ms": 20026.6875,
+      "sample_rate": 16000,
+      "channels": 1,
+      "profile": "balanced",
+      "processed": true,
+      "artifact": "artifact://522b1487b6a73bd23aa15d16e0e2b0de514a6f1c518d21fa49875142d0ee7001"
+    },
+    "source_preserved": true,
+    "profile": "balanced"
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 198.2,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [],
+  "evidence": [],
+  "artifacts": [
+    {
+      "id": "artifact_522b1487b6a73bd23aa15d16e0e2b0de514a6f1c518d21fa49875142d0ee7001",
+      "mime": "audio/wav",
+      "size_bytes": 640898,
+      "sha256": "522b1487b6a73bd23aa15d16e0e2b0de514a6f1c518d21fa49875142d0ee7001",
+      "uri": "artifact://522b1487b6a73bd23aa15d16e0e2b0de514a6f1c518d21fa49875142d0ee7001",
+      "metadata": {
+        "source_name": "denoised-b0568536cee74548-balanced.wav",
+        "capability": "audio.denoise",
+        "result_key": "audio"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 1329,
+    "device": "cpu",
+    "memory_mb": 198.2,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 0,
+    "artifact_count": 1,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "docs/assets/e2e/meeting-two-speaker-noisy.wav",
+      "size_bytes": 640932,
+      "sha256": "b0568536cee74548de620c3196c46695c6f19e650c377ffc5389fd4a54ec42ba"
+    },
+    "provider": "deepfilternet",
+    "model_version": "deepfilternet-2",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "audio.denoise",
+        "options": {
+          "strength": "balanced",
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "audio.denoise",
+          "provider": "deepfilternet",
+          "model": "deepfilternet-2",
+          "quality": 0.82,
+          "estimated_latency_ms": 81,
+          "memory_mb": 1024,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.6802,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "audio.denoise",
+        "provider": "deepfilternet",
+        "model": "deepfilternet-2",
+        "quality": 0.82,
+        "estimated_latency_ms": 81,
+        "memory_mb": 1024,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.6802,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}

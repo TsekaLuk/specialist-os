@@ -1,0 +1,201 @@
+{
+  "capability": "speech.clone_voice",
+  "provider": "fish_audio",
+  "model": "s2-pro",
+  "input": {
+    "type": "audio",
+    "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/audio-source.wav",
+    "size_bytes": 352078,
+    "sha256": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e"
+  },
+  "result": {
+    "audio": {
+      "mime": "audio/wav",
+      "sample_rate": 44100,
+      "duration_ms": 3669,
+      "artifact": "artifact://5b0e279e4af2992b048816215834c23035226cbf6b2a4ee4efc7393840ee8210"
+    },
+    "voice": "reference",
+    "server": "http://127.0.0.1:18080"
+  },
+  "performance": {
+    "latency_ms": 91715,
+    "device": "cpu",
+    "memory_mb": 197.8,
+    "cached": false,
+    "cold_start": true,
+    "audio_duration_ms": 3669.0,
+    "generation_latency_ms": 91715,
+    "rtf": 24.997274
+  },
+  "warnings": [],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_1e0443bc0e751ef5",
+      "type": "audio_artifact",
+      "value": {
+        "artifact": "artifact://5b0e279e4af2992b048816215834c23035226cbf6b2a4ee4efc7393840ee8210",
+        "mime": "audio/wav",
+        "duration_ms": 3669,
+        "sample_rate": 44100,
+        "voice": "reference"
+      },
+      "confidence": 1.0,
+      "evidence": [
+        {
+          "provider": "fish_audio",
+          "model": "s2-pro",
+          "confidence": 1.0
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/audio-source.wav",
+          "size_bytes": 352078,
+          "sha256": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e"
+        },
+        "provider": "fish_audio",
+        "model_version": "s2-pro",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "fish_audio",
+      "model": "s2-pro",
+      "confidence": 1.0
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_5b0e279e4af2992b048816215834c23035226cbf6b2a4ee4efc7393840ee8210",
+      "mime": "audio/wav",
+      "size_bytes": 323628,
+      "sha256": "5b0e279e4af2992b048816215834c23035226cbf6b2a4ee4efc7393840ee8210",
+      "uri": "artifact://5b0e279e4af2992b048816215834c23035226cbf6b2a4ee4efc7393840ee8210",
+      "metadata": {
+        "source_name": "fish-audio-pe81nzgf.wav",
+        "capability": "speech.clone_voice",
+        "result_key": "audio"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 91715,
+    "device": "cpu",
+    "memory_mb": 197.8,
+    "cached": false,
+    "cold_start": true,
+    "audio_duration_ms": 3669.0,
+    "generation_latency_ms": 91715,
+    "rtf": 24.997274,
+    "observation_count": 1,
+    "artifact_count": 1,
+    "deterministic": false,
+    "privacy_level": "restricted"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/audio-source.wav",
+      "size_bytes": 352078,
+      "sha256": "59dfb9a4acb36fe2a2affc14bacbee2920ff435cb13cc314a08c13f66ba7860e"
+    },
+    "provider": "fish_audio",
+    "model_version": "s2-pro",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "restricted",
+    "cache": {
+      "enabled": false,
+      "sensitive_override": false
+    },
+    "children": []
+  },
+  "confidence": 1.0,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "speech.clone_voice",
+        "options": {
+          "text": "The specialist pipeline is ready for the next scene.",
+          "reference_text": "And so, my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",
+          "format": "wav",
+          "provider": "fish_audio",
+          "provider_options": {
+            "fish_audio": {
+              "max_new_tokens": 128
+            }
+          },
+          "reference_audio": "/Users/tseka_luk/workspace/lab/spacialist/docs/assets/e2e/audio-source.wav",
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "speech.clone_voice",
+          "provider": "fish_audio",
+          "model": "s2-pro",
+          "quality": 0.98,
+          "estimated_latency_ms": 500,
+          "memory_mb": 24576,
+          "local": true,
+          "commercial": false,
+          "available": true,
+          "allowed": true,
+          "score": -1.219999,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "speech.clone_voice",
+        "provider": "fish_audio",
+        "model": "s2-pro",
+        "quality": 0.98,
+        "estimated_latency_ms": 500,
+        "memory_mb": 24576,
+        "local": true,
+        "commercial": false,
+        "available": true,
+        "allowed": true,
+        "score": -1.219999,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    }
+  ]
+}

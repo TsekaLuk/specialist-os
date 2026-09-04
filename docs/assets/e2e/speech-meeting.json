@@ -1,0 +1,473 @@
+{
+  "capability": "speech.meeting",
+  "provider": "composite",
+  "model": "runtime-composite-1",
+  "input": {
+    "type": "audio",
+    "path": "docs/assets/e2e/meeting-two-speaker.wav",
+    "size_bytes": 640932,
+    "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+  },
+  "result": {
+    "segments": [
+      {
+        "speaker": "SPEAKER_01",
+        "start": 0.0,
+        "end": 4.52,
+        "text": "The customer reported an intermittent checkout failure after the morning release.",
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_00",
+        "start": 4.52,
+        "end": 10.28,
+        "text": "I traced it to the payment callback, error rates peaked at 9% for 6 minutes.",
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_01",
+        "start": 10.28,
+        "end": 13.76,
+        "text": "Can we roll back safely and preserve the successful orders?",
+        "confidence": null
+      },
+      {
+        "speaker": "SPEAKER_00",
+        "start": 13.76,
+        "end": 20.04,
+        "text": "Yes, the database migration is backward compatible, I will start the roll back and monitor recovery.",
+        "confidence": null
+      }
+    ],
+    "audio": {
+      "denoise": {
+        "audio": {
+          "mime": "audio/wav",
+          "duration_ms": 20026.6875,
+          "sample_rate": 16000,
+          "channels": 1,
+          "profile": "balanced",
+          "processed": true,
+          "artifact": "artifact://fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a"
+        },
+        "source_preserved": true,
+        "profile": "balanced"
+      },
+      "vad": {
+        "segments": [
+          {
+            "start": 0.0,
+            "end": 4.2
+          },
+          {
+            "start": 4.5,
+            "end": 6.6
+          },
+          {
+            "start": 6.8,
+            "end": 9.8
+          },
+          {
+            "start": 10.1,
+            "end": 13.4
+          },
+          {
+            "start": 13.7,
+            "end": 14.4
+          },
+          {
+            "start": 14.5,
+            "end": 20.0
+          }
+        ],
+        "duration_seconds": 20.0266875
+      }
+    },
+    "deterministic": false,
+    "status": "completed"
+  },
+  "performance": {
+    "latency_ms": 0,
+    "device": "cpu",
+    "memory_mb": 198.5,
+    "cached": true,
+    "cold_start": true
+  },
+  "warnings": [
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence",
+    "confidence threshold could not be evaluated because the provider returned no confidence"
+  ],
+  "error": null,
+  "observations": [
+    {
+      "id": "obs_43a02e1505d9a5ce",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_01",
+        "start": 0.0,
+        "end": 4.52,
+        "text": "The customer reported an intermittent checkout failure after the morning release.",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 0.0,
+        "end": 4.52
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_ab3166725e953eb5",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_00",
+        "start": 4.52,
+        "end": 10.28,
+        "text": "I traced it to the payment callback, error rates peaked at 9% for 6 minutes.",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 4.52,
+        "end": 10.28
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_6caa4b30c9a45c19",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_01",
+        "start": 10.28,
+        "end": 13.76,
+        "text": "Can we roll back safely and preserve the successful orders?",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 10.28,
+        "end": 13.76
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    },
+    {
+      "id": "obs_aaaa9dd4abafea91",
+      "type": "timeline_segment",
+      "value": {
+        "speaker": "SPEAKER_00",
+        "start": 13.76,
+        "end": 20.04,
+        "text": "Yes, the database migration is backward compatible, I will start the roll back and monitor recovery.",
+        "confidence": null
+      },
+      "geometry": {
+        "start": 13.76,
+        "end": 20.04
+      },
+      "evidence": [
+        {
+          "provider": "composite",
+          "model": "runtime-composite-1"
+        }
+      ],
+      "provenance": {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "composite",
+        "model_version": "runtime-composite-1",
+        "runtime_version": "1.0.4",
+        "transformations": []
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "provider": "composite",
+      "model": "runtime-composite-1"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a",
+      "mime": "audio/wav",
+      "size_bytes": 640898,
+      "sha256": "fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a",
+      "uri": "artifact://fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a",
+      "metadata": {
+        "source_name": "denoised-7aa37c6f7c8e4635-balanced.wav",
+        "capability": "audio.denoise",
+        "result_key": "audio"
+      }
+    }
+  ],
+  "metrics": {
+    "latency_ms": 18432,
+    "device": "cpu",
+    "memory_mb": 198.5,
+    "cached": false,
+    "cold_start": true,
+    "observation_count": 4,
+    "artifact_count": 1,
+    "deterministic": false,
+    "privacy_level": "safe"
+  },
+  "provenance": {
+    "source": {
+      "type": "audio",
+      "path": "docs/assets/e2e/meeting-two-speaker.wav",
+      "size_bytes": 640932,
+      "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+    },
+    "provider": "composite",
+    "model_version": "runtime-composite-1",
+    "runtime_version": "1.0.4",
+    "transformations": [],
+    "deterministic": false,
+    "privacy_level": "safe",
+    "cache": {
+      "enabled": true,
+      "sensitive_override": false
+    },
+    "children": [
+      {
+        "source": {
+          "type": "audio",
+          "path": "docs/assets/e2e/meeting-two-speaker.wav",
+          "size_bytes": 640932,
+          "sha256": "7aa37c6f7c8e4635fcd6ac9ee3c2bca058af44536cb5dcd4bafb73f0d2801c45"
+        },
+        "provider": "deepfilternet",
+        "model_version": "deepfilternet-2",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      },
+      {
+        "source": {
+          "type": "audio",
+          "path": "/private/tmp/specialist-gallery-home.E6RTAM/artifacts/fe/cb/fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a",
+          "size_bytes": 640898,
+          "sha256": "fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a"
+        },
+        "provider": "silero-vad",
+        "model_version": "silero-vad-v5",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      },
+      {
+        "source": {
+          "type": "audio",
+          "path": "/private/tmp/specialist-gallery-home.E6RTAM/artifacts/fe/cb/fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a",
+          "size_bytes": 640898,
+          "sha256": "fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a"
+        },
+        "provider": "whisper.cpp",
+        "model_version": "ggml-base.en",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "safe",
+        "cache": {
+          "enabled": true,
+          "sensitive_override": false
+        },
+        "children": []
+      },
+      {
+        "source": {
+          "type": "audio",
+          "path": "/private/tmp/specialist-gallery-home.E6RTAM/artifacts/fe/cb/fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a",
+          "size_bytes": 640898,
+          "sha256": "fecb811a5503f01325355492acc07d86e94ff40e9b96b72b8a423bcd8819fe2a"
+        },
+        "provider": "pyannote",
+        "model_version": "pyannote-community-1",
+        "runtime_version": "1.0.4",
+        "transformations": [],
+        "deterministic": false,
+        "privacy_level": "sensitive",
+        "cache": {
+          "enabled": false,
+          "sensitive_override": false
+        },
+        "children": []
+      }
+    ]
+  },
+  "confidence": null,
+  "trace": [
+    {
+      "stage": "routing",
+      "requested": {
+        "capability": "speech.meeting",
+        "options": {
+          "min_speakers": 2,
+          "max_speakers": 2,
+          "exclusive": true,
+          "allow_remote": false
+        }
+      },
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "candidates": [
+        {
+          "capability": "speech.meeting",
+          "provider": "composite",
+          "model": "runtime-composite-1",
+          "quality": 0.82,
+          "estimated_latency_ms": 20,
+          "memory_mb": 128,
+          "local": true,
+          "commercial": true,
+          "available": true,
+          "allowed": true,
+          "score": 0.794625,
+          "reasons": []
+        }
+      ],
+      "rejected": [],
+      "selected": {
+        "capability": "speech.meeting",
+        "provider": "composite",
+        "model": "runtime-composite-1",
+        "quality": 0.82,
+        "estimated_latency_ms": 20,
+        "memory_mb": 128,
+        "local": true,
+        "commercial": true,
+        "available": true,
+        "allowed": true,
+        "score": 0.794625,
+        "reasons": []
+      },
+      "reason": "highest deterministic utility score; ties are resolved by provider and model name"
+    },
+    {
+      "stage": "policy",
+      "profile": "balanced",
+      "constraints": {
+        "max_latency_ms": null,
+        "max_memory_mb": null,
+        "min_confidence": 0.7,
+        "allow_remote": false,
+        "local_only": true,
+        "fallback": true,
+        "profile": "balanced"
+      },
+      "decision": {
+        "allowed": true,
+        "reasons": []
+      }
+    },
+    {
+      "capability": "audio.denoise",
+      "provider": "deepfilternet",
+      "model": "deepfilternet-2",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "capability": "audio.vad",
+      "provider": "silero-vad",
+      "model": "silero-vad-v5",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "capability": "audio.transcribe",
+      "provider": "whisper.cpp",
+      "model": "ggml-base.en",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "capability": "speech.diarize",
+      "provider": "pyannote",
+      "model": "pyannote-community-1",
+      "error": null,
+      "status": "completed"
+    },
+    {
+      "stage": "verification",
+      "mode": "none",
+      "status": "unavailable",
+      "threshold": 0.7
+    }
+  ]
+}
