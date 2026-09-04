@@ -18,9 +18,9 @@ The capability layer between AI applications and specialist intelligence.
 </div>
 
 Specialist OS is the capability layer for AI products that need to see, hear,
-read and speak. It turns specialist intelligence into product primitives such as
-`vision.detect`, `vision.ocr`, `audio.transcribe` and `speech.synthesize`, ready
-to flow into real product workflows.
+read and speak. It turns specialist intelligence into product primitives for
+object detection, segmentation, OCR, depth, screen understanding, document
+extraction, transcription and speech, ready to flow into real product workflows.
 
 The open-source `specialist-runtime` implementation discovers providers, chooses
 the right execution path for the request, and returns one result contract that
@@ -94,20 +94,41 @@ Runtime data is stored under `~/.specialist/` by default. Set
 `SPECIALIST_HOME` to use a dedicated location. Registered model artifacts are
 checked for availability and SHA256 integrity before execution.
 
-## See it in action
+## Capability showcase
 
-This detection run uses the pinned Ultralytics YOLO11s provider and returns one
-bus and four people with confidence scores in the normalized result envelope.
-The same contract is available to every interface, so a prototype workflow can
-flow directly into a background job or a customer-facing feature.
+Every capability has a clear product job and a measurable evaluation surface:
+compare quality, latency and resource cost per route without changing your
+application integration. The reference providers below cover visual perception,
+document intelligence, interface understanding and voice, while sharing one
+result contract and the same routing, caching and deployment surface.
+
+| Capability | Reference intelligence | Product outcome | CLI |
+| --- | --- | --- | --- |
+| `vision.detect` | YOLO | Find people, vehicles, products and safety events in live or recorded images | `specialist detect` |
+| `vision.segment` | SAM | Turn an object into a precise pixel mask for editing, inspection or robotics | `specialist segment` |
+| `vision.ocr` | PaddleOCR | Convert invoices, forms and screenshots into searchable structured text | `specialist ocr` |
+| `vision.depth` | Depth Anything V2 | Add spatial understanding to AR, navigation and scene automation | `specialist depth` |
+| `screen.parse` | OmniParser | Turn a screen into actionable UI targets for agents and testing | `specialist parse-screen` |
+| `document.parse` | MinerU | Extract layout, tables and content from PDFs and office documents | `specialist parse-document` |
+| `audio.transcribe` | whisper.cpp | Bring meetings, calls and media into search and workflow automation | `specialist transcribe` |
+| `audio.vad` | Silero VAD | Detect speech intervals for responsive, low-latency voice experiences | `specialist vad` |
+| `speech.synthesize` | Fish Audio S2 / system TTS | Give assistants, products and content pipelines a consistent voice | `specialist speak` |
+| `speech.clone_voice` | Fish Audio S2 | Create a controlled voice identity for a defined product or content workflow | `specialist clone-voice` |
+
+### One contract, many workflows
+
+Combine capabilities into a single product flow: detect and segment an object,
+read the text around it, estimate its depth, then hand the structured result to
+an agent or a customer-facing feature. The runtime keeps provider selection,
+artifacts, confidence and provenance consistent across every step.
 
 <p align="center">
-  <img src="docs/assets/real-yolo-bus.jpg" alt="Real Specialist Runtime YOLO11s output showing one bus and four people detected in a street photo" width="810">
+  <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist Runtime YOLO11s result detecting one bus and four people in a street photo" width="810">
 </p>
 
-<p align="center"><sub>Provider: <code>yolo</code> · Model: <code>yolo11s</code> · Package: <code>ultralytics==8.3.0</code> · Device: CPU · Input: <a href="https://www.ultralytics.com/images/bus.jpg">Ultralytics bus.jpg</a></sub></p>
+<p align="center"><sub>Live reference result · <code>yolo</code> / <code>yolo11s</code> · CPU · <a href="https://www.ultralytics.com/images/bus.jpg">Ultralytics bus.jpg</a></sub></p>
 
-Reproduce it with the pinned registry artifact:
+Reproduce the result with the pinned registry artifact:
 
 ```bash
 curl -L https://www.ultralytics.com/images/bus.jpg -o bus.jpg
@@ -117,22 +138,7 @@ specialist --backend real --isolate install vision.detect \
 specialist --backend real --isolate detect bus.jpg --json
 ```
 
-## Core capabilities
-
-| Capability | Reference provider | CLI |
-| --- | --- | --- |
-| `vision.detect` | YOLO | `specialist detect` |
-| `vision.segment` | SAM | `specialist segment` |
-| `vision.ocr` | PaddleOCR | `specialist ocr` |
-| `vision.depth` | Depth Anything V2 | `specialist depth` |
-| `screen.parse` | OmniParser | `specialist parse-screen` |
-| `document.parse` | MinerU | `specialist parse-document` |
-| `audio.transcribe` | whisper.cpp | `specialist transcribe` |
-| `audio.vad` | Silero VAD | `specialist vad` |
-| `speech.synthesize` | Fish Audio S2 / system TTS | `specialist speak` |
-| `speech.clone_voice` | Fish Audio S2 | `specialist clone-voice` |
-
-Install a capability, a pack or the complete reference set:
+Install one capability, a pack or the complete reference set:
 
 ```bash
 specialist install vision.ocr
@@ -141,42 +147,10 @@ specialist pack install vision-core
 specialist install all
 ```
 
-### Product voices with Fish Audio
-
-Voice is a product asset: a consistent brand narrator, a familiar assistant, a
-support agent that can speak naturally, or a content pipeline that can publish
-in many languages. Fish Audio S2 adds high-fidelity synthesis and voice cloning
-to the same capability layer, so teams can add these experiences while the rest
-of the product stays independent of the model runtime.
-
-Fish Audio runs as an isolated HTTP provider process. Point the adapter at an
-operator-managed Fish server, or configure a start command for on-demand
-lifecycle management:
-
-```bash
-export SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080
-export SPECIALIST_FISH_AUDIO_COMMAND='python /path/to/fish-speech/tools/api_server.py --listen 127.0.0.1:8080'
-specialist provider install fish_audio
-specialist provider start fish_audio
-specialist speak 'Hello from Specialist OS' --profile quality --json
-```
-
-Generated audio is returned as a content-addressed `artifact://` reference,
-which makes it easy to cache, audit and hand off between services. Voice
-references are explicitly imported and stay local by default:
-
-```bash
-specialist voice import ./reference.wav --name my-voice
-specialist speak 'A familiar voice' --voice voice://my-voice --provider fish_audio --json
-specialist clone-voice 'This is a clone' ./reference.wav --json
-```
-
-The Fish Audio Research License covers non-commercial use. Commercial launches
-require license terms that match your deployment and voice data. Remote
-reference audio requires the explicit `privacy.allow_remote=true` policy (or a
-request-level `allow_remote` setting), keeping voice data local by default.
-Standard synthesis can use the host OS TTS executable when a lightweight
-deployment fits the product; the result records the active quality profile.
+Speech capabilities use Fish Audio S2 or the host system TTS through the same
+capability layer. Configure the Fish server when voice synthesis or cloning is
+part of your product deployment; the [deployment guide](docs/deployment.md)
+covers server lifecycle, licensing and voice-data policy.
 
 ## Advanced runtime
 

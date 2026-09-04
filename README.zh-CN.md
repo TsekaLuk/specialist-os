@@ -18,8 +18,8 @@
 </div>
 
 Specialist OS 是面向 AI 产品的能力层，让应用直接获得看、听、读、说的能力。
-它把专业智能封装成 `vision.detect`、`vision.ocr`、`audio.transcribe`、
-`speech.synthesize` 等稳定的产品原语，让能力可以直接进入真实业务流程。
+它把目标检测、分割、OCR、深度、界面理解、文档解析、转写和语音等专业智能封装
+成稳定的产品原语，让能力可以直接进入真实业务流程。
 
 开源实现 `specialist-runtime` 负责发现 Provider、根据请求选择执行路径，并返回
 统一的结果协议。你的产品只依赖能力名称；模型、硬件、隔离和 Provider 的变化由
@@ -88,17 +88,36 @@ specialist --backend real --isolate ocr invoice.png --json
 Runtime 数据默认保存在 `~/.specialist/`。可以通过 `SPECIALIST_HOME` 指定独立
 目录。注册的模型 Artifact 会在执行前完成存在性和 SHA256 完整性校验。
 
-## 看看实际效果
+## 能力展示
 
-下面的检测使用锁定版本的 Ultralytics YOLO11s Provider，在统一结果协议中返回了
-1 辆公交车和 4 个人及其置信度。同一份结果契约可以被所有接口复用，让原型流程
-可以直接演进为后台任务或面向客户的功能。
+每项能力都对应一个明确的产品任务，也是可量化的评估面：可以在不改业务接入的前提
+下比较每条路由的质量、延迟和资源成本。参考 Provider 覆盖视觉感知、文档理解、界面
+操作和语音，同时共享同一套结果协议、路由、缓存与部署方式。
+
+| Capability | 参考智能 | 产品结果 | CLI |
+| --- | --- | --- | --- |
+| `vision.detect` | YOLO | 在实时或录制图像中识别人、车辆、商品和安全事件 | `specialist detect` |
+| `vision.segment` | SAM | 生成精确到像素的目标掩码，用于编辑、质检和机器人流程 | `specialist segment` |
+| `vision.ocr` | PaddleOCR | 把发票、表单和截图转成可搜索的结构化文字 | `specialist ocr` |
+| `vision.depth` | Depth Anything V2 | 为 AR、导航和场景自动化提供空间理解 | `specialist depth` |
+| `screen.parse` | OmniParser | 把屏幕解析成 Agent 和测试可以操作的 UI 目标 | `specialist parse-screen` |
+| `document.parse` | MinerU | 从 PDF 和办公文档中提取版面、表格和正文 | `specialist parse-document` |
+| `audio.transcribe` | whisper.cpp | 把会议、通话和媒体内容接入搜索与流程自动化 | `specialist transcribe` |
+| `audio.vad` | Silero VAD | 检测语音区间，构建响应更快的实时语音体验 | `specialist vad` |
+| `speech.synthesize` | Fish Audio S2 / 系统 TTS | 为助手、产品和内容生产线提供一致的声音 | `specialist speak` |
+| `speech.clone_voice` | Fish Audio S2 | 为明确的产品或内容流程建立可控的声音身份 | `specialist clone-voice` |
+
+### 一套契约，组合出完整流程
+
+可以把多项能力串成一条产品流程：先检测并分割目标，再读取周边文字、估计场景
+深度，最后把结构化结果交给 Agent 或面向客户的功能。Runtime 让每一步都保持一致
+的 Provider 选择、Artifact、置信度和来源信息。
 
 <p align="center">
-  <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist Runtime YOLO11s 真实推理结果，街景中检测到一辆公交车和四个人" width="810">
+  <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist Runtime YOLO11s 实际结果，街景中检测到一辆公交车和四个人" width="810">
 </p>
 
-<p align="center"><sub>Provider：<code>yolo</code> · Model：<code>yolo11s</code> · Package：<code>ultralytics==8.3.0</code> · Device：CPU · Input：<a href="https://www.ultralytics.com/images/bus.jpg">Ultralytics bus.jpg</a></sub></p>
+<p align="center"><sub>实际参考结果 · <code>yolo</code> / <code>yolo11s</code> · CPU · <a href="https://www.ultralytics.com/images/bus.jpg">Ultralytics bus.jpg</a></sub></p>
 
 使用 Registry 中锁定的 Artifact 复现：
 
@@ -110,22 +129,7 @@ specialist --backend real --isolate install vision.detect \
 specialist --backend real --isolate detect bus.jpg --json
 ```
 
-## 核心能力
-
-| Capability | 参考 Provider | CLI |
-| --- | --- | --- |
-| `vision.detect` | YOLO | `specialist detect` |
-| `vision.segment` | SAM | `specialist segment` |
-| `vision.ocr` | PaddleOCR | `specialist ocr` |
-| `vision.depth` | Depth Anything V2 | `specialist depth` |
-| `screen.parse` | OmniParser | `specialist parse-screen` |
-| `document.parse` | MinerU | `specialist parse-document` |
-| `audio.transcribe` | whisper.cpp | `specialist transcribe` |
-| `audio.vad` | Silero VAD | `specialist vad` |
-| `speech.synthesize` | Fish Audio S2 / 系统 TTS | `specialist speak` |
-| `speech.clone_voice` | Fish Audio S2 | `specialist clone-voice` |
-
-可以安装单项能力、Capability Pack 或完整参考能力集：
+安装单项能力、Capability Pack 或完整参考能力集：
 
 ```bash
 specialist install vision.ocr
@@ -134,36 +138,9 @@ specialist pack install vision-core
 specialist install all
 ```
 
-### 用 Fish Audio 打造产品声音
-
-声音本身就是产品资产：统一的品牌旁白、熟悉的智能助手、自然交流的客服，或支持
-多语言发布的内容生产线。Fish Audio S2 在同一能力层提供高保真合成和声音克隆，
-业务代码沿用同一套能力接口，就能把这些体验接入产品并持续迭代。
-
-Fish Audio 以隔离的 HTTP Provider 进程运行。可以连接运维启动的 Fish Server，也
-可以配置按需启动命令：
-
-```bash
-export SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080
-export SPECIALIST_FISH_AUDIO_COMMAND='python /path/to/fish-speech/tools/api_server.py --listen 127.0.0.1:8080'
-specialist provider install fish_audio
-specialist provider start fish_audio
-specialist speak '来自 Specialist OS 的高保真语音' --profile quality --json
-```
-
-生成结果写入内容寻址 Artifact Store，并返回 `artifact://` 引用，便于缓存、审计和
-跨服务传递。声音引用必须显式导入，并且默认保留在本地：
-
-```bash
-specialist voice import ./reference.wav --name my-voice
-specialist speak '使用我的声音' --voice voice://my-voice --provider fish_audio --json
-specialist clone-voice '这是一段克隆语音' ./reference.wav --json
-```
-
-Fish Audio Research License 适用于非商业使用。商业发布请确保部署方式和声音
-数据符合相应许可证要求。远程 reference audio 需要显式设置
-`privacy.allow_remote=true`（或请求级 `allow_remote`），声音数据默认留在本地。
-面向轻量部署时，普通合成可以使用主机的系统 TTS，并在结果中记录当前质量配置。
+语音能力通过同一套 Capability API 接入 Fish Audio S2 或主机系统 TTS。部署语音合成
+或声音克隆时，参见[部署指南](docs/deployment.md)了解 Server 生命周期、许可证和
+声音数据策略。
 
 ## Advanced Runtime
 
