@@ -204,6 +204,68 @@ The cache records a model only after verified bytes are atomically visible.
 
 ---
 
+## Reproducible Python Lock Contract
+
+### 1. Scope / Trigger
+
+Apply this contract whenever `pyproject.toml`, the project version, or Python
+dependency metadata changes. Developer-level uv mirror settings must not alter
+the committed supply-chain identity.
+
+### 2. Signatures
+
+```bash
+uv lock --no-config --default-index https://pypi.org/simple
+uv lock --check --no-config --default-index https://pypi.org/simple
+```
+
+### 3. Contracts
+
+- Committed registry and artifact URLs in `uv.lock` use PyPI and
+  `files.pythonhosted.org`.
+- Local or regional mirrors may be used for developer installs, but never to
+  generate the release lock.
+- CI and release workflows run the exact same `uv lock --check` command.
+
+### 4. Validation & Error Matrix
+
+| Condition | Result |
+| --- | --- |
+| Lock was generated through a configured mirror | CI reports that the lock needs updating |
+| Project metadata changed without relocking | CI fails before audit/build steps |
+| Official-source lock is current | Check exits zero without modifying the file |
+
+### 5. Good / Base / Bad Cases
+
+- Good: regenerate with `--no-config --default-index` after a version bump.
+- Base: use a mirror for local installation while leaving `uv.lock` unchanged.
+- Bad: run plain `uv lock` and commit machine-specific mirror URLs.
+
+### 6. Tests Required
+
+- Run the exact CI lock check before committing and before tagging a release.
+- Inspect lock diffs for unexpected registry host changes.
+- Keep `pip-audit --progress-spinner off` green after relocking.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```bash
+uv lock
+```
+
+#### Correct
+
+```bash
+uv lock --no-config --default-index https://pypi.org/simple
+```
+
+The second command ignores user configuration and produces the same lock on
+developer machines and GitHub runners.
+
+---
+
 ## Forbidden Patterns
 
 <!-- Patterns that should never be used and why -->
