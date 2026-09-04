@@ -37,6 +37,23 @@ Configure `SPECIALIST_FISH_AUDIO_URL`, optionally
 `speech.synthesize` or `speech.clone_voice`. The provider remains isolated and
 uses a single request per model instance.
 
+For a local Fish Speech S2 service, start the upstream server from its checked-out
+Fish Speech release:
+
+```bash
+python /path/to/fish-speech/tools/api_server.py --listen 127.0.0.1:8080
+```
+
+Use the absolute path to the checked-out Fish Speech release in
+`SPECIALIST_FISH_AUDIO_COMMAND` when Specialist OS manages this process.
+
+Then point Specialist OS at the service and run the readiness check:
+
+```bash
+export SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080
+specialist --backend real doctor --strict --json
+```
+
 The release contains a CycloneDX SBOM (`sbom.cdx.json`) and GitHub build
 provenance attestation. Keep both with the deployed package record and verify
 the published `SHA256SUMS` file before promotion.

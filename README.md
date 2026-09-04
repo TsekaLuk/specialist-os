@@ -155,7 +155,7 @@ lifecycle management:
 
 ```bash
 export SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080
-export SPECIALIST_FISH_AUDIO_COMMAND='fish-speech-server --listen 127.0.0.1:8080'
+export SPECIALIST_FISH_AUDIO_COMMAND='python /path/to/fish-speech/tools/api_server.py --listen 127.0.0.1:8080'
 specialist provider install fish_audio
 specialist provider start fish_audio
 specialist speak 'Hello from Specialist OS' --profile quality --json
@@ -282,6 +282,14 @@ Run the end-to-end suite locally:
 
 ```bash
 python -m unittest discover -s tests/e2e -v
+```
+
+Run the Fish Audio integration against a live S2 Server:
+
+```bash
+SPECIALIST_RUN_FISH_AUDIO_E2E=1 \
+SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080 \
+python -m unittest tests.e2e.test_real_fish_audio_e2e -v
 ```
 
 For a provider-backed deployment, install the provider package and its pinned

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Completed the Fish Audio S2 provider contract: official Server request fields,
+  style controls, reference artifacts, remote-node resource routing, audio
+  validation, speech performance metrics and live-server E2E coverage.
 - Hardened real-provider installation and acceptance: pinned provider
   environments, offline command-provider boundaries, venv console-script PATH
   handling, PaddleOCR PP-OCRv5 compatibility, and process-group cleanup on

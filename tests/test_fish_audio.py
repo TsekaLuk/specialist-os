@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import tempfile
@@ -11,11 +12,12 @@ import unittest
 import wave
 import sys
 import socket
+from unittest.mock import patch
 
 from specialist.runtime import SpecialistRuntime
 from specialist.voices import VoiceRegistry
 from specialist.providers.fish_audio import FishAudioProvider
-from specialist.providers.fish_audio.client import FishAudioClient
+from specialist.providers.fish_audio.client import FishAudioClient, FishAudioError
 from specialist.providers.fish_audio.lifecycle import FishAudioLifecycle
 
 
@@ -117,6 +119,8 @@ class FishAudioProviderTests(unittest.TestCase):
             self.assertNotIn("path", audio)
             self.assertEqual(runtime.artifacts.resolve(audio["artifact"]).read_bytes(), _wav())
             self.assertEqual(_FishContractHandler.last_request["text"], "Hello")
+            self.assertEqual(result["performance"]["audio_duration_ms"], 100.0)
+            self.assertGreaterEqual(result["performance"]["rtf"], 0)
 
     def test_json_base64_audio_payload_is_decoded(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -139,12 +143,125 @@ class FishAudioProviderTests(unittest.TestCase):
             reference.write_bytes(_wav())
             runtime = self._runtime(root)
             try:
-                result = runtime.run("speech.clone_voice", reference, {"text": "Hello", "provider": "fish_audio"})
+                result = runtime.run("speech.clone_voice", reference, {"text": "Hello", "reference_text": "Reference speech", "provider": "fish_audio"})
             finally:
                 runtime.close()
             self.assertIsNone(result["error"], result)
             self.assertEqual(result["provider"], "fish_audio")
-            self.assertIn("reference_audio", _FishContractHandler.last_request)
+            self.assertIn("references", _FishContractHandler.last_request)
+            self.assertEqual(_FishContractHandler.last_request["references"][0]["text"], "Reference speech")
+            self.assertNotIn("reference_text", _FishContractHandler.last_request)
+
+    def test_clone_accepts_artifact_uri_reference(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            reference = root / "reference.wav"
+            reference.write_bytes(_wav())
+            runtime = self._runtime(root)
+            try:
+                artifact = runtime.artifacts.put_file(reference, mime="audio/wav")
+                result = runtime.run(
+                    "speech.clone_voice",
+                    artifact.uri,
+                    {"text": "Hello", "reference_audio": artifact.uri, "provider": "fish_audio"},
+                )
+            finally:
+                runtime.close()
+            self.assertIsNone(result["error"], result)
+            self.assertIn("references", _FishContractHandler.last_request)
+
+    def test_style_and_stream_options_map_to_fish_contract(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            text = root / "text.txt"
+            text.write_text("Hello", encoding="utf-8")
+            runtime = self._runtime(root)
+            try:
+                result = runtime.run(
+                    "speech.synthesize",
+                    text,
+                    {"text": "Hello", "style": {"instruction": "whisper softly"}, "language": "en", "stream": True, "provider": "fish_audio"},
+                )
+            finally:
+                runtime.close()
+            self.assertIsNone(result["error"], result)
+            self.assertEqual(_FishContractHandler.last_request["text"], "[whisper softly] Hello")
+            self.assertTrue(_FishContractHandler.last_request["streaming"])
+            self.assertNotIn("language", _FishContractHandler.last_request)
+            self.assertIn("detects language", result["warnings"][0])
+
+    def test_streaming_rejects_non_wav_format(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            text = root / "text.txt"
+            text.write_text("Hello", encoding="utf-8")
+            runtime = self._runtime(root)
+            try:
+                result = runtime.run(
+                    "speech.synthesize",
+                    text,
+                    {"text": "Hello", "format": "ogg", "stream": True, "provider": "fish_audio"},
+                )
+            finally:
+                runtime.close()
+            self.assertEqual(result["error"]["code"], "invalid_audio_format")
+
+    def test_provider_options_keep_generic_contract_fields_protected(self):
+        client = FishAudioClient(f"http://127.0.0.1:{self.server.server_port}")
+        with self.assertRaises(FishAudioError) as native_error:
+            client.synthesize(text="Hello", provider_options={"native_text_controls": "false"})
+        self.assertEqual(native_error.exception.code, "invalid_provider_options")
+        with self.assertRaises(FishAudioError) as reserved_error:
+            client.synthesize(text="Hello", provider_options={"stream": False})
+        self.assertEqual(reserved_error.exception.code, "invalid_provider_options")
+
+    def test_remote_server_is_not_gated_by_client_host_memory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            text = root / "text.txt"
+            text.write_text("Hello", encoding="utf-8")
+            hardware = {"os": "Darwin 25", "architecture": "arm64", "memory_gb": 8, "memory_limit_gb": None, "cuda": False, "mps": True}
+            class RemoteFishProvider(FishAudioProvider):
+                @property
+                def remote(self):
+                    return True
+
+            with patch.dict(os.environ, {"SPECIALIST_FISH_AUDIO_URL": f"http://127.0.0.1:{self.server.server_port}", "SPECIALIST_FISH_AUDIO_START_POLICY": "manual"}, clear=False), patch("specialist.runtime.detect_hardware", return_value=hardware):
+                provider = RemoteFishProvider("speech.synthesize")
+                runtime = SpecialistRuntime(home=root / "home", backend="real", provider_overrides={"speech.synthesize": provider})
+                try:
+                    result = runtime.run("speech.synthesize", text, {"text": "Hello", "profile": "quality", "allow_remote": True, "local_only": False})
+                finally:
+                    runtime.close()
+            self.assertIsNone(result["error"], result)
+            self.assertEqual(result["provider"], "fish_audio")
+
+    def test_doctor_returns_structured_state_for_invalid_endpoint(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            hardware = {"os": "Darwin 25", "architecture": "arm64", "memory_gb": 8, "memory_limit_gb": None, "cuda": False, "mps": True}
+            with patch.dict(os.environ, {"SPECIALIST_FISH_AUDIO_URL": "not-an-http-url"}, clear=False), patch("specialist.runtime.detect_hardware", return_value=hardware):
+                runtime = SpecialistRuntime(home=root / "home", backend="real")
+                try:
+                    payload = runtime.doctor()
+                finally:
+                    runtime.close()
+            fish = next(item for item in payload["capabilities"] if item["capability"] == "speech.synthesize")
+            self.assertEqual(fish["status"], "unavailable")
+            self.assertEqual(fish["error"]["code"], "provider_doctor_failed")
+
+    def test_run_returns_structured_error_for_invalid_endpoint(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            text = root / "text.txt"
+            text.write_text("Hello", encoding="utf-8")
+            with patch.dict(os.environ, {"SPECIALIST_FISH_AUDIO_URL": "not-an-http-url"}, clear=False):
+                runtime = SpecialistRuntime(home=root / "home", backend="real")
+                try:
+                    result = runtime.run("speech.synthesize", text, {"text": "Hello", "provider": "fish_audio", "fallback": False})
+                finally:
+                    runtime.close()
+            self.assertEqual(result["error"]["code"], "routing_provider_error")
 
     def test_malformed_audio_fails_closed(self):
         with tempfile.TemporaryDirectory() as temporary:

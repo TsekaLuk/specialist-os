@@ -145,7 +145,7 @@ Fish Audio 以隔离的 HTTP Provider 进程运行。可以连接运维启动的
 
 ```bash
 export SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080
-export SPECIALIST_FISH_AUDIO_COMMAND='fish-speech-server --listen 127.0.0.1:8080'
+export SPECIALIST_FISH_AUDIO_COMMAND='python /path/to/fish-speech/tools/api_server.py --listen 127.0.0.1:8080'
 specialist provider install fish_audio
 specialist provider start fish_audio
 specialist speak '来自 Specialist OS 的高保真语音' --profile quality --json
@@ -264,6 +264,14 @@ Specialist OS 将专业模型周边的运行能力一并交付：隔离 Worker�
 python -m unittest discover -s tests/e2e -v
 ```
 
+连接正在运行的 Fish Audio S2 Server 执行真实联调：
+
+```bash
+SPECIALIST_RUN_FISH_AUDIO_E2E=1 \
+SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080 \
+python -m unittest tests.e2e.test_real_fish_audio_e2e -v
+```
+
 Provider-backed 部署使用锁定版本的 Provider Package 和模型 Artifact。Fish Audio
 使用运维管理的 HTTP Server，模型留在 GPU 服务中，应用仍然调用同一套 Capability API。
 
@@ -289,7 +297,7 @@ PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 \
   maturin develop --manifest-path rust-core/Cargo.toml --features python
 ```
 
-没有安装扩展时，Python 会自动使用行为等价的实现。
+Python 默认提供兼容实现，也可以切换到 Rust 原生扩展。
 
 ## 开发
 

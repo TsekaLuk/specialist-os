@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import base64
 import json
-import mimetypes
 from pathlib import Path
 import urllib.error
 from urllib.parse import urlsplit
@@ -68,21 +67,50 @@ class FishAudioClient:
             raise FishAudioError("Fish Audio server is not ready", code="fish_audio_unhealthy")
         return value
 
+    @staticmethod
+    def _upstream_format(value: str) -> str:
+        # Fish Speech names Ogg output ``opus`` in ServeTTSRequest. The
+        # capability API keeps ``ogg`` as the portable container name.
+        return "opus" if value == "ogg" else value
+
+    @staticmethod
+    def _styled_text(text: str, style: dict | str | None, *, native_text_controls: bool) -> str:
+        if native_text_controls or not style:
+            return text
+        instruction = style.get("instruction") if isinstance(style, dict) else style
+        if not isinstance(instruction, str) or not instruction.strip():
+            return text
+        instruction = instruction.strip()
+        tag = instruction if instruction.startswith("[") and instruction.endswith("]") else f"[{instruction}]"
+        return f"{tag} {text}"
+
     def synthesize(self, *, text: str, format: str = "wav", language: str | None = None, style: dict | str | None = None, reference_id: str | None = None, reference_audio: Path | None = None, reference_text: str | None = None, stream: bool = False, provider_options: dict | None = None, timeout: float | None = None) -> tuple[bytes, str, dict]:
         if not isinstance(text, str) or not text.strip():
             raise FishAudioError("speech text must be a non-empty string", code="invalid_speech_text", retryable=False)
         output_format = str(format).strip().lower()
-        if output_format not in {"wav", "mp3", "ogg", "flac"}:
-            raise FishAudioError("audio format must be wav, mp3, ogg or flac", code="invalid_audio_format", retryable=False)
-        payload: dict = {"text": text, "format": output_format, "stream": bool(stream)}
-        if language:
-            payload["language"] = language
-        if style:
-            payload["style"] = style
+        if output_format not in {"wav", "mp3", "ogg"}:
+            raise FishAudioError("Fish Audio supports wav, mp3 or ogg output", code="invalid_audio_format", retryable=False)
+        if stream and output_format != "wav":
+            raise FishAudioError("Fish Audio streaming supports WAV format only", code="invalid_audio_format", retryable=False)
+        if provider_options is not None and not isinstance(provider_options, dict):
+            raise FishAudioError("provider_options.fish_audio must be an object", code="invalid_provider_options", retryable=False)
+        provider_values = dict(provider_options or {})
+        native_text_controls = provider_values.pop("native_text_controls", False)
+        if not isinstance(native_text_controls, bool):
+            raise FishAudioError("provider_options.fish_audio.native_text_controls must be boolean", code="invalid_provider_options", retryable=False)
+        reserved = {"text", "format", "stream", "streaming", "language", "style", "voice", "audio", "profile", "provider", "allow_remote", "local_only", "fallback", "timeout_seconds", "reference_id", "reference_audio", "reference_audio_mime", "reference_text", "references"}
+        if reserved.intersection(provider_values):
+            raise FishAudioError("provider_options.fish_audio cannot override generic speech fields", code="invalid_provider_options", retryable=False)
+        payload: dict = {
+            "text": self._styled_text(text, style, native_text_controls=native_text_controls),
+            "format": self._upstream_format(output_format),
+            "streaming": bool(stream),
+        }
+        # Fish Speech detects language from the input text. Its current
+        # Server contract has no language field, so keep the generic hint out
+        # of the upstream request.
         if reference_id:
             payload["reference_id"] = reference_id
-        if reference_text:
-            payload["reference_text"] = reference_text
         if reference_audio is not None:
             reference_audio = Path(reference_audio).expanduser()
             if reference_audio.is_symlink() or not reference_audio.is_file():
@@ -98,16 +126,13 @@ class FishAudioClient:
                 raise FishAudioError(f"reference audio cannot be read: {reference_audio}", code="reference_audio_unavailable", retryable=False) from exc
             # This is request transport only. Generated results are always
             # persisted as files and never returned as base64.
-            payload["reference_audio"] = encoded
-            payload["reference_audio_mime"] = mimetypes.guess_type(reference_audio.name)[0] or "audio/wav"
-            payload["references"] = [{"audio": encoded, "text": reference_text}]
-        if provider_options:
-            if not isinstance(provider_options, dict):
-                raise FishAudioError("provider_options.fish_audio must be an object", code="invalid_provider_options", retryable=False)
-            reserved = {"text", "format", "stream", "language", "style", "reference_id", "reference_audio", "reference_text"}
-            if reserved.intersection(provider_options):
-                raise FishAudioError("provider_options.fish_audio cannot override generic speech fields", code="invalid_provider_options", retryable=False)
-            payload.update(provider_options)
+            payload["references"] = [{"audio": encoded, "text": reference_text or ""}]
+        if provider_values:
+            payload.update(provider_values)
+        try:
+            json.dumps(payload, ensure_ascii=True, separators=(",", ":"), allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise FishAudioError(f"provider_options.fish_audio contains non-JSON values: {exc}", code="invalid_provider_options", retryable=False) from exc
         status, headers, raw = self._request("/v1/tts", method="POST", payload=payload, timeout=timeout)
         if status != 200 or not raw:
             raise FishAudioError(f"Fish Audio returned an empty response (HTTP {status})", code="fish_audio_empty_audio", retryable=False)

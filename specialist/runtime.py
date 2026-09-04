@@ -224,6 +224,16 @@ class SpecialistRuntime:
         installations = {name: self.cache.installation(name) for name in CAPABILITIES}
         return DeterministicRouter(policy=self.policy, specs=CAPABILITIES, providers=self.providers, installations=installations, benchmarks=self.benchmarks, hardware=detect_hardware())
 
+    @staticmethod
+    def _provider_is_remote(provider) -> bool:
+        try:
+            return bool(getattr(provider, "remote", False) or getattr(provider, "node_id", None))
+        except Exception:
+            # Doctor/readiness must still report a malformed provider endpoint
+            # as unavailable instead of failing before it can expose the
+            # actionable configuration error.
+            return False
+
     def _route_provider(self, capability: str, provider_name: str):
         for key, provider in self.providers.items():
             if getattr(provider, "name", None) == provider_name and getattr(provider, "capability", capability) == capability:
@@ -273,7 +283,8 @@ class SpecialistRuntime:
                 if platform not in model_spec.platforms:
                     check = {**check, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
                 effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
-                if effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
+                provider_is_remote = self._provider_is_remote(provider)
+                if check.get("status") == "ready" and not provider_is_remote and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
                     check = {**check, "status": "not ready", "error": {"code": "insufficient_memory", "message": f"model requires {model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB"}}
                 if check.get("status") != "ready":
                     state = "unavailable"
@@ -429,7 +440,7 @@ class SpecialistRuntime:
         hardware = detect_hardware()
         capabilities = []
         fixes = []
-        warnings = ["Built-in providers are dependency-free fallbacks. Install the optional backend and a verified model artifact for production inference."]
+        warnings = ["Core capabilities are available through local adapters. Add a provider package and verified model artifact when a managed model deployment is required."]
         if not hardware.get("ffmpeg"):
             warnings.append("FFmpeg is not available; audio and document providers may not work. Install it with the system package manager.")
         if not hardware.get("supported_target"):
@@ -437,13 +448,17 @@ class SpecialistRuntime:
         for spec in CAPABILITIES.values():
             installation = self.cache.installation(spec.name)
             provider = self._provider_for_installation(spec.name, installation)
-            details = provider.doctor(hardware)
+            try:
+                details = provider.doctor(hardware) or {}
+            except Exception as exc:
+                details = {"status": "not ready", "error": {"code": "provider_doctor_failed", "message": str(exc)}}
             model_spec = spec.model_spec(self._model_for(spec, installation, hardware))
             platform = target_id(hardware)
             if platform not in model_spec.platforms:
                 details = {**details, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
             effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
-            if effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
+            provider_is_remote = self._provider_is_remote(provider)
+            if details.get("status") == "ready" and not provider_is_remote and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
                 details = {**details, "status": "not ready", "error": {"code": "insufficient_memory", "message": f"model requires {model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB"}}
             environment = self.environments.status(spec.provider) if spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency] else None
             if environment and environment.get("status") == "ready" and not self.environments.verify(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency]):
@@ -816,8 +831,11 @@ class SpecialistRuntime:
         spec = CAPABILITIES[canonical]
         provider = self.providers[canonical]
         try:
-            path = Path(input_path).expanduser()
-        except TypeError as exc:
+            if canonical == "speech.clone_voice" and isinstance(input_path, str) and input_path.startswith("artifact://"):
+                path = self.artifacts.resolve(input_path)
+            else:
+                path = Path(input_path).expanduser()
+        except (TypeError, ArtifactError, ValueError) as exc:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, {"type": spec.modality, "path": str(input_path)}, "invalid_input", str(exc)).to_dict())
         input_info = {"type": spec.modality, "path": str(path)}
         if not isinstance(raw_options, dict):
@@ -846,6 +864,8 @@ class SpecialistRuntime:
             route = self._router().route(canonical, options)
         except RoutingError as exc:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "routing_unavailable", str(exc), retryable=False, routing=exc.explanation).to_dict())
+        except Exception as exc:
+            return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "routing_provider_error", str(exc), retryable=False).to_dict())
         selected = route["selected"] or {}
         selected_model = str(selected.get("model") or spec.model)
         route_latency = selected.get("estimated_latency_ms")
@@ -864,7 +884,8 @@ class SpecialistRuntime:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "unsupported_device", f"model {requested_model_spec.id} does not support device {requested_device}").to_dict())
         hardware = detect_hardware()
         effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
-        if (self.backend == "real" or getattr(provider, "requires_verified_artifact", False)) and effective_memory_mb and effective_memory_mb < requested_model_spec.memory_mb:
+        provider_is_remote = self._provider_is_remote(provider)
+        if (self.backend == "real" or getattr(provider, "requires_verified_artifact", False)) and not provider_is_remote and effective_memory_mb and effective_memory_mb < requested_model_spec.memory_mb:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, requested_model_spec.id, input_info, "insufficient_memory", f"model requires {requested_model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB").to_dict())
         if not path.exists():
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "input_not_found", f"Input file does not exist: {path}").to_dict())
@@ -929,6 +950,15 @@ class SpecialistRuntime:
             self.cache.update_state(canonical, "running")
             result, warnings = provider.infer(path, options, self.cache)
             performance = {"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}
+            if canonical in {"speech.synthesize", "speech.clone_voice"} and isinstance(result, dict):
+                audio = result.get("audio")
+                duration_ms = audio.get("duration_ms") if isinstance(audio, dict) else None
+                if isinstance(duration_ms, (int, float)) and not isinstance(duration_ms, bool) and duration_ms >= 0:
+                    duration_ms = float(duration_ms)
+                    performance["audio_duration_ms"] = round(duration_ms, 3)
+                    performance["generation_latency_ms"] = performance["latency_ms"]
+                    if duration_ms > 0:
+                        performance["rtf"] = round(performance["latency_ms"] / duration_ms, 6)
             from . import __version__
 
             artifacts = self._collect_artifacts(canonical, result)

@@ -13,7 +13,7 @@ import subprocess
 import tempfile
 import wave
 
-from ...artifacts import ArtifactStore
+from ...artifacts import ArtifactError, ArtifactStore
 from ...voices import VoiceRegistry, VoiceRegistryError
 from ..ipc import WorkerError
 from .client import FishAudioClient, FishAudioError
@@ -35,6 +35,12 @@ def _audio_metadata(path: Path, raw_metadata: dict, mime: str) -> dict:
             raise WorkerError("generated audio is not a valid MPEG stream", code="malformed_audio", retryable=False)
     elif mime in {"audio/ogg", "audio/opus"} and path.read_bytes()[:4] != b"OggS":
         raise WorkerError("generated audio is not a valid Ogg stream", code="malformed_audio", retryable=False)
+    elif mime == "audio/flac" and path.read_bytes()[:4] != b"fLaC":
+        raise WorkerError("generated audio is not a valid FLAC stream", code="malformed_audio", retryable=False)
+    elif mime in {"audio/aiff", "audio/x-aiff"}:
+        header = path.read_bytes()[:12]
+        if len(header) < 12 or header[:4] != b"FORM" or header[8:12] not in {b"AIFF", b"AIFC"}:
+            raise WorkerError("generated audio is not a valid AIFF stream", code="malformed_audio", retryable=False)
     if not path.is_file() or path.stat().st_size == 0:
         raise WorkerError("generated audio is empty", code="malformed_audio", retryable=False)
     metadata.setdefault("sample_rate", None)
@@ -157,6 +163,23 @@ class FishAudioProvider:
         reference_id = fish.get("reference_id") if isinstance(fish, dict) else None
         return reference_id, path
 
+    @staticmethod
+    def _reference_path(value, cache) -> Path:
+        """Resolve a local reference or an Artifact URI inside the worker."""
+        if isinstance(value, str) and value.startswith("artifact://"):
+            try:
+                path = ArtifactStore(Path(getattr(cache, "home", Path.home() / ".specialist")) / "artifacts").resolve(value)
+            except (ArtifactError, OSError) as exc:
+                raise WorkerError(f"reference audio artifact is unavailable: {exc}", code="reference_audio_unavailable", retryable=False) from exc
+        else:
+            try:
+                path = Path(value).expanduser()
+            except TypeError as exc:
+                raise WorkerError("reference audio must be a local path or artifact:// URI", code="reference_audio_unavailable", retryable=False) from exc
+        if path.is_symlink() or not path.is_file():
+            raise WorkerError(f"reference audio is not a regular file: {path}", code="reference_audio_unavailable", retryable=False)
+        return path
+
     def infer(self, input_path, options, cache):
         self._cache = cache
         self.load()
@@ -169,13 +192,13 @@ class FishAudioProvider:
         reference_id, voice_path = self._voice(options.get("voice"), cache)
         reference_audio = None
         if self.capability == "speech.clone_voice":
-            reference_audio = voice_path
-            if reference_audio is None:
-                raw_reference = options.get("reference_audio") or input_path
-                reference_audio = Path(raw_reference).expanduser()
-                if reference_audio.is_symlink() or not reference_audio.is_file():
-                    raise WorkerError(f"reference audio is not a regular file: {reference_audio}", code="reference_audio_unavailable", retryable=False)
-            if self.lifecycle.client.is_remote and not bool(options.get("allow_remote") or os.environ.get("SPECIALIST_PRIVACY_ALLOW_REMOTE") == "1"):
+            # A provider-specific reference_id is already resident on the
+            # Fish server. Reuse it directly and keep the local source audio
+            # inside the trusted boundary; otherwise resolve and send the
+            # caller's reference artifact.
+            if not reference_id:
+                reference_audio = voice_path or self._reference_path(options.get("reference_audio") or input_path, cache)
+            if reference_audio is not None and self.lifecycle.client.is_remote and not bool(options.get("allow_remote") or os.environ.get("SPECIALIST_PRIVACY_ALLOW_REMOTE") == "1"):
                 raise WorkerError("reference audio cannot be sent to a remote provider without privacy.allow_remote=true", code="privacy_remote_disabled", retryable=False)
         elif voice_path is not None and reference_id is None:
             reference_audio = voice_path
@@ -214,9 +237,12 @@ class FishAudioProvider:
         audio_metadata.update({"path": str(generated), "temporary": True})
         voice = options.get("voice") or ("reference" if reference_audio else None)
         result = {"audio": audio_metadata, "voice": voice, "server": self.lifecycle.client.endpoint}
+        warnings = []
+        if options.get("language"):
+            warnings.append("Fish Audio detects language from the input text")
         if options.get("stream"):
             result["streaming"] = {"mode": "complete_then_chunk", "chunked": False}
-        return result, []
+        return result, warnings
 
 
 class SystemTTSProvider:

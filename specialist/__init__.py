@@ -37,7 +37,8 @@ class SpeechFacade:
     def clone_voice(self, text, reference_audio, *, reference_text=None, style=None, format="wav", provider="fish_audio", **options):
         if not isinstance(text, str) or not text.strip():
             raise ValueError("text must be a non-empty string")
-        reference = Path(reference_audio).expanduser()
+        reference_value = str(reference_audio)
+        reference = reference_value if reference_value.startswith("artifact://") else Path(reference_audio).expanduser()
         request = {**options, "text": text, "reference_audio": str(reference), "format": format, "provider": provider}
         if reference_text is not None:
             request["reference_text"] = reference_text
