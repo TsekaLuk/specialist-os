@@ -53,6 +53,7 @@ class CapabilitySpec:
     optional_dependency: str | None = None
     license: str = "See provider terms"
     commercial: bool = False
+    commercial_allowed_by_default: bool = False
     source_url: str | None = None
     models: tuple[ModelSpec, ...] = ()
     semantic_guarantees: tuple[str, ...] = ()
@@ -130,8 +131,8 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
             if (url is None) != (checksum is None):
                 raise RegistryError(f"{name}: artifact.url and artifact.sha256 must be specified together")
             kind = artifact.get("kind", "file")
-            if kind not in {"file", "bundle"}:
-                raise RegistryError(f"{name}: artifact.kind must be 'file' or 'bundle'")
+            if kind not in {"file", "bundle", "server"}:
+                raise RegistryError(f"{name}: artifact.kind must be 'file', 'bundle' or 'server'")
             filename = artifact.get("filename")
             if filename is not None and (not isinstance(filename, str) or not filename or Path(filename).name != filename):
                 raise RegistryError(f"{name}: artifact.filename must be a simple file name")
@@ -154,6 +155,8 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
                 raise RegistryError(f"{name}: bundle artifacts require at least one file")
             if kind == "bundle" and (url is not None or checksum is not None):
                 raise RegistryError(f"{name}: bundle artifacts must use per-file digests and leave top-level URL/SHA256 null")
+            if kind == "server" and (url is not None or checksum is not None or artifact.get("files")):
+                raise RegistryError(f"{name}: server-managed artifacts cannot declare downloadable files")
             model_id = model.get("id")
             platforms = model.get("platforms")
             devices = model.get("devices")
@@ -195,6 +198,7 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
             optional_dependency=item.get("optional_dependency"),
             license=license_info["weights"],
             commercial=bool(license_info.get("commercial", False)),
+            commercial_allowed_by_default=bool(license_info.get("commercial_allowed_by_default", license_info.get("commercial", False))),
             source_url=source_url,
             models=tuple(models),
             semantic_guarantees=tuple(str(value) for value in semantic if str(value).strip()),
@@ -249,7 +253,7 @@ def registry_snapshot() -> list[dict[str, Any]]:
             "bundle": spec.bundle,
             "optional_dependency": spec.optional_dependency,
             "source_url": spec.source_url,
-            "license": {"code": REGISTRY_DOCUMENT.get("code_license", "MIT"), "weights": spec.license, "commercial": spec.commercial},
+            "license": {"code": REGISTRY_DOCUMENT.get("code_license", "MIT"), "weights": spec.license, "commercial": spec.commercial, "commercial_allowed_by_default": spec.commercial_allowed_by_default},
             "semantic_guarantees": list(spec.semantic_guarantees),
             "quality_metrics": list(spec.quality_metrics),
             "supports": dict(spec.supports),

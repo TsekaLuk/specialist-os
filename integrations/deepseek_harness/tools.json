@@ -7,7 +7,9 @@
     {"name": "screen_parse", "capability": "screen.parse"},
     {"name": "document_parse", "capability": "document.parse"},
     {"name": "audio_transcribe", "capability": "audio.transcribe"},
-    {"name": "audio_vad", "capability": "audio.vad"}
+    {"name": "audio_vad", "capability": "audio.vad"},
+    {"name": "speech_synthesize", "capability": "speech.synthesize"},
+    {"name": "speech_clone_voice", "capability": "speech.clone_voice"}
   ],
   "transport": "mcp-or-http",
   "result_envelope": "schemas/result-envelope.schema.json"

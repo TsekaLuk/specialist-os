@@ -1,0 +1,19 @@
+{
+  "provider": "fish_audio",
+  "version": "s2",
+  "capability": ["speech.synthesize", "speech.clone_voice"],
+  "runtime": {
+    "type": "http",
+    "process_isolation": "required",
+    "persistent_server": true,
+    "start_policy": "on-demand",
+    "max_concurrency": 1,
+    "class": "heavy"
+  },
+  "models": {"default_model": "s2-pro", "recommended_gpu_memory_gb": 24},
+  "metrics": {"ttfa_ms": null, "generation_latency_ms": null, "rtf": null, "peak_vram_mb": null, "peak_ram_mb": null},
+  "license": {"family": "Fish Audio Research License", "commercial_allowed_by_default": false, "commercial": false},
+  "platform": {"linux_x64": "supported", "windows_wsl": "supported", "macos_arm64": "experimental"},
+  "network_required": false,
+  "trust_level": "official"
+}

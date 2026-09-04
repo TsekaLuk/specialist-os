@@ -31,7 +31,7 @@ class McpE2ETests(unittest.TestCase):
 
                 server.send({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
                 tools = server.response()
-                self.assertEqual(len(tools["result"]["tools"]), 8)
+                self.assertEqual(len(tools["result"]["tools"]), 10)
                 self.assertIn("vision_ocr", {tool["name"] for tool in tools["result"]["tools"]})
 
                 server.send({

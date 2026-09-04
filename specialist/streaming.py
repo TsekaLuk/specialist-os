@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 import threading
 import time
 import uuid
+import weakref
 from pathlib import Path
 from typing import Any
 
@@ -70,12 +71,18 @@ class SpecialistSession:
 
 class SessionManager:
     def __init__(self, runtime):
-        self.runtime = runtime
+        # The manager lives on the runtime, so keeping a strong reference here
+        # would create a cycle and defer runtime cleanup until interpreter
+        # shutdown. A weak reference lets worker processes close promptly.
+        self._runtime = weakref.ref(runtime)
         self._sessions: dict[str, SpecialistSession] = {}
         self._lock = threading.RLock()
 
     def open(self, capability: str, options: dict[str, Any] | None = None) -> SpecialistSession:
-        session = SpecialistSession(self.runtime, capability, dict(options or {}))
+        runtime = self._runtime()
+        if runtime is None:
+            raise SessionError("runtime is no longer available")
+        session = SpecialistSession(runtime, capability, dict(options or {}))
         with self._lock:
             self._sessions[session.id] = session
         return session

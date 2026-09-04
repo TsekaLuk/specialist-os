@@ -51,9 +51,11 @@ def check_registry(require_artifacts: bool) -> list[str]:
             if digest is not None and (not isinstance(digest, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", digest)):
                 failures.append(f"{name}/{model.get('id')}: artifact SHA256 must be 64 hexadecimal characters")
             kind = artifact.get("kind", "file")
-            if kind not in {"file", "bundle"}:
-                failures.append(f"{name}/{model.get('id')}: artifact kind must be file or bundle")
+            if kind not in {"file", "bundle", "server"}:
+                failures.append(f"{name}/{model.get('id')}: artifact kind must be file, bundle or server")
             files = artifact.get("files") or []
+            if kind == "server" and (url is not None or digest is not None or files):
+                failures.append(f"{name}/{model.get('id')}: server-managed artifacts cannot declare downloadable files")
             if kind == "bundle" and not files:
                 failures.append(f"{name}/{model.get('id')}: bundle artifact must enumerate files")
             if kind == "bundle" and (url is not None or digest is not None):
@@ -74,6 +76,8 @@ def check_registry(require_artifacts: bool) -> list[str]:
                 if kind == "bundle":
                     if not files or any(not isinstance(item, dict) or not item.get("url", "").startswith("https://") or not re.fullmatch(r"[0-9a-fA-F]{64}", str(item.get("sha256", ""))) for item in files):
                         failures.append(f"{name}/{model.get('id')}: every bundle file must have an audited HTTPS URL and SHA256")
+                elif kind == "server":
+                    pass
                 elif url is None or digest is None:
                     failures.append(f"{name}/{model.get('id')}: verified artifact is required for release")
                 elif not url.startswith("https://"):
@@ -87,7 +91,7 @@ def check_registry(require_artifacts: bool) -> list[str]:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Validate Specialist Runtime release metadata")
-    parser.add_argument("--require-artifacts", action="store_true", help="require every registered model to have a pinned URL and SHA256")
+    parser.add_argument("--require-artifacts", action="store_true", help="require downloadable models to have a pinned URL and SHA256; server-managed models are operator-owned")
     parser.add_argument("--tag", help="verify a release tag matches project.version")
     args = parser.parse_args(argv)
     try:

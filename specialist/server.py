@@ -155,7 +155,37 @@ class RuntimeRequestHandler(BaseHTTPRequestHandler):
             capability = endpoint if endpoint in CAPABILITIES else endpoint.replace("_", ".")
             if capability not in CAPABILITIES:
                 return self._send(404, {"error": {"code": "unknown_capability", "message": endpoint}})
-            path = payload.get("path") or payload.get("input")
+            path = payload.get("path")
+            request_options = payload.get("options") or {}
+            if not isinstance(request_options, dict):
+                return self._send(400, {"error": {"code": "invalid_request", "message": "options must be an object"}})
+            structured_input = payload.get("input") if isinstance(payload.get("input"), dict) else None
+            if capability == "speech.synthesize" and structured_input:
+                text = structured_input.get("text")
+                if not isinstance(text, str) or not text.strip():
+                    return self._send(400, {"error": {"code": "invalid_request", "message": "speech.synthesize input.text is required"}})
+                self.runtime.cache.ensure_dirs()
+                temporary = tempfile.NamedTemporaryFile(prefix="specialist-speech-", suffix=".txt", dir=self.runtime.cache.home, mode="w", encoding="utf-8", delete=False)
+                temporary.write(text)
+                temporary.close()
+                path = temporary.name
+                request_options = {**request_options, "text": text}
+            elif capability == "speech.clone_voice" and structured_input:
+                text = structured_input.get("text")
+                reference = structured_input.get("reference") if isinstance(structured_input.get("reference"), dict) else {}
+                reference_audio = reference.get("audio") or structured_input.get("reference_audio")
+                if not isinstance(text, str) or not text.strip() or not isinstance(reference_audio, str):
+                    return self._send(400, {"error": {"code": "invalid_request", "message": "speech.clone_voice input.text and input.reference.audio are required"}})
+                if reference_audio.startswith("artifact://"):
+                    try:
+                        path = str(self.runtime.artifacts.resolve(reference_audio))
+                    except Exception as exc:
+                        return self._send(400, {"error": {"code": "invalid_request", "message": str(exc)}})
+                else:
+                    path = reference_audio
+                request_options = {**request_options, "text": text, "reference_audio": path}
+            elif payload.get("input") is not None:
+                path = payload.get("input")
             temporary = None
             if not isinstance(path, str) and isinstance(payload.get("data_base64"), str):
                 try:
@@ -173,7 +203,7 @@ class RuntimeRequestHandler(BaseHTTPRequestHandler):
             if not isinstance(path, str):
                 return self._send(400, {"error": {"code": "invalid_request", "message": "JSON body requires a string 'path' or data_base64"}})
             try:
-                response = self.runtime.run(capability, path, payload.get("options") or {})
+                response = self.runtime.run(capability, path, request_options)
             finally:
                 if temporary is not None:
                     Path(temporary.name).unlink(missing_ok=True)
@@ -262,9 +292,33 @@ def serve_mcp(runtime, max_request_bytes=4 * 1024 * 1024):
                         tool_name = params.get("name", "").replace("_", ".")
                         capability = tool_name if tool_name in CAPABILITIES else next((name for name in CAPABILITIES if name.replace(".", "_") == params.get("name")), None)
                         arguments = params.get("arguments") or {}
-                        if capability not in CAPABILITIES or not isinstance(arguments.get("path"), str):
-                            raise ValueError("tools/call requires a known tool and string arguments.path")
-                        value = runtime.run(capability, arguments["path"], arguments.get("options") or {})
+                        if capability not in CAPABILITIES:
+                            raise ValueError("tools/call requires a known tool")
+                        call_options = arguments.get("options") or {}
+                        if not isinstance(call_options, dict):
+                            raise ValueError("tools/call arguments.options must be an object")
+                        temporary_path = None
+                        if capability == "speech.synthesize" and isinstance(arguments.get("text"), str):
+                            temporary_path = tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".txt", delete=False)
+                            temporary_path.write(arguments["text"])
+                            temporary_path.close()
+                            call_options = {**call_options, "text": arguments["text"]}
+                            input_value = temporary_path.name
+                        elif capability == "speech.clone_voice" and isinstance(arguments.get("text"), str) and isinstance(arguments.get("reference_audio"), str):
+                            reference_audio = arguments["reference_audio"]
+                            if reference_audio.startswith("artifact://"):
+                                reference_audio = str(runtime.artifacts.resolve(reference_audio))
+                            call_options = {**call_options, "text": arguments["text"], "reference_audio": reference_audio}
+                            input_value = reference_audio
+                        elif isinstance(arguments.get("path"), str):
+                            input_value = arguments["path"]
+                        else:
+                            raise ValueError("tools/call requires arguments.path or speech text/reference_audio")
+                        try:
+                            value = runtime.run(capability, input_value, call_options)
+                        finally:
+                            if temporary_path is not None:
+                                Path(temporary_path.name).unlink(missing_ok=True)
                         result = {"content": [{"type": "text", "text": json.dumps(value, ensure_ascii=True)}], "structuredContent": value, "isError": value.get("error") is not None}
                     else:
                         if is_notification:

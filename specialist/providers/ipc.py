@@ -58,7 +58,7 @@ class JsonlProcessProvider:
         if not self.command:
             raise WorkerError("worker command is empty", code="worker_not_configured", retryable=False)
         model = getattr(self, "model", None) or spec.model
-        cache.mark_installed(spec.name, spec.provider, model, license_name=spec.license, source="worker", commercial=getattr(spec, "commercial", None), source_url=getattr(spec, "source_url", None))
+        cache.mark_installed(spec.name, self.name, model, license_name=getattr(self, "license", spec.license), source="worker", commercial=getattr(spec, "commercial", None), source_url=getattr(spec, "source_url", None))
         return {"status": "ready", "downloaded": False, "worker": self.command[0]}
 
     def doctor(self, hardware):
@@ -165,16 +165,20 @@ class JsonlProcessProvider:
             process.wait(timeout=2)
         except subprocess.TimeoutExpired:
             pass
-        reader = self._reader_thread
-        if reader is not None and reader is not threading.current_thread():
-            reader.join(timeout=2)
-        self._reader_thread = None
+        # Closing the parent pipe is what unblocks a reader that is waiting in
+        # ``for line in process.stdout`` after the child has exited. Do this
+        # before joining so interpreter shutdown cannot leave a daemon thread
+        # holding a BufferedReader lock.
         for stream in (process.stdin, process.stdout):
             try:
                 if stream:
                     stream.close()
             except OSError:
                 pass
+        reader = self._reader_thread
+        if reader is not None and reader is not threading.current_thread():
+            reader.join(timeout=2)
+        self._reader_thread = None
         if self._stderr_stream:
             try:
                 self._stderr_stream.close()
@@ -183,7 +187,7 @@ class JsonlProcessProvider:
             self._stderr_stream = None
 
     def infer(self, input_path: Path, options: dict[str, Any], cache):
-        request = {"capability": self.capability, "input_path": str(input_path), "options": options}
+        request = {"capability": self.capability, "provider": self.name, "input_path": str(input_path), "options": options}
         encoded_request = json.dumps(request, ensure_ascii=True, separators=(",", ":")) + "\n"
         if len(encoded_request.encode("utf-8")) > self.max_request_bytes:
             raise WorkerError("provider worker request exceeds safety limit", code="worker_request_too_large", retryable=False)
@@ -228,12 +232,16 @@ class JsonlProcessProvider:
             return response.get("result", {}), response.get("warnings", [])
 
 
-def run_worker(request: dict[str, Any], backend="fallback") -> dict[str, Any]:
+def run_worker(request: dict[str, Any], backend="fallback", providers=None) -> dict[str, Any]:
     """Worker entrypoint for fallback or optional production providers."""
     from .factory import provider_map
 
     capability = request.get("capability")
-    provider = provider_map(backend).get(capability)
+    providers = providers if providers is not None else provider_map(backend)
+    provider = providers.get(capability)
+    requested_provider = request.get("provider")
+    if isinstance(requested_provider, str) and requested_provider:
+        provider = next((candidate for candidate in providers.values() if getattr(candidate, "name", None) == requested_provider and getattr(candidate, "capability", capability) == capability), provider)
     if provider is None:
         return {"error": {"code": "unknown_capability", "message": str(capability), "retryable": False}}
     try:

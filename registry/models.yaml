@@ -147,6 +147,55 @@
       "models": [
         {"id": "silero-vad-v5", "recommended": true, "memory_mb": 1024, "disk_mb": 100, "platforms": ["macos-arm64", "linux-x64"], "devices": ["cpu", "mps", "cuda"], "artifact": {"url": "https://raw.githubusercontent.com/snakers4/silero-vad/master/src/silero_vad/data/silero_vad.jit", "sha256": "e1122837f4154c511485fe0b9c64455f7b929c96fbb8d79fbdb336383ebd3720", "filename": "silero_vad.jit"}}
       ]
+    },
+    {
+      "name": "speech.synthesize",
+      "command": "speak",
+      "provider": "fish_audio",
+      "model": "s2-pro",
+      "modality": "audio",
+      "description": "Generate high-fidelity speech audio from text.",
+      "bundle": "speech",
+      "optional_dependency": null,
+      "source_url": "https://github.com/fishaudio/fish-speech",
+      "license": {"weights": "Fish Audio Research License", "commercial": false, "commercial_allowed_by_default": false},
+      "semantic_guarantees": ["returns an audio artifact", "does not silently change requested voice identity"],
+      "quality_metrics": ["ttfa_ms", "generation_latency_ms", "rtf", "audio_duration_ms"],
+      "supports": {"voice": true, "style": true, "multilingual": true, "stream": true, "voice_clone": true},
+      "resource_profile": {"class": "heavy", "recommended_gpu_memory_gb": 24, "load_cost": "high", "max_concurrency": 1},
+      "privacy_level": "sensitive",
+      "determinism": "provider_defined",
+      "providers": ["fish_audio", "system_tts"],
+      "input_schema": {"type": "object", "required": ["text"], "properties": {"text": {"type": "string"}, "options": {"type": "object"}}},
+      "output_schema": {"type": "object", "required": ["audio"], "properties": {"audio": {"type": "object"}}},
+      "models": [
+        {"id": "s2-pro", "recommended": true, "quality": 0.98, "memory_mb": 24576, "disk_mb": 0, "platforms": ["linux-x64", "windows-x64", "macos-arm64"], "devices": ["cuda", "cpu", "mps"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}},
+        {"id": "system-default", "recommended": false, "quality": 0.35, "memory_mb": 128, "disk_mb": 0, "platforms": ["linux-x64", "windows-x64", "macos-arm64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}
+      ]
+    },
+    {
+      "name": "speech.clone_voice",
+      "command": "clone-voice",
+      "provider": "fish_audio",
+      "model": "s2-pro",
+      "modality": "audio",
+      "description": "Generate speech conditioned on a reference voice.",
+      "bundle": "speech",
+      "optional_dependency": null,
+      "source_url": "https://github.com/fishaudio/fish-speech",
+      "license": {"weights": "Fish Audio Research License", "commercial": false, "commercial_allowed_by_default": false},
+      "semantic_guarantees": ["reference voice identity is required", "never falls back to an unrelated default voice"],
+      "quality_metrics": ["ttfa_ms", "generation_latency_ms", "rtf", "audio_duration_ms"],
+      "supports": {"voice": true, "style": true, "reference_audio": true, "multilingual": true},
+      "resource_profile": {"class": "heavy", "recommended_gpu_memory_gb": 24, "load_cost": "high", "max_concurrency": 1},
+      "privacy_level": "restricted",
+      "determinism": "provider_defined",
+      "providers": ["fish_audio"],
+      "input_schema": {"type": "object", "required": ["text", "reference_audio"], "properties": {"text": {"type": "string"}, "reference_audio": {"type": "string"}, "options": {"type": "object"}}},
+      "output_schema": {"type": "object", "required": ["audio"], "properties": {"audio": {"type": "object"}}},
+      "models": [
+        {"id": "s2-pro", "recommended": true, "quality": 0.98, "memory_mb": 24576, "disk_mb": 0, "platforms": ["linux-x64", "windows-x64", "macos-arm64"], "devices": ["cuda", "cpu", "mps"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "operator"}}
+      ]
     }
   ]
 }

@@ -23,7 +23,7 @@ class CliE2ETests(unittest.TestCase):
             capabilities = run_cli(["capabilities"], home)
             self.assertEqual(capabilities.returncode, 0, capabilities.stderr)
             capability_payload = json.loads(capabilities.stdout)
-            self.assertEqual(len(capability_payload), 8)
+            self.assertEqual(len(capability_payload), 10)
             self.assertEqual({item["capability"] for item in capability_payload}, {
                 "vision.detect",
                 "vision.segment",
@@ -33,6 +33,8 @@ class CliE2ETests(unittest.TestCase):
                 "document.parse",
                 "audio.transcribe",
                 "audio.vad",
+                "speech.synthesize",
+                "speech.clone_voice",
             })
 
             ocr = run_cli(["--backend", "fallback", "ocr", str(source), "--json"], home)
@@ -49,7 +51,7 @@ class CliE2ETests(unittest.TestCase):
             doctor = run_cli(["doctor", "--json"], home)
             self.assertEqual(doctor.returncode, 0, doctor.stderr)
             doctor_payload = json.loads(doctor.stdout)
-            self.assertEqual(len(doctor_payload["capabilities"]), 8)
+            self.assertEqual(len(doctor_payload["capabilities"]), 10)
             self.assertEqual(doctor_payload["home"], str(home))
 
             strict_doctor = run_cli(["--backend", "fallback", "doctor", "--strict", "--json"], home)

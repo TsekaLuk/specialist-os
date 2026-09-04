@@ -69,7 +69,10 @@ class DeterministicRouter:
         self.hardware = hardware or {}
 
     @staticmethod
-    def _quality(model: ModelSpec) -> float:
+    def _quality(model: ModelSpec, provider: Any = None) -> float:
+        provider_quality = getattr(provider, "quality", None)
+        if isinstance(provider_quality, (int, float)) and not isinstance(provider_quality, bool):
+            return max(0.0, min(1.0, float(provider_quality)))
         value = getattr(model, "quality", None)
         if value is not None:
             return max(0.0, min(1.0, float(value)))
@@ -106,7 +109,7 @@ class DeterministicRouter:
         available = provider is not None
         if provider is None:
             reasons.append("provider adapter is not registered")
-        if installation and installation.get("model") and installation.get("model") != model.id:
+        if installation and installation.get("model") and installation.get("provider") == getattr(provider, "name", spec.provider) and installation.get("model") != model.id:
             available = False
             reasons.append(f"installed model is pinned to {installation['model']}")
         if getattr(provider, "requires_verified_artifact", False) and not installation:
@@ -119,9 +122,10 @@ class DeterministicRouter:
         latency = self._measured_latency(capability, provider, model) if provider is not None else None
         latency = self._latency(provider, model) if latency is None and provider is not None else (latency or 0)
         policy = self.policy.evaluate(capability=capability, provider=provider or object(), model=model, options=rule, estimated_latency_ms=latency)
-        if rule.get("commercial_safe") and not spec.commercial:
-            reasons.append("capability weights are not marked commercial-safe")
-            policy = PolicyDecision(False, tuple(policy.reasons) + ("capability weights are not marked commercial-safe",))
+        commercial = bool(getattr(provider, "commercial", spec.commercial))
+        if rule.get("commercial_safe") and not commercial:
+            reasons.append("provider or weights are not marked commercial-safe")
+            policy = PolicyDecision(False, tuple(policy.reasons) + ("provider or weights are not marked commercial-safe",))
         profile = str(rule.get("profile", self.policy.default_profile))
         weights = {
             "fast": (0.6, 1.6, 0.4),
@@ -129,8 +133,12 @@ class DeterministicRouter:
             "quality": (1.7, 0.3, 0.15),
             "ultra": (2.2, 0.15, 0.1),
         }.get(profile, (1.0, 0.8, 0.3))
-        score = round(weights[0] * self._quality(model) - weights[1] * latency / 1000 - weights[2] * model.memory_mb / 4096, 6)
-        return RouteCandidate(capability, provider_name, model.id, self._quality(model), latency, model.memory_mb, local, spec.commercial, available, score, tuple(reasons), policy)
+        provider_memory = getattr(provider, "memory_requirement_mb", None)
+        memory_mb = int(provider_memory) if provider_memory is not None else model.memory_mb
+        score = round(weights[0] * self._quality(model, provider) - weights[1] * latency / 1000 - weights[2] * memory_mb / 4096, 6)
+        if getattr(provider, "preferred_model", None) == model.id:
+            score += 0.000001
+        return RouteCandidate(capability, provider_name, model.id, self._quality(model, provider), latency, memory_mb, local, commercial, available, score, tuple(reasons), policy)
 
     def route(self, capability: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
         if capability not in self.specs:
@@ -138,16 +146,19 @@ class DeterministicRouter:
         spec = self.specs[capability]
         options = options if isinstance(options, dict) else {}
         rule = self.policy.resolve(capability, options)
+        requested_provider = options.get("provider")
+        if requested_provider is not None and (not isinstance(requested_provider, str) or not requested_provider.strip()):
+            raise RoutingError("provider must be a non-empty string")
         provider_options = []
         primary = self.providers.get(capability)
-        if primary is not None:
+        if primary is not None and (not requested_provider or getattr(primary, "name", None) == requested_provider):
             provider_options.append(primary)
         for provider_name in spec.providers:
             alternate = self.providers.get(f"{capability}@{provider_name}") or self.providers.get(provider_name)
-            if alternate is not None and alternate not in provider_options:
+            if alternate is not None and (not requested_provider or getattr(alternate, "name", None) == requested_provider) and alternate not in provider_options:
                 provider_options.append(alternate)
         for key, alternate in self.providers.items():
-            if key.startswith(f"{capability}@") and alternate not in provider_options:
+            if key.startswith(f"{capability}@") and (not requested_provider or getattr(alternate, "name", None) == requested_provider) and alternate not in provider_options:
                 provider_options.append(alternate)
         if not provider_options:
             provider_options = [None]
@@ -158,9 +169,29 @@ class DeterministicRouter:
             models = [model for model in models if model.id == str(requested_model)]
             if not models:
                 raise RoutingError(f"model '{requested_model}' is not registered for {capability}")
-        elif installation and installation.get("model"):
-            models = [model for model in models if model.id == installation["model"]] or models
-        candidates = [self._candidate(capability, spec, provider, model, rule) for provider in provider_options for model in models]
+        candidates = []
+        for provider in provider_options:
+            provider_models = models
+            # An installed model pins only the provider that owns it. An
+            # alternate provider must keep its own model identity so a local
+            # fallback can never relabel the primary provider (or vice versa).
+            if (
+                not requested_model
+                and installation
+                and installation.get("model")
+                and installation.get("provider") == getattr(provider, "name", spec.provider)
+            ):
+                provider_models = [model for model in models if model.id == installation["model"]] or models
+            preferred_model = getattr(provider, "preferred_model", None)
+            # Provider adapters may expose a stable model identity that is
+            # different from the capability's primary model (for example the
+            # real OS TTS fallback). Keep candidates honest so routing and
+            # result provenance never label one provider as another model.
+            if not requested_model and preferred_model:
+                preferred = [model for model in models if model.id == preferred_model]
+                if preferred:
+                    provider_models = preferred
+            candidates.extend(self._candidate(capability, spec, provider, model, rule) for model in provider_models)
         eligible = [item for item in candidates if item.allowed]
         selected = sorted(eligible, key=lambda item: (-float(item.score or 0), item.provider, item.model))[0] if eligible else None
         explanation = {

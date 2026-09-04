@@ -128,6 +128,10 @@ def build_observations(capability: str, result: dict[str, Any], *, provider: str
         for index, item in enumerate(result.get("segments") or []):
             if isinstance(item, dict):
                 add(index, "speech_interval", item, {"start": item.get("start"), "end": item.get("end")}, item.get("confidence"))
+    elif capability in {"speech.synthesize", "speech.clone_voice"}:
+        audio = result.get("audio") or {}
+        if isinstance(audio, dict) and audio.get("artifact"):
+            add(0, "audio_artifact", {"artifact": audio.get("artifact"), "mime": audio.get("mime"), "duration_ms": audio.get("duration_ms"), "sample_rate": audio.get("sample_rate"), "voice": result.get("voice")}, None, 1.0)
     return [item.to_dict() for item in records]
 
 
@@ -149,4 +153,3 @@ def evidence_from_observations(observations: list[dict[str, Any]]) -> list[dict[
                 seen.add(key)
                 values.append(item)
     return values
-

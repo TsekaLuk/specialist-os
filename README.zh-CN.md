@@ -17,28 +17,27 @@
 
 </div>
 
-Specialist OS 为 LLM、Agent 和应用提供 `vision.detect`、`vision.ocr`、
-`audio.transcribe` 等稳定的能力名称。开源参考实现 `specialist-runtime`
-负责发现 Provider、应用策略、选择硬件、执行 Specialist，并返回统一且可追溯的
-结果协议。
+Specialist OS 是面向 AI 产品的能力层，让应用直接获得看、听、读、说的能力。
+它把专业智能封装成 `vision.detect`、`vision.ocr`、`audio.transcribe`、
+`speech.synthesize` 等稳定的产品原语。
 
-应用依赖的是 Capability，而不是 YOLO、PaddleOCR、Whisper 或其他具体模型。
-Provider 可以持续演进，上层业务代码不必随之改写。
+开源实现 `specialist-runtime` 负责发现 Provider、根据请求选择执行路径，并返回
+统一的结果协议。你的产品只依赖能力名称；模型、硬件、隔离和 Provider 的变化由
+Runtime 在底层处理。
 
-> **生产边界：** Core Runtime 通过完整发布门禁，且不强制依赖第三方运行库。
-> 可选模型 Provider 安装在隔离环境中，并拥有独立的真实模型验收通道。
-> 无依赖 fallback 适合验证接口，但绝不会被当作模型质量证据。
+这样的分层让想法更快变成可上线的功能：可以用当前最合适的模型启动，随着质量和
+成本变化替换 Provider，同时保持业务 API 稳定，让智能层持续进化。
 
-## 为什么是 Specialist OS
+## 为什么团队选择 Specialist OS
 
-| | Runtime 保证什么 |
+| | 产品价值 |
 | --- | --- |
-| **稳定能力契约** | 稳定的能力名称、输入输出 Schema 和语义保证 |
-| **默认确定性** | 基于 Policy、硬件和 Benchmark 路由，核心决策链不调用 LLM |
-| **结果可验证** | Observation、Evidence、Provenance、Confidence、Metrics、Artifact 与 Trace |
-| **能力可组合** | DAG、置信度 Cascade、Fallback 与有状态流式 Session |
-| **本地优先分布式执行** | 隔离的本地 Worker 与 Token 认证的 HTTP Compute Node |
-| **开放 Provider 生态** | 纯数据 Manifest、Adapter SDK、Capability Pack 与许可证元数据 |
+| **稳定的产品 API** | 依赖持久的能力名称和 Schema，不被具体模型调用绑住 |
+| **更快迭代** | 增加或替换专业 Provider，无需重写应用层 |
+| **成本与延迟可控** | 根据策略、硬件和 Benchmark 路由，为每次请求选择合适的执行路径 |
+| **自动化可追溯** | 每个结果都带有置信度、来源、证据、指标、Artifact 和执行 Trace |
+| **一次接入，多处复用** | CLI、Python SDK、HTTP 服务和 MCP 客户端共享同一套能力 |
+| **适配敏感数据** | 需要时保持本地执行，也可以交给认证的 Compute Node 扩展规模 |
 
 ## 架构
 
@@ -56,8 +55,8 @@ flowchart LR
     O --> E["Evidence · Artifacts · Trace"]
 ```
 
-Specialist OS 刻意不成为 Agent Framework、Chatbot、RAG Framework 或通用
-Model Gateway。它位于这些系统之下，为机器感知和专业计算提供操作层。
+Specialist OS 位于 Agent Framework、Chatbot、RAG 产品和各类模型应用之下，
+为机器感知与专业计算提供稳定的运行层。
 
 ## 快速开始
 
@@ -89,11 +88,11 @@ specialist --backend real --isolate ocr invoice.png --json
 Runtime 数据默认保存在 `~/.specialist/`。可以通过 `SPECIALIST_HOME` 指定独立
 目录。真实 Provider 缺少必要模型 Artifact 或 SHA256 校验失败时会直接拒绝执行。
 
-## 真实 Provider 结果
+## 看看实际效果
 
-下图是 Specialist Runtime 的真实推理结果，不是 mock，也不是概念插图。
-Runtime 对 Ultralytics YOLO11s Artifact 完成 SHA256 校验后，在统一结果协议中
-返回了 1 辆公交车和 4 个人及其置信度。
+下面的检测使用锁定版本的 Ultralytics YOLO11s Provider，在统一结果协议中返回了
+1 辆公交车和 4 个人及其置信度。同一份结果契约可以被所有接口复用，让原型流程
+自然演进为后台任务或面向客户的功能，无需再次集成。
 
 <p align="center">
   <img src="docs/assets/real-yolo-bus.jpg" alt="Specialist Runtime YOLO11s 真实推理结果，街景中检测到一辆公交车和四个人" width="810">
@@ -123,6 +122,8 @@ specialist --backend real --isolate detect bus.jpg --json
 | `document.parse` | MinerU | `specialist parse-document` |
 | `audio.transcribe` | whisper.cpp | `specialist transcribe` |
 | `audio.vad` | Silero VAD | `specialist vad` |
+| `speech.synthesize` | Fish Audio S2 / 系统 TTS fallback | `specialist speak` |
+| `speech.clone_voice` | Fish Audio S2 | `specialist clone-voice` |
 
 可以安装单项能力、Capability Pack 或完整参考能力集：
 
@@ -132,6 +133,38 @@ specialist pack list
 specialist pack install vision-core
 specialist install all
 ```
+
+### 用 Fish Audio 打造产品声音
+
+声音本身就是产品资产：统一的品牌旁白、熟悉的智能助手、自然交流的客服，或支持
+多语言发布的内容生产线。Fish Audio S2 在同一能力层提供高保真合成和声音克隆，
+无需让业务代码绑定某个模型运行时，就能把这些体验接入产品。
+
+Fish Audio 以隔离的 HTTP Provider 进程运行。可以连接运维启动的 Fish Server，也
+可以配置按需启动命令：
+
+```bash
+export SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080
+export SPECIALIST_FISH_AUDIO_COMMAND='fish-speech-server --listen 127.0.0.1:8080'
+specialist provider install fish_audio
+specialist provider start fish_audio
+specialist speak '来自 Specialist OS 的高保真语音' --profile quality --json
+```
+
+生成结果写入内容寻址 Artifact Store，并返回 `artifact://` 引用，便于缓存、审计和
+跨服务传递。声音引用必须显式导入，并且默认保留在本地：
+
+```bash
+specialist voice import ./reference.wav --name my-voice
+specialist speak '使用我的声音' --voice voice://my-voice --provider fish_audio --json
+specialist clone-voice '这是一段克隆语音' ./reference.wav --json
+```
+
+Fish Audio Research License 默认不可商用。用于商业发布时，请确认部署方式和声音
+数据符合许可证要求。远程 reference audio 需要显式设置
+`privacy.allow_remote=true`（或请求级 `allow_remote`），声音数据默认留在本地。
+如果产品更重视轻量部署，普通合成也可以使用主机的系统 TTS，并在结果中记录当前
+质量配置。
 
 ## Advanced Runtime
 
@@ -179,8 +212,8 @@ session.close()
 
 每个成功结果都遵循
 [Observation Protocol Schema](schemas/result-envelope.schema.json)。较大的 Provider
-输出会写入内容寻址 Artifact Store，而不是直接塞入 JSON。Artifact ID 可以通过
-SHA256 校验，解析路径时也会拒绝符号链接穿越。
+输出写入内容寻址 Artifact Store，并以小体积、可校验的引用在系统间传递。Artifact
+ID 可以通过 SHA256 校验，解析路径时也会拒绝符号链接穿越。
 
 ## 调用接口
 
@@ -218,45 +251,25 @@ curl -s -X POST http://127.0.0.1:8741/v1/vision/ocr \
 specialist serve --mcp
 ```
 
-stdio Server 为全部 8 个核心工具实现 `initialize`、`tools/list` 和 `tools/call`。
-工具定义由 Capability Registry 生成。
+stdio Server 为 Registry 中的全部工具（包括语音合成和声音克隆）实现
+`initialize`、`tools/list` 和 `tools/call`。工具定义由 Capability Registry 生成。
 
-## 生产验收
+## 面向生产构建
 
-默认 E2E 会使用临时 Runtime Home，启动真实 CLI、HTTP、MCP、Worker 和 Remote
-Node 进程边界。它在不下载模型权重的情况下验证传输与生命周期行为：
+Specialist OS 将专业模型周边的运行能力一并交付：隔离 Worker、认证的 HTTP Node、
+健康与就绪探针、Metrics、内容寻址 Artifact、策略路由和统一 Observation Protocol。
+同一套能力可以运行在个人电脑、私有服务或分布式 Worker 集群中。
+
+在本地运行端到端测试：
 
 ```bash
 python -m unittest discover -s tests/e2e -v
 ```
 
-可执行证据位于
-[CLI E2E](tests/e2e/test_cli_e2e.py)、
-[HTTP E2E](tests/e2e/test_http_e2e.py)、
-[MCP E2E](tests/e2e/test_mcp_e2e.py) 和
-[Remote Node E2E](tests/e2e/test_remote_e2e.py)。本 README 不使用手工制作的
-E2E 截图。
+Provider-backed 部署使用锁定版本的 Provider Package 和模型 Artifact。Fish Audio
+使用运维管理的 HTTP Server，模型留在 GPU 服务中，应用仍然调用同一套 Capability API。
 
-在已经安装 Provider Package 和锁定模型 Artifact 的机器上运行独立的真实
-Provider 验收：
-
-```bash
-SPECIALIST_RUN_REAL_PROVIDER_E2E=1 \
-SPECIALIST_REAL_PROVIDERS=yolo,sam,paddleocr,silero,whisper \
-python -m unittest discover -s tests/e2e -p test_real_provider_e2e.py -v
-```
-
-| Provider | 生产依赖 | 离线边界 |
-| --- | --- | --- |
-| YOLO / SAM | `ultralytics==8.3.0` | 锁定的 `.pt` Artifact |
-| PaddleOCR | `paddleocr==3.7.0`、`paddlepaddle==3.3.1` | PP-OCRv5 det/rec Bundle；禁用额外阶段 |
-| Depth Anything | `transformers==4.57.3`、`torch==2.14.0` | 启用 `local_files_only` 的本地 Hugging Face Bundle |
-| Silero VAD | `silero-vad==6.2.1`、`torch==2.14.0` | 经过校验的 `.jit` Artifact |
-| whisper.cpp | 运维提供的 `whisper-cli` | 经过校验的 `ggml-base.en.bin` |
-| MinerU | `mineru==3.4.5` | 经过校验的 Wheel 与运维提供的本地模型 |
-| OmniParser | 运维提供的 JSON CLI | 通过 `OMNIPARSER_MODEL_DIR` 暴露的校验 Bundle |
-
-生产发布前执行：
+发布前执行：
 
 ```bash
 specialist --backend real doctor --strict --json
@@ -265,9 +278,7 @@ SPECIALIST_RUN_PACKAGE_E2E=1 \
   python -m unittest discover -s tests/e2e -p test_package_e2e.py -v
 ```
 
-网络服务必须配置 Token，第三方 Provider 应在隔离 Worker 中执行，同时需要检查
-上游代码与模型权重的许可证。完整生产边界参见
-[部署指南](docs/deployment.md)和[安全策略](SECURITY.md)。
+部署配置和运行控制参见[部署指南](docs/deployment.md)与[安全策略](SECURITY.md)。
 
 ## Rust + Python
 

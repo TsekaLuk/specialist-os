@@ -6,6 +6,7 @@ import argparse
 import atexit
 import json
 import sys
+import tempfile
 from pathlib import Path
 
 from . import __version__
@@ -18,6 +19,7 @@ from .environments import EnvironmentError
 from .provider_manifest import ProviderCatalog, ProviderManifest, ProviderManifestError, builtin_manifests
 from .node import ComputeNode, NodeError
 from .hardware import detect_hardware
+from .providers.fish_audio.client import FishAudioError
 
 
 def _json_dump(value):
@@ -41,6 +43,9 @@ def _human_result(value):
         print(result.get("text") or "No speech detected.")
     elif value["capability"] == "document.parse":
         print(result.get("markdown", ""))
+    elif value["capability"] in {"speech.synthesize", "speech.clone_voice"}:
+        audio = result.get("audio") or {}
+        print(f"audio={audio.get('artifact')} mime={audio.get('mime')} duration_ms={audio.get('duration_ms')}")
     else:
         print(json.dumps(result, ensure_ascii=True, indent=2))
     performance = value.get("performance") or {}
@@ -65,6 +70,10 @@ def _human_doctor(value):
     for item in value.get("capabilities", []):
         marker = item.get("status", "unknown")
         print(f"{item['capability']:<22} {marker:<16} provider={item['provider']}")
+        if item.get("provider") == "fish_audio":
+            print(f"  model={item.get('model')} server={item.get('endpoint') or item.get('server_endpoint') or 'not configured'} state={item.get('state', 'unknown')} license={item.get('license_mode', 'research_only')}")
+            if item.get("recommended_execution"):
+                print(f"  recommended execution: {item['recommended_execution']}")
     return 0
 
 
@@ -109,6 +118,9 @@ def build_parser():
     validate.add_argument("manifest")
     provider_install = provider_sub.add_parser("install", help="Install a local provider manifest into the catalog")
     provider_install.add_argument("manifest_or_name")
+    for action in ("start", "stop", "restart", "status"):
+        action_parser = provider_sub.add_parser(action, help=f"{action.title()} the provider server")
+        action_parser.add_argument("provider", nargs="?", default="fish_audio")
 
     explain = sub.add_parser("explain", help="Explain deterministic provider routing")
     explain.add_argument("capability")
@@ -145,6 +157,16 @@ def build_parser():
     register = node_sub.add_parser("register")
     register.add_argument("metadata", help="JSON file containing node metadata")
 
+    voice = sub.add_parser("voice", help="Manage local voice references")
+    voice_sub = voice.add_subparsers(dest="voice_command", required=True)
+    voice_import = voice_sub.add_parser("import")
+    voice_import.add_argument("source")
+    voice_import.add_argument("--name", required=True)
+    voice_import.add_argument("--reference-id")
+    voice_sub.add_parser("list")
+    voice_remove = voice_sub.add_parser("remove")
+    voice_remove.add_argument("voice")
+
     for command in ["detect", "segment", "ocr", "depth", "parse-screen", "parse-document", "transcribe", "vad"]:
         item = sub.add_parser(command)
         item.add_argument("input", help="Local input path")
@@ -153,6 +175,28 @@ def build_parser():
         item.add_argument("--profile", choices=["fast", "balanced", "quality", "ultra"])
         item.add_argument("--json", action="store_true", dest="as_json")
         item.add_argument("--options", help="Additional options as a JSON object")
+
+    speak = sub.add_parser("speak", help="Synthesize speech through the selected provider")
+    speak.add_argument("text")
+    speak.add_argument("--provider")
+    speak.add_argument("--voice")
+    speak.add_argument("--language")
+    speak.add_argument("--format", default="wav", choices=["wav", "mp3", "ogg", "flac"])
+    speak.add_argument("--style")
+    speak.add_argument("--profile", choices=["fast", "balanced", "quality", "ultra"])
+    speak.add_argument("--stream", action="store_true")
+    speak.add_argument("--json", action="store_true", dest="as_json")
+    speak.add_argument("--options", help="Additional options as a JSON object")
+
+    clone = sub.add_parser("clone-voice", help="Synthesize speech from a reference voice recording")
+    clone.add_argument("text")
+    clone.add_argument("reference_audio")
+    clone.add_argument("--reference-text")
+    clone.add_argument("--provider", default="fish_audio")
+    clone.add_argument("--format", default="wav", choices=["wav", "mp3", "ogg", "flac"])
+    clone.add_argument("--style")
+    clone.add_argument("--json", action="store_true", dest="as_json")
+    clone.add_argument("--options")
 
     serve = sub.add_parser("serve", help="Run local HTTP or MCP server")
     serve.add_argument("--mcp", action="store_true", help="Use MCP JSON-RPC over stdin/stdout")
@@ -219,14 +263,34 @@ def main(argv=None):
                 _json_dump(values)
             elif args.provider_command == "validate":
                 _json_dump(ProviderManifest.load(args.manifest).to_dict())
+            elif args.provider_command in {"start", "stop", "restart", "status"}:
+                _json_dump(runtime.provider_lifecycle(args.provider, args.provider_command))
             else:
                 target = Path(args.manifest_or_name).expanduser()
+                if args.manifest_or_name == "fish_audio":
+                    synth_provider = runtime.providers.get("speech.synthesize")
+                    clone_provider = runtime.providers.get("speech.clone_voice")
+                    _json_dump({"provider": "fish_audio", "installed": runtime.install("speech.synthesize", provider_override=synth_provider) + runtime.install("speech.clone_voice", provider_override=clone_provider)})
+                    return 0
                 manifest = catalog.install_path(target) if target.exists() else catalog.get(args.manifest_or_name)
                 if manifest is None:
                     raise ProviderManifestError("provider install expects a local manifest path; remote marketplace installation is not enabled")
                 _json_dump(manifest.to_dict())
             return 0
-        except (ProviderManifestError, OSError, ValueError) as exc:
+        except (ProviderManifestError, FishAudioError, OSError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    if args.command == "voice":
+        try:
+            if args.voice_command == "import":
+                assets = {"fish_audio": {"reference_id": args.reference_id}} if args.reference_id else None
+                _json_dump(runtime.import_voice(args.source, args.name, provider_assets=assets))
+            elif args.voice_command == "list":
+                _json_dump(runtime.list_voices())
+            else:
+                _json_dump({"voice": args.voice, "removed": runtime.remove_voice(args.voice)})
+            return 0
+        except (OSError, ValueError) as exc:
             print(str(exc), file=sys.stderr)
             return 2
     if args.command == "explain":
@@ -314,14 +378,76 @@ def main(argv=None):
             return 2
         return 0
     if args.command == "_worker":
-        for line in sys.stdin:
-            try:
-                request = json.loads(line)
-                request["capability"] = args.capability
-                print(json.dumps(run_worker(request, backend=args.backend), ensure_ascii=True), flush=True)
-            except Exception as exc:
-                print(json.dumps({"error": {"code": "worker_protocol_error", "message": str(exc), "retryable": False}}, ensure_ascii=True), flush=True)
+        from .providers.factory import provider_map
+
+        worker_providers = provider_map(args.backend)
+        try:
+            for line in sys.stdin:
+                try:
+                    request = json.loads(line)
+                    request["capability"] = args.capability
+                    print(json.dumps(run_worker(request, backend=args.backend, providers=worker_providers), ensure_ascii=True), flush=True)
+                except Exception as exc:
+                    print(json.dumps({"error": {"code": "worker_protocol_error", "message": str(exc), "retryable": False}}, ensure_ascii=True), flush=True)
+        finally:
+            seen = set()
+            for provider in worker_providers.values():
+                if id(provider) in seen:
+                    continue
+                seen.add(id(provider))
+                close_provider = getattr(provider, "close", None)
+                if callable(close_provider):
+                    try:
+                        close_provider()
+                    except Exception:
+                        pass
         return 0
+    if args.command in {"speak", "clone-voice"}:
+        options = {}
+        if getattr(args, "options", None):
+            try:
+                options = json.loads(args.options)
+                if not isinstance(options, dict):
+                    raise ValueError("options must be a JSON object")
+            except ValueError as exc:
+                print(f"Invalid --options: {exc}", file=sys.stderr)
+                return 2
+        options["format"] = args.format
+        if getattr(args, "provider", None):
+            options["provider"] = args.provider
+        if getattr(args, "voice", None):
+            options["voice"] = args.voice
+        if getattr(args, "language", None):
+            options["language"] = args.language
+        if getattr(args, "style", None):
+            options["style"] = {"instruction": args.style}
+        if getattr(args, "profile", None):
+            options["profile"] = args.profile
+        if getattr(args, "stream", False):
+            options["stream"] = True
+        if args.command == "clone-voice":
+            options["text"] = args.text
+            options["reference_audio"] = str(Path(args.reference_audio).expanduser())
+            if args.reference_text:
+                options["reference_text"] = args.reference_text
+            input_path = args.reference_audio
+            capability = "speech.clone_voice"
+        else:
+            options["text"] = args.text
+            capability = "speech.synthesize"
+            temporary = tempfile.NamedTemporaryFile("w", encoding="utf-8", prefix="specialist-speech-", suffix=".txt", delete=False)
+            temporary.write(args.text)
+            temporary.close()
+            input_path = temporary.name
+        try:
+            value = runtime.run(capability, input_path, options)
+        finally:
+            if args.command == "speak":
+                Path(input_path).unlink(missing_ok=True)
+        if args.as_json:
+            _json_dump(value)
+            return 1 if value.get("error") else 0
+        return _human_result(value)
     options = {}
     if args.options:
         try:

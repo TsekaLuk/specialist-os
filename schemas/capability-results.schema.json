@@ -12,6 +12,8 @@
     {"properties": {"capability": {"const": "document.parse"}, "result": {"$ref": "#/$defs/document"}}, "required": ["capability", "result"]},
     {"properties": {"capability": {"const": "audio.transcribe"}, "result": {"$ref": "#/$defs/transcribe"}}, "required": ["capability", "result"]},
     {"properties": {"capability": {"const": "audio.vad"}, "result": {"$ref": "#/$defs/vad"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "speech.synthesize"}, "result": {"$ref": "#/$defs/speech"}}, "required": ["capability", "result"]}
+    ,{"properties": {"capability": {"const": "speech.clone_voice"}, "result": {"$ref": "#/$defs/speech"}}, "required": ["capability", "result"]}
   ],
   "$defs": {
     "bbox": {
@@ -59,6 +61,15 @@
       "properties": {
         "segments": {"type": "array", "items": {"type": "object", "required": ["start", "end"], "properties": {"start": {"type": "number", "minimum": 0}, "end": {"type": "number", "minimum": 0}}}},
         "duration_seconds": {"type": "number", "minimum": 0}
+      }
+    },
+    "speech": {
+      "type": "object",
+      "required": ["audio"],
+      "properties": {
+        "audio": {"type": "object", "required": ["artifact", "mime", "duration_ms", "sample_rate"], "properties": {"artifact": {"type": "string", "pattern": "^artifact://[0-9a-f]{64}$"}, "mime": {"type": "string", "pattern": "^audio/"}, "duration_ms": {"type": ["number", "null"], "minimum": 0}, "sample_rate": {"type": ["number", "null"], "minimum": 0}}},
+        "voice": {"type": ["string", "null"]},
+        "server": {"type": "string"}
       }
     }
   }

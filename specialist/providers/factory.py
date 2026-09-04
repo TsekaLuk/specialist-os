@@ -8,11 +8,15 @@ import shutil
 
 from .builtin import BUILTIN_PROVIDERS
 from .optional import CommandDocumentProvider, CommandScreenProvider, PaddleOCRProvider, SileroVADProvider, TransformersDepthProvider, UltralyticsSegmentProvider, WhisperCppProvider, YOLOProvider
+from .fish_audio import FishAudioProvider, SystemTTSProvider
 
 
 def provider_map(backend="auto"):
     selected = dict(BUILTIN_PROVIDERS)
     if backend == "fallback":
+        selected["speech.synthesize"] = FishAudioProvider("speech.synthesize")
+        selected["speech.clone_voice"] = FishAudioProvider("speech.clone_voice")
+        selected["speech.synthesize@system_tts"] = SystemTTSProvider()
         return selected
     candidates = {
         "vision.detect": ("ultralytics", YOLOProvider()),
@@ -23,8 +27,15 @@ def provider_map(backend="auto"):
         "audio.vad": ("silero_vad", SileroVADProvider()),
         "document.parse": ("mineru", CommandDocumentProvider(command=os.environ.get("SPECIALIST_MINERU_COMMAND", "mineru"))),
         "screen.parse": ("omniparser", CommandScreenProvider(command=os.environ.get("SPECIALIST_OMNIPARSER_COMMAND", "omniparser"))),
+        # The adapter is HTTP-only and has no Fish/PyTorch import. The system
+        # TTS provider is a genuine local fallback when the OS offers one.
+        "speech.synthesize": (None, FishAudioProvider("speech.synthesize")),
+        "speech.clone_voice": (None, FishAudioProvider("speech.clone_voice")),
     }
     for capability, (dependencies, provider) in candidates.items():
+        if dependencies is None:
+            selected[capability] = provider
+            continue
         if isinstance(dependencies, str):
             dependencies = (dependencies,)
         available = all(importlib.util.find_spec(dependency) is not None for dependency in dependencies)
@@ -37,4 +48,5 @@ def provider_map(backend="auto"):
             available = backend == "real" and all(shutil.which(dependency) is not None for dependency in dependencies if dependency in command_dependencies)
         if backend == "real" or available:
             selected[capability] = provider
+    selected["speech.synthesize@system_tts"] = SystemTTSProvider()
     return selected

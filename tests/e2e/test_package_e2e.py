@@ -72,7 +72,7 @@ class PackageE2ETests(unittest.TestCase):
                 timeout=30,
             )
             self.assertEqual(capabilities.returncode, 0, capabilities.stdout + capabilities.stderr)
-            self.assertEqual(len(json.loads(capabilities.stdout)), 8)
+            self.assertEqual(len(json.loads(capabilities.stdout)), 10)
 
             source = root / "installed.txt"
             source.write_text("installed package", encoding="utf-8")

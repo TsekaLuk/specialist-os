@@ -17,32 +17,30 @@ The capability layer between AI applications and specialist intelligence.
 
 </div>
 
-Specialist OS gives LLMs, agents and applications stable capability names such
-as `vision.detect`, `vision.ocr` and `audio.transcribe`. The open-source
-`specialist-runtime` implementation discovers providers, applies policy,
-selects hardware, executes specialists and returns one normalized,
-traceable result contract.
+Specialist OS is the capability layer for AI products that need to see, hear,
+read and speak. It turns specialist intelligence into product primitives such as
+`vision.detect`, `vision.ocr`, `audio.transcribe` and `speech.synthesize`.
 
-Applications depend on capabilities instead of YOLO, PaddleOCR, Whisper or any
-other specific model. Providers can change without forcing application code to
-change.
+The open-source `specialist-runtime` implementation discovers providers, chooses
+the right execution path for the request, and returns one result contract that
+your application can build on. Your product talks to a capability; the runtime
+handles models, hardware, isolation and provider changes underneath it.
 
-> **Production boundary:** the core runtime is release-gated and has no required
-> third-party runtime dependencies. Optional model providers are installed in
-> isolated environments and have their own real-model acceptance lane. A
-> dependency-free fallback is useful for interface validation, but it is never
-> presented as model-quality evidence.
+That separation shortens the path from an idea to a shippable feature. Teams can
+launch with the best available model, switch providers as quality or economics
+change, and keep the application API stable while the intelligence layer keeps
+improving.
 
-## Why Specialist OS
+## Why teams build on Specialist OS
 
-| | What the runtime guarantees |
+| | Product value |
 | --- | --- |
-| **Stable by contract** | Stable capability names, input/output schemas and semantic guarantees |
-| **Deterministic by default** | Policy-, hardware- and benchmark-aware routing without an LLM in the decision path |
-| **Verifiable results** | Observations, evidence, provenance, confidence, metrics, artifacts and execution trace |
-| **Composable execution** | DAGs, confidence cascades, fallback and stateful streaming sessions |
-| **Local-first distribution** | Isolated local workers plus token-authenticated HTTP compute nodes |
-| **Open provider ecosystem** | Data-only manifests, an adapter SDK, capability packs and license metadata |
+| **Stable product APIs** | Ship against durable capability names and schemas instead of model-specific calls |
+| **Faster iteration** | Add or replace specialist providers without rewriting the application layer |
+| **Cost and latency control** | Route by policy, hardware and benchmark data so each request gets the right execution path |
+| **Trustworthy automation** | Return confidence, provenance, evidence, metrics, artifacts and an execution trace with every result |
+| **One system, many surfaces** | Reuse the same capabilities from a CLI, Python SDK, HTTP service or MCP client |
+| **Built for sensitive data** | Keep workloads local when required, or send them to authenticated compute nodes when scale matters |
 
 ## Architecture
 
@@ -60,9 +58,9 @@ flowchart LR
     O --> E["Evidence · Artifacts · Trace"]
 ```
 
-The runtime is deliberately not an agent framework, chatbot, RAG framework or
-general model gateway. It is the operating layer underneath those systems for
-machine perception and specialist computation.
+Specialist OS sits underneath agent frameworks, chatbots, RAG products and
+model-powered workflows, giving them a dependable operating layer for machine
+perception and specialist computation.
 
 ## Quick start
 
@@ -95,12 +93,13 @@ Runtime data is stored under `~/.specialist/` by default. Set
 `SPECIALIST_HOME` to use a dedicated location. Real providers fail closed when
 a required model artifact is missing or does not match its registered SHA256.
 
-## Real provider output
+## See it in action
 
-The image below is an actual Specialist Runtime result, not a mock or an
-illustration. The runtime verified the Ultralytics YOLO11s artifact by SHA256
-and returned one bus and four people with confidence scores in the normalized
-result envelope.
+This detection run uses the pinned Ultralytics YOLO11s provider and returns one
+bus and four people with confidence scores in the normalized result envelope.
+The same contract is available to every interface, so a prototype workflow can
+become a background job or a customer-facing feature without a second
+integration.
 
 <p align="center">
   <img src="docs/assets/real-yolo-bus.jpg" alt="Real Specialist Runtime YOLO11s output showing one bus and four people detected in a street photo" width="810">
@@ -130,6 +129,8 @@ specialist --backend real --isolate detect bus.jpg --json
 | `document.parse` | MinerU | `specialist parse-document` |
 | `audio.transcribe` | whisper.cpp | `specialist transcribe` |
 | `audio.vad` | Silero VAD | `specialist vad` |
+| `speech.synthesize` | Fish Audio S2 / system TTS fallback | `specialist speak` |
+| `speech.clone_voice` | Fish Audio S2 | `specialist clone-voice` |
 
 Install a capability, a pack or the complete reference set:
 
@@ -139,6 +140,44 @@ specialist pack list
 specialist pack install vision-core
 specialist install all
 ```
+
+### Product voices with Fish Audio
+
+Voice is a product asset: a consistent brand narrator, a familiar assistant, a
+support agent that can speak naturally, or a content pipeline that can publish
+in many languages. Fish Audio S2 adds high-fidelity synthesis and voice cloning
+to the same capability layer, so teams can add these experiences without
+coupling the rest of the product to a model runtime.
+
+Fish Audio runs as an isolated HTTP provider process. Point the adapter at an
+operator-managed Fish server, or configure a start command for on-demand
+lifecycle management:
+
+```bash
+export SPECIALIST_FISH_AUDIO_URL=http://127.0.0.1:8080
+export SPECIALIST_FISH_AUDIO_COMMAND='fish-speech-server --listen 127.0.0.1:8080'
+specialist provider install fish_audio
+specialist provider start fish_audio
+specialist speak 'Hello from Specialist OS' --profile quality --json
+```
+
+Generated audio is returned as a content-addressed `artifact://` reference,
+which makes it easy to cache, audit and hand off between services. Voice
+references are explicitly imported and stay local by default:
+
+```bash
+specialist voice import ./reference.wav --name my-voice
+specialist speak 'A familiar voice' --voice voice://my-voice --provider fish_audio --json
+specialist clone-voice 'This is a clone' ./reference.wav --json
+```
+
+The Fish Audio Research License is non-commercial by default. For commercial
+launches, confirm the license terms for your deployment and voice data. Remote
+reference audio requires the explicit `privacy.allow_remote=true` policy (or a
+request-level `allow_remote` setting), keeping voice data local by default.
+Standard synthesis can also use the host OS TTS executable when a lightweight
+fallback is the right product choice; the result records the active quality
+profile.
 
 ## Advanced runtime
 
@@ -188,9 +227,9 @@ session.close()
 
 Every successful result implements the
 [Observation Protocol schema](schemas/result-envelope.schema.json). Large
-provider outputs are placed in the content-addressed artifact store rather than
-embedded in JSON. Artifact IDs are SHA256-verifiable, and artifact resolution
-rejects symlink traversal.
+provider outputs live in the content-addressed artifact store and travel as
+small, verifiable references. Artifact IDs are SHA256-verifiable, and artifact
+resolution rejects symlink traversal.
 
 ## Interfaces
 
@@ -229,45 +268,28 @@ specialist serve --mcp
 ```
 
 The stdio server implements `initialize`, `tools/list` and `tools/call` for all
-eight core tools. Tool definitions are derived from the capability registry.
+registered tools, including speech synthesis and voice cloning. Tool
+definitions are derived from the capability registry.
 
-## Production acceptance
+## Built for production
 
-The default E2E lane starts real CLI, HTTP, MCP, worker and remote-node process
-boundaries using temporary runtime homes. It validates transport and lifecycle
-behavior without downloading model weights:
+Specialist OS ships with the operating pieces around specialist models:
+isolated workers, authenticated HTTP nodes, health and readiness probes,
+metrics, content-addressed artifacts, policy-driven routing and a normalized
+observation protocol. The same capabilities can run in a laptop workflow, a
+private service or a distributed worker pool.
+
+Run the end-to-end suite locally:
 
 ```bash
 python -m unittest discover -s tests/e2e -v
 ```
 
-The executable evidence lives in
-[CLI E2E](tests/e2e/test_cli_e2e.py),
-[HTTP E2E](tests/e2e/test_http_e2e.py),
-[MCP E2E](tests/e2e/test_mcp_e2e.py) and
-[remote-node E2E](tests/e2e/test_remote_e2e.py). There are no handcrafted E2E
-screenshots in this README.
+For a provider-backed deployment, install the provider package and its pinned
+artifacts. Fish Audio uses an operator-managed HTTP server, so the model stays
+with the GPU service while your application keeps the same capability API.
 
-Run the separate real-provider acceptance lane on a host with the provider
-packages and pinned model artifacts installed:
-
-```bash
-SPECIALIST_RUN_REAL_PROVIDER_E2E=1 \
-SPECIALIST_REAL_PROVIDERS=yolo,sam,paddleocr,silero,whisper \
-python -m unittest discover -s tests/e2e -p test_real_provider_e2e.py -v
-```
-
-| Provider | Production dependency | Offline boundary |
-| --- | --- | --- |
-| YOLO / SAM | `ultralytics==8.3.0` | pinned `.pt` artifact |
-| PaddleOCR | `paddleocr==3.7.0`, `paddlepaddle==3.3.1` | PP-OCRv5 det/rec bundle; extra stages disabled |
-| Depth Anything | `transformers==4.57.3`, `torch==2.14.0` | local Hugging Face bundle with `local_files_only` |
-| Silero VAD | `silero-vad==6.2.1`, `torch==2.14.0` | verified `.jit` artifact |
-| whisper.cpp | operator-provided `whisper-cli` | verified `ggml-base.en.bin` |
-| MinerU | `mineru==3.4.5` | verified wheel plus operator-provisioned local models |
-| OmniParser | operator-provided JSON CLI | verified bundle via `OMNIPARSER_MODEL_DIR` |
-
-Before production promotion:
+Before a release:
 
 ```bash
 specialist --backend real doctor --strict --json
@@ -276,10 +298,8 @@ SPECIALIST_RUN_PACKAGE_E2E=1 \
   python -m unittest discover -s tests/e2e -p test_package_e2e.py -v
 ```
 
-Keep network services token-protected, execute third-party providers in isolated
-workers, and review upstream code and weight licenses. See the
-[deployment guide](docs/deployment.md) and [security policy](SECURITY.md) for
-the complete production boundary.
+See the [deployment guide](docs/deployment.md) and [security policy](SECURITY.md)
+for deployment configuration and operational controls.
 
 ## Rust + Python
 

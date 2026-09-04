@@ -30,6 +30,13 @@ specialist models clean --max-age-hours 168 --max-entries 5000
 Model downloads must provide a SHA256 checksum. Failed or interrupted
 downloads are removed before an installation marker is committed.
 
+Fish Audio is the exception by design: its `server`-managed registry model is
+owned by an operator-managed Fish HTTP service rather than downloaded by Core.
+Configure `SPECIALIST_FISH_AUDIO_URL`, optionally
+`SPECIALIST_FISH_AUDIO_COMMAND`, and verify `/v1/health` before enabling
+`speech.synthesize` or `speech.clone_voice`. The provider remains isolated and
+uses a single request per model instance.
+
 The release contains a CycloneDX SBOM (`sbom.cdx.json`) and GitHub build
 provenance attestation. Keep both with the deployed package record and verify
 the published `SHA256SUMS` file before promotion.
@@ -86,10 +93,11 @@ SPECIALIST_RUN_PACKAGE_E2E=1 python -m unittest discover -s tests/e2e -p test_pa
 ```
 
 Release tags are guarded by `.github/workflows/release.yml`. The tag must match
-the project version (`v<version>`), and
-`scripts/release_check.py --require-artifacts` requires every model entry to
-carry a paired HTTPS URL and SHA256. Multi-file providers use an atomic manifest
-that records and verifies every file before loading.
+the project version (`v<version>`). For downloadable models,
+`scripts/release_check.py --require-artifacts` requires a paired HTTPS URL and
+SHA256; operator-owned `server` models intentionally carry no download
+artifact. Multi-file providers use an atomic manifest that records and verifies
+every file before loading.
 
 Reference service-manager templates are provided at
 `deploy/systemd/specialist.service` and

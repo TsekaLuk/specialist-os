@@ -19,7 +19,7 @@ class CapabilityPack:
 PACKS = (
     CapabilityPack("vision-core", "Detection, segmentation, OCR and depth", ("vision.detect", "vision.segment", "vision.ocr", "vision.depth")),
     CapabilityPack("document", "Document parsing and structure recovery", ("document.parse",)),
-    CapabilityPack("voice", "Speech transcription and activity detection", ("audio.transcribe", "audio.vad")),
+    CapabilityPack("voice", "Speech synthesis, voice cloning, transcription and activity detection", ("speech.synthesize", "speech.clone_voice", "audio.transcribe", "audio.vad")),
     CapabilityPack("screen", "Actionable screen element parsing", ("screen.parse",)),
     CapabilityPack("spatial", "Depth and geometry primitives", ("vision.depth", "vision.detect", "vision.segment")),
 )

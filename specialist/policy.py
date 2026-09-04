@@ -54,6 +54,7 @@ class Policy:
         hardware = policy_section.get("hardware") if isinstance(policy_section.get("hardware"), dict) else {}
         quality = policy_section.get("quality") if isinstance(policy_section.get("quality"), dict) else {}
         cost = policy_section.get("cost") if isinstance(policy_section.get("cost"), dict) else {}
+        privacy_config = policy_section.get("privacy") if isinstance(policy_section.get("privacy"), dict) else {}
         profile = str(policy_section.get("default_profile") or quality.get("default_profile") or "balanced")
         if profile not in PROFILE_DEFAULTS:
             raise PolicyError(f"unknown default profile '{profile}'")
@@ -84,14 +85,14 @@ class Policy:
         return cls(
             default_profile=profile,
             local_first=bool(policy_section.get("local_first", True)),
-            allow_remote=bool(policy_section.get("allow_remote", False)),
+            allow_remote=bool(policy_section.get("allow_remote", privacy_config.get("allow_remote", False))),
             fallback=bool(policy_section.get("fallback", True)),
             local_only=bool(policy_section.get("local_only", False)),
             max_latency_ms=_positive_int(policy_section["max_latency_ms"], "max_latency_ms") if policy_section.get("max_latency_ms") is not None else None,
             min_confidence=min_confidence,
             max_memory_mb=max_memory,
             commercial_safe=bool(policy_section.get("commercial_safe", cost.get("commercial_safe", False))),
-            privacy=str(policy_section.get("privacy", "local_first")),
+            privacy=str(policy_section.get("privacy", "local_first")) if not isinstance(policy_section.get("privacy"), dict) else "local_first",
             capability_rules={str(name): dict(settings) for name, settings in capability_rules.items() if isinstance(settings, dict)},
             profiles=profiles,
             source=source,
@@ -169,7 +170,7 @@ class Policy:
         if max_latency is not None and estimated_latency_ms is not None and int(estimated_latency_ms) > int(max_latency):
             reasons.append(f"estimated latency {estimated_latency_ms}ms exceeds {max_latency}ms")
         max_memory = rule.get("max_memory_mb")
-        model_memory = getattr(model, "memory_mb", None)
+        model_memory = getattr(provider, "memory_requirement_mb", None) or getattr(model, "memory_mb", None)
         if max_memory is not None and model_memory is not None and int(model_memory) > int(max_memory):
             reasons.append(f"model memory {model_memory}MiB exceeds {max_memory}MiB")
         if rule.get("commercial_safe") and not bool(getattr(model, "commercial", True)):

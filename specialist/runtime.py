@@ -30,14 +30,16 @@ from .node import NodeRegistry
 from .provider_manifest import ProviderCatalog, builtin_manifests
 from .remote import RemoteNodeProvider
 from .packs import get_pack
+from .voices import VoiceRegistry
 
 
 class SpecialistRuntime:
-    TIMEOUTS = {"vision.detect": 120, "vision.segment": 120, "vision.ocr": 120, "vision.depth": 300, "screen.parse": 120, "document.parse": 900, "audio.transcribe": 900, "audio.vad": 300}
+    TIMEOUTS = {"vision.detect": 120, "vision.segment": 120, "vision.ocr": 120, "vision.depth": 300, "screen.parse": 120, "document.parse": 900, "audio.transcribe": 900, "audio.vad": 300, "speech.synthesize": 1800, "speech.clone_voice": 1800}
 
     def __init__(self, home=None, provider_overrides=None, isolate=False, backend="auto", with_dependencies=False, max_loaded=4, allow_unverified_models=None):
         self.cache = Cache(home)
         self.artifacts = ArtifactStore(self.cache.artifacts)
+        self.voices = VoiceRegistry(self.cache.home / "voices", self.artifacts)
         self.policy = Policy.load(self.cache.home, cwd=Path.cwd())
         self.backend = backend
         self.with_dependencies = with_dependencies
@@ -67,6 +69,7 @@ class SpecialistRuntime:
                 if name not in (provider_overrides or {}):
                     self.providers[name] = self._worker_provider(name, provider, sys.executable)
         self._loaded: set[str] = set()
+        self._active_providers: dict[str, Any] = {}
         self._last_used: dict[str, float] = {}
         self._locks = {name: threading.RLock() for name in self.providers}
         self._metrics_lock = threading.Lock()
@@ -141,6 +144,12 @@ class SpecialistRuntime:
             "SPECIALIST_OMNIPARSER_COMMAND",
             "OMNIPARSER_MODEL_DIR",
             "MINERU_TOOLS_CONFIG_JSON",
+            "SPECIALIST_FISH_AUDIO_URL",
+            "SPECIALIST_FISH_AUDIO_TOKEN",
+            "SPECIALIST_FISH_AUDIO_COMMAND",
+            "SPECIALIST_FISH_AUDIO_START_POLICY",
+            "SPECIALIST_FISH_AUDIO_STARTUP_TIMEOUT",
+            "SPECIALIST_PRIVACY_ALLOW_REMOTE",
         ):
             if key in os.environ:
                 worker_env[key] = os.environ[key]
@@ -161,7 +170,34 @@ class SpecialistRuntime:
         # being killed by RLIMIT_AS before inference begins.
         provider_memory_mb = int(getattr(provider, "memory_requirement_mb", 0) or 0)
         memory_limit_bytes = max(4 * 1024**3, (provider_memory_mb + 2048) * 1024**2)
-        worker = JsonlProcessProvider(provider.name, name, provider.model, [str(python), "-m", "specialist", "_worker", "--capability", name, "--backend", worker_backend], timeout_seconds=timeout, cpu_limit_seconds=timeout + 10, memory_limit_bytes=memory_limit_bytes, env=worker_env, log_path=self.cache.logs / f"{name.replace('.', '__')}.worker.log")
+        worker_capability = getattr(provider, "capability", name)
+        worker = JsonlProcessProvider(provider.name, worker_capability, provider.model, [str(python), "-m", "specialist", "_worker", "--capability", worker_capability, "--backend", worker_backend], timeout_seconds=timeout if worker_capability == name else self.TIMEOUTS.get(worker_capability, timeout), cpu_limit_seconds=timeout + 10, memory_limit_bytes=memory_limit_bytes, env=worker_env, log_path=self.cache.logs / f"{name.replace('.', '__').replace('@', '__')}.worker.log")
+        # Preserve provider metadata across the process boundary. Routing and
+        # policy run in Core, so a worker must retain the same model identity,
+        # resource profile and locality facts as its in-process counterpart.
+        for attribute in (
+            "preferred_model",
+            "quality",
+            "latency_ms",
+            "memory_requirement_mb",
+            "disk_requirement_mb",
+            "license",
+            "commercial",
+            "requires_local_model_directory",
+            "remote",
+            "node_id",
+        ):
+            try:
+                if hasattr(provider, attribute):
+                    setattr(worker, attribute, getattr(provider, attribute))
+            except Exception:
+                # Metadata is advisory; provider startup remains responsible
+                # for reporting the actionable configuration error.
+                continue
+        if hasattr(provider, "supported_devices"):
+            worker.supported_devices = tuple(provider.supported_devices)
+        if hasattr(provider, "supported_platforms"):
+            worker.supported_platforms = tuple(provider.supported_platforms)
         worker.requires_verified_artifact = artifact_required
         worker.requires_local_model_directory = bool(getattr(provider, "requires_local_model_directory", False))
         return worker
@@ -198,6 +234,12 @@ class SpecialistRuntime:
                 return provider
         return self.providers[capability]
 
+    def _provider_for_installation(self, capability: str, installation=None):
+        provider_name = installation.get("provider") if isinstance(installation, dict) else None
+        if isinstance(provider_name, str) and provider_name:
+            return self._route_provider(capability, provider_name)
+        return self.providers[capability]
+
     def explain(self, capability: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
         """Return the deterministic routing decision without executing input."""
         canonical = resolve_capability(capability)
@@ -212,8 +254,8 @@ class SpecialistRuntime:
         hardware = detect_hardware()
         capability_states = []
         for spec in CAPABILITIES.values():
-            provider = self.providers[spec.name]
             installation = self.cache.installation(spec.name)
+            provider = self._provider_for_installation(spec.name, installation)
             error = self.cache.error_state(spec.name)
             check = {}
             state = "ready"
@@ -294,14 +336,28 @@ class SpecialistRuntime:
             spec = CAPABILITIES[name]
             with self.cache.capability_lock(name):
                 existing = self.cache.installation(name)
-                if existing and not source and not install_dependencies:
+                if existing and not source and not install_dependencies and (provider_override is None or existing.get("provider") == getattr(provider_override, "name", spec.provider)):
                     installed.append({"capability": name, "provider": existing.get("provider", spec.provider), "model": existing.get("model", spec.model), "status": existing.get("status", "ready"), "already_installed": True})
                     continue
-                selected_model = model if model and model in {item.id for item in spec.models} else self._model_for(spec, existing)
-                model_spec = spec.model_spec(selected_model)
                 provider = provider_override if provider_override is not None and len(names) == 1 else self.providers[name]
+                registered_models = {item.id for item in spec.models}
+                if model is not None and model not in registered_models:
+                    raise ValueError(f"model '{model}' is not registered for {name}")
+                preferred_model = getattr(provider, "preferred_model", None)
+                selected_model = (
+                    model
+                    if model is not None
+                    else preferred_model
+                    if preferred_model in registered_models
+                    else self._model_for(spec, existing)
+                )
+                model_spec = spec.model_spec(selected_model)
                 if provider_override is not None and len(names) == 1:
-                    self.providers[name] = provider
+                    # Alternate providers (for example system_tts) live under
+                    # a qualified key so installing one route never replaces
+                    # the Fish primary adapter for later quality requests.
+                    target_key = name if getattr(provider, "name", spec.provider) == spec.provider else f"{name}@{getattr(provider, 'name', 'override')}"
+                    self.providers[target_key] = provider
                 if hasattr(provider, "model"):
                     provider.model = selected_model
                 dependency_env = None
@@ -379,8 +435,8 @@ class SpecialistRuntime:
         if not hardware.get("supported_target"):
             warnings.append("This platform is outside the primary macOS Apple Silicon support target; validate providers before production use.")
         for spec in CAPABILITIES.values():
-            provider = self.providers[spec.name]
             installation = self.cache.installation(spec.name)
+            provider = self._provider_for_installation(spec.name, installation)
             details = provider.doctor(hardware)
             model_spec = spec.model_spec(self._model_for(spec, installation, hardware))
             platform = target_id(hardware)
@@ -432,7 +488,7 @@ class SpecialistRuntime:
                 state = "corrupt"
             if details.get("status") != "ready":
                 state = "unavailable"
-            capabilities.append({"capability": spec.name, "provider": spec.provider, "model": self._model_for(spec, installation, hardware), "installation": installation, "error": error_state, "environment": environment, "verification": verification, "registry": {"source_url": spec.source_url, "models": [model.id for model in spec.models]}, **details, "status": state})
+            capabilities.append({"capability": spec.name, "provider": getattr(provider, "name", spec.provider), "model": self._model_for(spec, installation, hardware), "installation": installation, "error": error_state, "environment": environment, "verification": verification, "registry": {"source_url": spec.source_url, "models": [model.id for model in spec.models]}, **details, "status": state})
         from . import __version__
 
         return {"version": __version__, "home": str(self.cache.home), "system": hardware, "capabilities": capabilities, "fixes": fixes, "warnings": warnings}
@@ -441,6 +497,7 @@ class SpecialistRuntime:
         output = []
         for spec in CAPABILITIES.values():
             installation = self.cache.installation(spec.name)
+            provider = self._provider_for_installation(spec.name, installation)
             state = "not installed"
             verification = None
             if installation:
@@ -456,7 +513,7 @@ class SpecialistRuntime:
             if not installation and error_state:
                 state = "error"
             registry_model = spec.model_spec(self._model_for(spec, installation))
-            output.append({"capability": spec.name, "provider": spec.provider, "model": self._model_for(spec, installation), "status": state, "installation": installation, "error": error_state, "registry": {"source_url": spec.source_url, "recommended": registry_model.recommended, "memory_mb": registry_model.memory_mb, "disk_mb": registry_model.disk_mb, "platforms": list(registry_model.platforms), "devices": list(registry_model.devices), "artifact_url": registry_model.artifact_url, "artifact_sha256": registry_model.artifact_sha256, "artifact_kind": registry_model.artifact_kind, "artifact_entrypoint": registry_model.artifact_entrypoint, "artifact_files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in registry_model.artifact_files]}, "verification": verification})
+            output.append({"capability": spec.name, "provider": getattr(provider, "name", spec.provider), "model": self._model_for(spec, installation), "status": state, "installation": installation, "error": error_state, "registry": {"source_url": spec.source_url, "recommended": registry_model.recommended, "memory_mb": registry_model.memory_mb, "disk_mb": registry_model.disk_mb, "platforms": list(registry_model.platforms), "devices": list(registry_model.devices), "artifact_url": registry_model.artifact_url, "artifact_sha256": registry_model.artifact_sha256, "artifact_kind": registry_model.artifact_kind, "artifact_entrypoint": registry_model.artifact_entrypoint, "artifact_files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in registry_model.artifact_files]}, "verification": verification})
         return output
 
     def remove_model(self, target):
@@ -465,8 +522,13 @@ class SpecialistRuntime:
         for name in names:
             with self._locks[name]:
                 if name in self._loaded:
-                    self.providers[name].unload()
+                    active_provider = self._active_providers.get(name, self.providers[name])
+                    active_provider.unload()
+                    close_provider = getattr(active_provider, "close", None)
+                    if callable(close_provider):
+                        close_provider()
                     self._loaded.discard(name)
+                    self._active_providers.pop(name, None)
                     self._last_used.pop(name, None)
                 output.append({"capability": name, "removed": self.cache.remove_model(name)})
         return output
@@ -531,6 +593,41 @@ class SpecialistRuntime:
         values.extend(item.to_dict() for item in self.provider_catalog.list() if item.provider not in known)
         return values
 
+    def import_voice(self, source: str | Path, name: str, *, provider_assets: dict[str, Any] | None = None) -> dict[str, Any]:
+        return self.voices.import_voice(source, name, provider_assets=provider_assets)
+
+    def list_voices(self) -> list[dict[str, Any]]:
+        return self.voices.list()
+
+    def remove_voice(self, value: str) -> bool:
+        return self.voices.remove(value)
+
+    def provider_lifecycle(self, provider: str, action: str) -> dict[str, Any]:
+        if provider != "fish_audio":
+            raise ValueError(f"provider lifecycle is not implemented for '{provider}'")
+        adapter = self.providers.get("speech.synthesize")
+        if hasattr(adapter, "_cache"):
+            adapter._cache = self.cache
+        lifecycle = getattr(adapter, "lifecycle", None)
+        if lifecycle is None:
+            # Isolated runtimes intentionally do not expose a child process'
+            # server object. Lifecycle commands are operator operations and
+            # use a direct adapter instance in normal CLI mode.
+            from .providers.fish_audio import FishAudioProvider
+
+            adapter = FishAudioProvider("speech.synthesize")
+            adapter._cache = self.cache
+            lifecycle = adapter.lifecycle
+        if action == "start":
+            return lifecycle.start(persist=True)
+        if action == "stop":
+            return lifecycle.stop()
+        if action == "restart":
+            return lifecycle.restart(persist=True)
+        if action in {"status", "health"}:
+            return lifecycle.health()
+        raise ValueError("provider action must be start, stop, restart or status")
+
     def packs(self):
         from .packs import PACKS
 
@@ -546,12 +643,31 @@ class SpecialistRuntime:
     def close(self):
         self.sessions.close_all()
         for name in list(self._loaded):
+            active_provider = self._active_providers.get(name, self.providers[name])
             try:
-                self.providers[name].unload()
+                active_provider.unload()
+                close_provider = getattr(active_provider, "close", None)
+                if callable(close_provider):
+                    close_provider()
                 self.cache.update_state(name, "unloaded")
             finally:
                 self._loaded.discard(name)
+                self._active_providers.pop(name, None)
                 self._last_used.pop(name, None)
+        # A provider can fail while starting before it is marked loaded. Give
+        # lifecycle-aware adapters a final chance to reap owned child servers.
+        seen = set()
+        for provider in self.providers.values():
+            identity = id(provider)
+            if identity in seen:
+                continue
+            seen.add(identity)
+            close_provider = getattr(provider, "close", None)
+            if callable(close_provider):
+                try:
+                    close_provider()
+                except Exception:
+                    pass
 
     def __enter__(self):
         return self
@@ -572,11 +688,13 @@ class SpecialistRuntime:
         if not candidates:
             return
         victim = min(candidates, key=lambda name: self._last_used.get(name, 0))
+        active_provider = self._active_providers.get(victim, self.providers[victim])
         try:
-            self.providers[victim].unload()
+            active_provider.unload()
             self.cache.update_state(victim, "unloaded")
         finally:
             self._loaded.discard(victim)
+            self._active_providers.pop(victim, None)
             self._last_used.pop(victim, None)
 
     def run(self, capability: str, input_path: str | Path, options: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -629,7 +747,56 @@ class SpecialistRuntime:
                 # A provider result remains useful when an optional preview
                 # cannot be copied; the original result path is preserved.
                 continue
+        audio = result.get("audio")
+        if isinstance(audio, dict):
+            path_value = audio.get("path")
+            if isinstance(path_value, str) and not path_value.startswith("artifact://"):
+                path = Path(path_value).expanduser()
+                temporary_output = bool(audio.get("temporary"))
+                try:
+                    if path.is_file():
+                        reference = self.artifacts.put_file(path, mime=audio.get("mime"), metadata={"capability": capability, "result_key": "audio"})
+                        audio["artifact"] = reference.uri
+                        audio["mime"] = reference.mime
+                        audio.pop("path", None)
+                        audio.pop("temporary", None)
+                        if reference.to_dict() not in references:
+                            references.append(reference.to_dict())
+                        if temporary_output:
+                            path.unlink(missing_ok=True)
+                except (ArtifactError, OSError):
+                    # Do not leave generated audio in the temporary area when
+                    # artifact persistence fails; non-temporary provider
+                    # previews remain available for diagnostics.
+                    if temporary_output:
+                        try:
+                            path.unlink(missing_ok=True)
+                        except OSError:
+                            pass
+                    pass
         return references
+
+    def _speech_fallback(self, canonical: str, input_path: str | Path, options: dict[str, Any], error: WorkerError | Exception):
+        if canonical != "speech.synthesize" or options.get("provider") or options.get("_fallback_attempted"):
+            return None
+        error_code = getattr(error, "code", None)
+        if not getattr(error, "retryable", False) and error_code not in {"fish_audio_start_not_configured", "fish_audio_not_ready"}:
+            # Protocol, privacy, validation and malformed-output failures are
+            # actionable provider drift, not availability conditions.
+            return None
+        rule = self.policy.resolve(canonical, options)
+        if not bool(rule.get("fallback", True)):
+            return None
+        fallback = self.providers.get("speech.synthesize@system_tts")
+        if fallback is None:
+            return None
+        fallback_options = {**options, "provider": "system_tts", "_fallback_attempted": True}
+        value = self._run(canonical, input_path, fallback_options)
+        if value.get("error") is None:
+            value.setdefault("warnings", []).append("QUALITY_PROFILE_DEGRADED: fish_audio unavailable; used system_tts fallback")
+            value.setdefault("trace", []).append({"stage": "fallback", "from": "fish_audio", "to": "system_tts", "reason": str(error)})
+            value.setdefault("metrics", {})["fallback"] = True
+        return value
 
     @staticmethod
     def _memory_mb():
@@ -660,6 +827,9 @@ class SpecialistRuntime:
             policy_rule = self.policy.resolve(canonical, options)
         except PolicyError as exc:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_policy", str(exc)).to_dict())
+        # Carry the resolved privacy decision across the provider boundary so
+        # remote reference-audio checks cannot diverge from Runtime policy.
+        options.setdefault("allow_remote", bool(policy_rule.get("allow_remote", False)))
         try:
             json.dumps(options, sort_keys=True, separators=(",", ":"), allow_nan=False)
         except (TypeError, ValueError) as exc:
@@ -684,7 +854,7 @@ class SpecialistRuntime:
         if requested_device not in getattr(provider, "supported_devices", ("cpu",)):
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", f"device must be one of {list(getattr(provider, 'supported_devices', ('cpu',)))}").to_dict())
         installation = self.cache.installation(canonical)
-        if installation and installation.get("model"):
+        if installation and installation.get("model") and installation.get("provider") == getattr(provider, "name", spec.provider):
             selected_model = self._model_for(spec, installation)
         requested_model_spec = spec.model_spec(selected_model)
         policy_decision = self.policy.evaluate(capability=canonical, provider=provider, model=requested_model_spec, options=options, estimated_latency_ms=route_latency)
@@ -727,12 +897,14 @@ class SpecialistRuntime:
             try:
                 if self.with_dependencies:
                     self.install(canonical, with_dependencies=True, model=selected_model, provider_override=provider)
-                    provider = self.providers.get(canonical, provider)
+                    if getattr(provider, "name", spec.provider) == spec.provider:
+                        provider = self.providers.get(canonical, provider)
                     installation = self.cache.installation(canonical)
                     selected_model = self._model_for(spec, installation)
                 else:
                     self.install(canonical, with_dependencies=False, model=selected_model, provider_override=provider)
-                    provider = self.providers.get(canonical, provider)
+                    if getattr(provider, "name", spec.provider) == spec.provider:
+                        provider = self.providers.get(canonical, provider)
                     installation = self.cache.installation(canonical)
                     selected_model = self._model_for(spec, installation)
                 if hasattr(provider, "model"):
@@ -745,6 +917,7 @@ class SpecialistRuntime:
                 return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, exc.code, str(exc), retryable=exc.retryable).to_dict())
             except Exception as exc:
                 return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "provider_install_failed", str(exc), retryable=False).to_dict())
+        self._active_providers[canonical] = provider
         cold_start = canonical not in self._loaded
         started = time.perf_counter()
         try:
@@ -758,8 +931,8 @@ class SpecialistRuntime:
             performance = {"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}
             from . import __version__
 
-            observations = build_observations(canonical, result, provider=provider.name, model=selected_model, source=input_info, runtime_version=__version__)
             artifacts = self._collect_artifacts(canonical, result)
+            observations = build_observations(canonical, result, provider=provider.name, model=selected_model, source=input_info, runtime_version=__version__)
             envelope = ResultEnvelope(
                 canonical,
                 provider.name,
@@ -784,10 +957,16 @@ class SpecialistRuntime:
                 envelope["warnings"].append("confidence threshold could not be evaluated because the provider returned no confidence")
                 envelope["trace"].append({"stage": "verification", "mode": options.get("verification", "none"), "status": "unavailable", "threshold": float(minimum_confidence)})
         except WorkerError as exc:
+            fallback = self._speech_fallback(canonical, input_path, options, exc)
+            if fallback is not None:
+                return fallback
             envelope = ResultEnvelope.failure(canonical, provider.name, selected_model, input_info, exc.code, str(exc), retryable=exc.retryable, backend=provider.name).to_dict()
             envelope["performance"] = {"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}
             envelope["trace"] = [{"stage": "routing", **route}, {"stage": "provider", "status": "error", "code": exc.code}]
         except Exception as exc:  # provider isolation: one broken provider never crashes the core
+            fallback = self._speech_fallback(canonical, input_path, options, exc)
+            if fallback is not None:
+                return fallback
             envelope = ResultEnvelope.failure(canonical, provider.name, selected_model, input_info, "provider_error", str(exc), backend=provider.name).to_dict()
             envelope["performance"] = {"latency_ms": round((time.perf_counter() - started) * 1000), "device": requested_device, "memory_mb": self._memory_mb(), "cached": False, "cold_start": cold_start}
             envelope["trace"] = [{"stage": "routing", **route}, {"stage": "provider", "status": "error", "code": "provider_error"}]

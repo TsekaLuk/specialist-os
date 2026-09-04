@@ -181,3 +181,19 @@ def _validate_capability_result(capability: str, result: dict[str, Any]) -> None
         duration = result.get("duration_seconds")
         if not isinstance(duration, (int, float)) or isinstance(duration, bool) or not math.isfinite(duration) or duration < 0:
             raise ValueError("result.duration_seconds must be a non-negative finite number")
+    elif capability in {"speech.synthesize", "speech.clone_voice"}:
+        audio = result.get("audio")
+        if not isinstance(audio, dict):
+            raise ValueError("result.audio must be an object")
+        artifact = audio.get("artifact")
+        if not isinstance(artifact, str) or not artifact.startswith("artifact://"):
+            raise ValueError("result.audio.artifact must be an artifact:// URI")
+        mime = audio.get("mime")
+        if not isinstance(mime, str) or not mime.startswith("audio/"):
+            raise ValueError("result.audio.mime must be an audio MIME type")
+        for key in ("duration_ms", "sample_rate"):
+            value = audio.get(key)
+            if value is not None and (not isinstance(value, (int, float)) or isinstance(value, bool) or value < 0):
+                raise ValueError(f"result.audio.{key} must be a non-negative number or null")
+        if capability == "speech.clone_voice" and not result.get("voice"):
+            raise ValueError("result.voice is required for speech.clone_voice")

@@ -28,7 +28,7 @@ class ServerTests(unittest.TestCase):
                 self.assertEqual(caught.exception.code, 401)
                 request = urllib.request.Request(url, headers={"Authorization": "Bearer secret"})
                 with urllib.request.urlopen(request, timeout=2) as response:
-                    self.assertEqual(len(json.loads(response.read())["capabilities"]), 8)
+                    self.assertEqual(len(json.loads(response.read())["capabilities"]), 10)
                 metrics_request = urllib.request.Request(f"http://127.0.0.1:{server.server_port}/metrics", headers={"Authorization": "Bearer secret"})
                 with urllib.request.urlopen(metrics_request, timeout=2) as response:
                     self.assertIn("specialist_requests_total", response.read().decode())

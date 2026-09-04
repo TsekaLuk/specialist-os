@@ -34,13 +34,13 @@ class ProviderManifest:
     def from_dict(cls, value: dict[str, Any], *, source: str | None = None) -> "ProviderManifest":
         if not isinstance(value, dict):
             raise ProviderManifestError("provider manifest must be an object")
-        required = {"provider", "version", "capability", "runtime", "models", "metrics", "license", "platform"}
+        required = {"provider", "version", "runtime", "models", "metrics", "license", "platform"}
         missing = required.difference(value)
         if missing:
             raise ProviderManifestError(f"provider manifest missing keys: {sorted(missing)}")
         provider = value.get("provider")
         version = value.get("version")
-        capabilities = value.get("capability")
+        capabilities = value.get("capability", value.get("capabilities"))
         if isinstance(capabilities, str):
             capabilities = [capabilities]
         if not isinstance(provider, str) or not provider.strip() or not isinstance(version, str) or not version.strip() or not isinstance(capabilities, list) or not capabilities or any(not isinstance(item, str) or not item.strip() for item in capabilities):
@@ -80,6 +80,7 @@ class ProviderManifest:
             "provider": self.provider,
             "version": self.version,
             "capability": list(self.capabilities),
+            "capabilities": list(self.capabilities),
             "runtime": dict(self.runtime),
             "models": dict(self.models),
             "metrics": dict(self.metrics),
@@ -167,8 +168,9 @@ def builtin_manifests() -> list[ProviderManifest]:
         ("mineru", ["document.parse"], "3.4.5", "command", ["cpu", "cuda"], "AGPL-3.0"),
         ("whisper.cpp", ["audio.transcribe"], "1.9.2", "native", ["cpu", "mps", "cuda"], "MIT"),
         ("silero-vad", ["audio.vad"], "6.2.1", "python", ["cpu", "mps", "cuda"], "MIT"),
+        ("fish_audio", ["speech.synthesize", "speech.clone_voice"], "S2", "http", ["cpu", "mps", "cuda"], "Fish Audio Research License"),
     ]
-    return [
+    manifests = [
         ProviderManifest(
             provider=name,
             version=version,
@@ -184,3 +186,18 @@ def builtin_manifests() -> list[ProviderManifest]:
         )
         for name, capabilities, version, runtime, devices, license_name in definitions
     ]
+    fish = next(item for item in manifests if item.provider == "fish_audio")
+    manifests[manifests.index(fish)] = ProviderManifest(
+        provider=fish.provider,
+        version=fish.version,
+        capabilities=fish.capabilities,
+        runtime={"type": "http", "process_isolation": "required", "persistent_server": True, "start_policy": "on-demand", "max_concurrency": 1, "model_class": "heavy"},
+        models={"default_model": "s2-pro", "recommended_gpu_memory_gb": 24},
+        metrics={"ttfa_ms": None, "generation_latency_ms": None, "rtf": None, "audio_duration_ms": None, "peak_vram_mb": None},
+        license={"family": "Fish Audio Research License", "commercial_allowed_by_default": False, "commercial": False},
+        platform={"linux_x64": "supported", "windows_wsl": "supported", "macos_arm64": "experimental"},
+        network_required=False,
+        trust_level="official",
+        source="builtin",
+    )
+    return manifests

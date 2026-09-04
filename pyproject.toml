@@ -26,6 +26,9 @@ rust = ["maturin>=1.7"]
 [tool.setuptools.packages.find]
 include = ["specialist*"]
 
+[tool.setuptools.package-data]
+"specialist.providers.fish_audio" = ["manifest.json"]
+
 [tool.setuptools.data-files]
 "share/specialist/registry" = ["registry/models.yaml", "registry/models.schema.json"]
 "share/specialist/schemas" = ["schemas/result-envelope.schema.json", "schemas/capability-results.schema.json", "schemas/provider-manifest.schema.json"]

@@ -125,7 +125,7 @@ class RuntimeTests(unittest.TestCase):
         readiness = runtime.readiness()
         self.assertEqual(readiness["status"], "degraded")
         self.assertEqual(readiness["ready_capabilities"], 7)
-        self.assertEqual(readiness["unready_capabilities"], 1)
+        self.assertEqual(readiness["unready_capabilities"], 3)
         ocr = next(item for item in readiness["details"] if item["capability"] == "vision.ocr")
         self.assertEqual(ocr["status"], "unavailable")
         self.assertIn("fixture provider", ocr["reason"])

@@ -110,7 +110,7 @@ class ProductionBoundaryTests(unittest.TestCase):
 
     def test_registry_is_validated_and_has_one_recommended_model(self):
         self.assertEqual(REGISTRY_DOCUMENT["schema_version"], 1)
-        self.assertEqual(len(CAPABILITIES), 8)
+        self.assertEqual(len(CAPABILITIES), 10)
         for spec in CAPABILITIES.values():
             self.assertEqual(sum(item.recommended for item in spec.models), 1)
             self.assertEqual(spec.model_spec().id, spec.model)
@@ -122,8 +122,12 @@ class ProductionBoundaryTests(unittest.TestCase):
                     self.assertGreaterEqual(len(model.artifact_files), 1)
                     self.assertTrue(all(item.url.startswith("https://") and len(item.sha256) == 64 for item in model.artifact_files))
                 else:
-                    self.assertIsNotNone(model.artifact_url, spec.name)
-                    self.assertRegex(model.artifact_sha256 or "", r"^[0-9a-f]{64}$")
+                    if spec.provider == "fish_audio":
+                        self.assertIsNone(model.artifact_url)
+                        self.assertIsNone(model.artifact_sha256)
+                    else:
+                        self.assertIsNotNone(model.artifact_url, spec.name)
+                        self.assertRegex(model.artifact_sha256 or "", r"^[0-9a-f]{64}$")
 
     def test_bundle_install_is_atomic_and_detects_tampering(self):
         with tempfile.TemporaryDirectory() as temp:
