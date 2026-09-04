@@ -60,6 +60,9 @@ class FishAudioProvider:
     requires_verified_artifact = False
     requires_provider_environment = False
     requires_local_model_directory = False
+    # S2 weights and GPU memory belong to the operator-managed Fish server.
+    # Specialist Core only manages the authenticated protocol boundary.
+    server_managed = True
     max_concurrency = 1
     quality = 0.98
     # Warm-server estimate; cold startup is represented separately by the

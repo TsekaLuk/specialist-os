@@ -184,6 +184,7 @@ class SpecialistRuntime:
             "license",
             "commercial",
             "requires_local_model_directory",
+            "server_managed",
             "remote",
             "node_id",
         ):
@@ -234,6 +235,11 @@ class SpecialistRuntime:
             # actionable configuration error.
             return False
 
+    @staticmethod
+    def _provider_uses_managed_resources(provider) -> bool:
+        """Return whether model resources live outside the Core process."""
+        return bool(SpecialistRuntime._provider_is_remote(provider) or getattr(provider, "server_managed", False))
+
     def _route_provider(self, capability: str, provider_name: str):
         for key, provider in self.providers.items():
             if getattr(provider, "name", None) == provider_name and getattr(provider, "capability", capability) == capability:
@@ -283,8 +289,8 @@ class SpecialistRuntime:
                 if platform not in model_spec.platforms:
                     check = {**check, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
                 effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
-                provider_is_remote = self._provider_is_remote(provider)
-                if check.get("status") == "ready" and not provider_is_remote and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
+                provider_uses_managed_resources = self._provider_uses_managed_resources(provider)
+                if check.get("status") == "ready" and not provider_uses_managed_resources and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
                     check = {**check, "status": "not ready", "error": {"code": "insufficient_memory", "message": f"model requires {model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB"}}
                 if check.get("status") != "ready":
                     state = "unavailable"
@@ -315,18 +321,31 @@ class SpecialistRuntime:
             })
         ready_count = sum(item["status"] == "ready" for item in capability_states)
         unready = len(capability_states) - ready_count
+        error_capabilities = sum(item["status"] in {"error", "corrupt"} for item in capability_states)
         if unready == 0:
             status = "ready"
         elif ready_count == 0 or self.backend == "real":
             status = "not_ready"
         else:
             status = "degraded"
+        # Readiness is the traffic gate, while ``doctor --strict`` remains the
+        # complete capability gate. A default/auto service can accept requests
+        # when at least one provider is ready and no persisted error or corrupt
+        # installation exists; callers can inspect the detailed state for the
+        # capabilities that still need attention.
+        accepting_requests = bool(
+            ready_count > 0
+            and error_capabilities == 0
+            and status in {"ready", "degraded"}
+            and self.backend != "real"
+        )
         return {
             "status": status,
+            "accepting_requests": accepting_requests,
             "installed_capabilities": sum(item["installation"] is not None for item in capability_states),
             "ready_capabilities": ready_count,
             "capabilities": len(capability_states),
-            "error_capabilities": sum(item["status"] in {"error", "corrupt"} for item in capability_states),
+            "error_capabilities": error_capabilities,
             "unready_capabilities": unready,
             "backend": self.backend,
             "isolate": self.isolate,
@@ -457,8 +476,8 @@ class SpecialistRuntime:
             if platform not in model_spec.platforms:
                 details = {**details, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
             effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
-            provider_is_remote = self._provider_is_remote(provider)
-            if details.get("status") == "ready" and not provider_is_remote and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
+            provider_uses_managed_resources = self._provider_uses_managed_resources(provider)
+            if details.get("status") == "ready" and not provider_uses_managed_resources and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
                 details = {**details, "status": "not ready", "error": {"code": "insufficient_memory", "message": f"model requires {model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB"}}
             environment = self.environments.status(spec.provider) if spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency] else None
             if environment and environment.get("status") == "ready" and not self.environments.verify(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency]):
@@ -884,8 +903,8 @@ class SpecialistRuntime:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "unsupported_device", f"model {requested_model_spec.id} does not support device {requested_device}").to_dict())
         hardware = detect_hardware()
         effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
-        provider_is_remote = self._provider_is_remote(provider)
-        if (self.backend == "real" or getattr(provider, "requires_verified_artifact", False)) and not provider_is_remote and effective_memory_mb and effective_memory_mb < requested_model_spec.memory_mb:
+        provider_uses_managed_resources = self._provider_uses_managed_resources(provider)
+        if (self.backend == "real" or getattr(provider, "requires_verified_artifact", False)) and not provider_uses_managed_resources and effective_memory_mb and effective_memory_mb < requested_model_spec.memory_mb:
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, requested_model_spec.id, input_info, "insufficient_memory", f"model requires {requested_model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB").to_dict())
         if not path.exists():
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "input_not_found", f"Input file does not exist: {path}").to_dict())

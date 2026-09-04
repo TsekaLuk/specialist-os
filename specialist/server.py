@@ -99,7 +99,7 @@ class RuntimeRequestHandler(BaseHTTPRequestHandler):
                 return self._send(404, {"error": {"code": "unknown_capability", "message": str(exc)}})
         if route in {"/ready", "/v1/ready"}:
             readiness = self.runtime.readiness()
-            return self._send(200 if readiness.get("status") == "ready" else 503, readiness)
+            return self._send(200 if readiness.get("accepting_requests", readiness.get("status") == "ready") else 503, readiness)
         if route in {"/metrics", "/v1/metrics"}:
             metrics = self.runtime.metrics()
             return self._send_text(200, "\n".join(f"specialist_{key} {value}" for key, value in metrics.items()) + "\n")

@@ -26,7 +26,9 @@ class HttpE2ETests(unittest.TestCase):
 
                 status, _, body = http_request(f"{service.url}/ready")
                 self.assertEqual(status, 200)
-                self.assertEqual(json.loads(body)["status"], "ready")
+                readiness = json.loads(body)
+                self.assertIn(readiness["status"], {"ready", "degraded"})
+                self.assertTrue(readiness["accepting_requests"])
 
                 status, _, body = http_request(f"{service.url}/v1/capabilities")
                 self.assertEqual(status, 200)
@@ -115,6 +117,7 @@ class HttpE2ETests(unittest.TestCase):
                 readiness = json.loads(body)
                 self.assertEqual(readiness["status"], "degraded")
                 self.assertEqual(readiness["error_capabilities"], 1)
+                self.assertFalse(readiness["accepting_requests"])
 
 
 if __name__ == "__main__":

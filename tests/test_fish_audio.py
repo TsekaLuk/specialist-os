@@ -236,6 +236,22 @@ class FishAudioProviderTests(unittest.TestCase):
             self.assertIsNone(result["error"], result)
             self.assertEqual(result["provider"], "fish_audio")
 
+    def test_server_managed_provider_is_not_gated_by_client_host_memory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            text = root / "text.txt"
+            text.write_text("Hello", encoding="utf-8")
+            hardware = {"os": "Darwin 25", "architecture": "arm64", "memory_gb": 8, "memory_limit_gb": None, "cuda": False, "mps": True}
+            with patch.dict(os.environ, {"SPECIALIST_FISH_AUDIO_URL": f"http://127.0.0.1:{self.server.server_port}", "SPECIALIST_FISH_AUDIO_START_POLICY": "manual"}, clear=False), patch("specialist.runtime.detect_hardware", return_value=hardware):
+                provider = FishAudioProvider("speech.synthesize")
+                runtime = SpecialistRuntime(home=root / "home", backend="real", provider_overrides={"speech.synthesize": provider})
+                try:
+                    result = runtime.run("speech.synthesize", text, {"text": "Hello", "profile": "quality"})
+                finally:
+                    runtime.close()
+            self.assertIsNone(result["error"], result)
+            self.assertEqual(result["provider"], "fish_audio")
+
     def test_doctor_returns_structured_state_for_invalid_endpoint(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
