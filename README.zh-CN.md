@@ -12,7 +12,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/TsekaLuk/specialist-runtime/ci.yml?branch=main&label=CI&logo=github)](https://github.com/TsekaLuk/specialist-runtime/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/TsekaLuk/specialist-runtime?display_name=tag&sort=semver)](https://github.com/TsekaLuk/specialist-runtime/releases/latest)
-[![Python](https://img.shields.io/pypi/pyversions/specialist-runtime?logo=python&logoColor=white)](https://pypi.org/project/specialist-runtime/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](pyproject.toml)
 [![License](https://img.shields.io/github/license/TsekaLuk/specialist-runtime)](LICENSE)
 
 `CLI` · `Python SDK` · `HTTP` · `MCP` · `Rust Core`
