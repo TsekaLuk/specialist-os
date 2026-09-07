@@ -58,6 +58,16 @@ const { chromium } = require('playwright');
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       await page.screenshot({path:path.join(output,`workspace-${width}.png`),fullPage:true});
       assert.deepEqual(errors, []);
+      await page.evaluate(() => { location.hash = 'audio.transcribe'; });
+      await page.getByRole('heading', {name:'audio.transcribe',exact:true}).waitFor();
+      const sourceAudio = page.getByRole('region', {name:'Input sample'}).locator('audio');
+      await sourceAudio.evaluate(async el => { el.muted = true; await el.play(); el.pause(); });
+      assert.ok(await sourceAudio.evaluate(el => el.duration > 0));
+      assert.ok((await page.locator('.transcript-text').textContent()).length > 40);
+      assert.ok(await page.getByRole('region', {name:'Time segments'}).locator('tbody tr').count() > 0);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await page.screenshot({path:path.join(output,`transcription-${width}.png`),fullPage:true});
+      assert.deepEqual(errors, []);
       results.push({width,media,focus:true,overflow:false});
       await page.close();
     }

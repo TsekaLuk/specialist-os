@@ -39,3 +39,13 @@ fresh rehearsal. Six transform previews have no recoverable local artifact and
 remain marked unavailable, not replaced. Old records without original argv may
 offer a replay command reconstructed from retained routing options and a
 SHA-verified input, explicitly distinguished from a recorded command.
+
+## Input and Result Presentation
+
+Input publication matches local asset bytes to envelope.input.sha256. Retained
+input text may be displayed only when its UTF-8 SHA matches the same digest.
+All 56 current Core pages have a verified input (55 files and one text input).
+Audio transcription now displays the source player, full transcript and segment
+table before the JSON disclosure. Input media and transcript are canonical
+design-system patterns. Browser tests cover muted source playback and visible
+segments at 1440/768/390. No inference was rerun for this presentation change.

@@ -6,6 +6,24 @@ import { Input } from '../components/ui/input';
 
 export { Badge, Button, Input };
 
+export function SampleMedia({ src, mime, name }: { src: string; mime?: string | null; name: string }) {
+  return <figure className="sample-media">
+    <figcaption>{name}</figcaption>
+    {mime?.startsWith('audio/') ? <audio controls preload="metadata" aria-label={`Input audio: ${name}`} src={src} />
+      : mime?.startsWith('video/') ? <video controls preload="metadata" aria-label={`Input video: ${name}`} src={src} />
+      : mime?.startsWith('image/') ? <img src={src} alt={`Input sample: ${name}`} /> : null}
+    <Button variant="outline" size="sm" asChild><a href={src} target="_blank" rel="noreferrer">Open sample</a></Button>
+  </figure>;
+}
+
+export function Transcript({ text, segments }: { text?: string | null; segments?: { start?: number; end?: number; text?: string; speaker?: string }[] }) {
+  const time = (value?: number) => typeof value === 'number' && Number.isFinite(value) ? `${value.toFixed(2)} s` : '';
+  return <div className="transcript">
+    {text && <p className="transcript-text">{text}</p>}
+    {!!segments?.length && <div className="transcript-segments" role="region" aria-label="Time segments" tabIndex={0}><table><thead><tr><th>Start</th><th>End</th><th>Content</th></tr></thead><tbody>{segments.map((segment, i) => <tr key={i}><td>{time(segment.start)}</td><td>{time(segment.end)}</td><td>{segment.speaker && <strong>{segment.speaker} </strong>}{segment.text}</td></tr>)}</tbody></table></div>}
+  </div>;
+}
+
 export function StatusBadge({ status }: { status: string }) {
   const success = status === 'ok';
   const failed = status === 'error';

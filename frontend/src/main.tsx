@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowLeft, Clipboard, SlidersHorizontal } from 'lucide-react';
-import { Button, NavigationItem, SearchInput, StatusBadge } from './design-system';
+import { Button, NavigationItem, SampleMedia, SearchInput, StatusBadge, Transcript } from './design-system';
 import { serializeCommand } from './lib/command.mjs';
 import './styles.css';
 
-type Capability = { capability: string; family: string; status: string; preview?: string; preview_unavailable?: boolean; cached?: boolean; json: string; latency_ms?: number; command?: string[]; command_origin?: string; media?: { src: string; mime: string; sha256: string }[] };
+type Capability = { capability: string; family: string; status: string; preview?: string; preview_unavailable?: boolean; cached?: boolean; json: string; latency_ms?: number; command?: string[]; command_origin?: string; media?: { src: string; mime: string; sha256: string }[]; input_sample?: { name: string; text?: string; src?: string | null; mime?: string | null }; result_view?: { text?: string | null; segments?: { start?: number; end?: number; text?: string; speaker?: string }[] } };
 type Manifest = { results: Capability[] };
 
 export function App() {
@@ -57,9 +57,14 @@ export function App() {
       <main className="content">
         <div className="eyebrow">{item.family}</div>
         <div className="title-row"><div><h1>{item.capability}</h1></div><StatusBadge status={item.status} /></div>
+        <section className="input-sample" aria-label="Input sample">
+          <div className="section-label">INPUT SAMPLE</div>
+          {item.input_sample?.src ? <SampleMedia key={item.input_sample.src} src={`./assets/${item.input_sample.src}`} mime={item.input_sample.mime} name={item.input_sample.name} /> : item.input_sample?.text !== undefined ? <Transcript text={item.input_sample.text} /> : <p>Input sample unavailable</p>}
+        </section>
         <section className="result-panel">
           <div className="panel-head"><div><div className="section-label">RESULT</div><h2>Execution output</h2></div><span>{item.cached ? 'Cached result' : item.latency_ms ? `${(item.latency_ms / 1000).toFixed(2)} s` : 'Recorded run'}</span></div>
           {error && <p role="alert">{error}</p>}
+          {item.result_view && <Transcript text={item.result_view.text} segments={item.result_view.segments} />}
           {item.preview_unavailable && <p role="status">Preview artifact unavailable</p>}
           {item.preview && <img className="preview" src={`./assets/${item.preview}`} alt={`${item.capability} result`} />}
           {item.media?.map(media => <figure className="media-output" key={media.sha256}><figcaption>{media.src}</figcaption>{media.mime.startsWith('audio/') ? <audio controls preload="metadata" aria-label={media.src}><source src={`./assets/${media.src}`} type={media.mime}/></audio> : <video controls preload="metadata" src={`./assets/${media.src}`} /> }<a href={`./assets/${media.src}`} download>Download</a></figure>)}

@@ -33,6 +33,19 @@ button, input { font-family: inherit; }
 .media-output audio, .media-output video { width: 100%; display: block; margin-bottom: var(--space-2); }
 .media-output a { color: var(--color-brand-500); font-size: var(--font-size-sm); }
 details { margin-top: var(--space-4); }
+.input-sample { margin-bottom: var(--space-6); padding-bottom: var(--space-6); border-bottom: var(--border-default); }
+.sample-media { margin: var(--space-3) 0 0; display: grid; justify-items: start; gap: var(--space-3); }
+.sample-media figcaption { font-size: var(--font-size-sm); color: var(--foreground-muted); overflow-wrap: anywhere; }
+.sample-media audio, .sample-media video { display: block; width: 100%; max-height: 280px; }
+.sample-media img { display: block; max-width: 100%; max-height: 280px; object-fit: contain; }
+.sample-media a { text-decoration: none; }
+.transcript-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--font-size-md); line-height: 1.65; }
+.transcript-segments { max-height: 360px; overflow: auto; margin: var(--space-4) 0; }
+.transcript-segments table { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); text-align: left; }
+.transcript-segments th, .transcript-segments td { padding: var(--space-2); border-bottom: var(--border-default); vertical-align: top; }
+.transcript-segments th { color: var(--foreground-muted); font-weight: var(--font-weight-medium); }
+.transcript-segments td:first-child, .transcript-segments td:nth-child(2) { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.transcript-segments td:last-child { overflow-wrap: anywhere; }
 summary { cursor: pointer; }
 @media (max-width: 1020px) { .app { height: auto; min-height: 100dvh; } .shell { grid-template-columns: 220px minmax(0, 1fr); } .sidebar { max-height: 700px; } .inspector { grid-column: 1 / -1; border-top: var(--border-default); border-left: 0; } }
 @media (max-width: 640px) { .topbar { padding: 0 var(--space-4); } .shell { display: block; } .sidebar { max-height: 260px; border-right: 0; border-bottom: var(--border-default); } .content { padding: var(--space-6) var(--space-4); } .title-row { flex-wrap: wrap; } .title-row h1 { font-size: var(--font-size-lg); } .inspector { padding: var(--space-6) var(--space-4); } }
