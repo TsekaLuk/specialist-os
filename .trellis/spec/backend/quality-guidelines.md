@@ -317,6 +317,40 @@ Wrong: `BUNDLES["core"] = list(CAPABILITIES)`.
 Correct: `BUNDLES["core"] = core_install_targets(CAPABILITIES)`.
 Changing the baseline requires a new reviewed Core admission ADR.
 
+## CI and Recorded Command Contract
+
+### 1. Scope / Trigger
+Changes to tests, CI/release workflows, media conversion or workspace commands.
+
+### 2. Signatures
+`python -m pytest tests -q`; `serializeCommand(argv: string[]): string`;
+`audio_transform(..., 'resample', sample_rate=16000, channels=1)`.
+
+### 3. Contracts
+CI installs pytest and collects both test functions and unittest classes.
+Recorded commands preserve every argv element under POSIX shell parsing.
+Read-only evidence must not offer editable controls that do not affect a command.
+Clipboard success is reported only after the write resolves. Resampling applies
+channel conversion independently of sample-rate conversion.
+
+### 4. Validation and Errors
+Missing/empty commands or NUL arguments: reject serialization and disable copy.
+Unavailable/denied clipboard: visible error, no success state.
+Invalid channels: MediaError; valid stereo-to-mono: one output channel.
+
+### 5. Cases
+Good: JSON remains one argument after paste. Base: missing recorded command is
+disabled. Bad: joining argv with spaces or collecting pytest functions with unittest.
+
+### 6. Tests Required
+Run frontend command tests through a real POSIX shell, typecheck and build.
+Run browser media/focus/clipboard checks at 1440, 768 and 390 pixels.
+Run FFmpeg resample regression and verify WAV channel count and sample rate.
+
+### 7. Wrong vs Correct
+Wrong: `argv.join(' ')`. Correct: `serializeCommand(argv)` with quoted arguments.
+Wrong: resample silently ignores channels. Correct: apply both `-ar` and `-ac`.
+
 ## Forbidden Patterns
 
 <!-- Patterns that should never be used and why -->

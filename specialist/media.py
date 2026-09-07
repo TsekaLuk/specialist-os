@@ -226,7 +226,7 @@ def audio_transform(input_path: Any, output_root: Path, operation: str, *, sampl
         if rate < 8000 or rate > 192000:
             raise MediaError("sample_rate must be between 8000 and 192000")
         args.extend(["-ar", str(rate)])
-    if operation in {"convert", "normalize"}:
+    if operation in {"resample", "convert", "normalize"}:
         if channels is not None:
             channel_count = int(_time(channels, "channels"))
             if channel_count not in {1, 2}:
