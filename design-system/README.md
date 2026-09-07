@@ -8,6 +8,9 @@ their own color, radius, shadow or typography primitives.
 
 - `tokens.css` owns primitive, semantic and component tokens.
 - `workspace.css` owns the stable Workspace pattern and responsive behavior.
+- `music-evidence.css` and `music-evidence.js` own the read-only listening and
+  note-timeline evidence pattern. They consume the shared tokens and plot only
+  supplied note events; audio playback uses the browser's accessible player.
 - future primitives and patterns belong here before they are reused by a feature.
 
 ## Visual direction

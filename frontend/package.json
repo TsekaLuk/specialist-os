@@ -2,6 +2,23 @@
   "name": "specialist-os-workspace",
   "private": true,
   "type": "module",
-  "scripts": {"dev": "vite", "build": "vite build", "preview": "vite preview"},
-  "dependencies": {"@vitejs/plugin-react": "latest", "vite": "latest", "typescript": "latest", "react": "latest", "react-dom": "latest", "lucide-react": "latest", "tailwindcss": "latest", "@tailwindcss/vite": "latest"}
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "latest",
+    "@vitejs/plugin-react": "latest",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7"
+  }
 }
