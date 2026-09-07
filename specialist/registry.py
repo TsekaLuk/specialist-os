@@ -12,6 +12,8 @@ from pathlib import Path
 import sys
 from typing import Any
 
+from .core import CORE_CAPABILITIES, CORE_FAMILY_BY_CAPABILITY, core_install_targets
+
 
 class RegistryError(RuntimeError):
     """Raised when the installed registry is missing or malformed."""
@@ -227,9 +229,10 @@ BUNDLES = {
 for bundle_name in ("human", "identity", "audio-plus", "retrieval", "media", "vision-operators", "speech"):
     BUNDLES[bundle_name] = [name for name, spec in CAPABILITIES.items() if spec.bundle == bundle_name]
 BUNDLES["audio-plus"] = [name for name, spec in CAPABILITIES.items() if spec.bundle in {"audio-plus", "speech"} or name in {"audio.denoise", "speech.diarize"}]
-# ``core`` intentionally includes metadata for every capability. Installation
-# remains lazy at the provider boundary, so this does not download every model.
-BUNDLES["core"] = list(CAPABILITIES)
+# ADR-003 freezes admission, while preserving the existing registry order.
+if missing_core := CORE_CAPABILITIES.difference(CAPABILITIES):
+    raise RegistryError(f"ADR-003 Core capabilities missing: {sorted(missing_core)}")
+BUNDLES["core"] = core_install_targets(CAPABILITIES)
 BUNDLES["all"] = list(CAPABILITIES)
 
 ALIASES = {spec.command: name for name, spec in CAPABILITIES.items()}
@@ -264,6 +267,8 @@ def registry_snapshot() -> list[dict[str, Any]]:
             "input_schema": dict(spec.input_schema),
             "output_schema": dict(spec.output_schema),
             "bundle": spec.bundle,
+            "core_family": CORE_FAMILY_BY_CAPABILITY.get(spec.name),
+            "core": spec.name in CORE_CAPABILITIES,
             "optional_dependency": spec.optional_dependency,
             "source_url": spec.source_url,
             "license": {"code": REGISTRY_DOCUMENT.get("code_license", "MIT"), "weights": spec.license, "commercial": spec.commercial, "commercial_allowed_by_default": spec.commercial_allowed_by_default},

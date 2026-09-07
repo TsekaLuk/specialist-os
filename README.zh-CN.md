@@ -6,7 +6,7 @@
 
 **把专业智能变成产品能力。**
 
-连接 AI 应用与专业智能的能力层。
+面向 LLM 的本地优先机器感知、媒体处理与专业计算层。
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
@@ -30,6 +30,11 @@ Specialist OS 是面向 AI 产品的能力层，让应用直接获得看、听�
 开源实现 `specialist-os` 负责发现 Provider、根据请求选择执行路径，并返回
 统一的结果协议。你的产品只依赖能力名称；模型、硬件、隔离和 Provider 的变化由
 Runtime 在底层处理。
+
+Core 15 汇集感知与媒体领域的 15 个能力族，通过 56 个 API 提供模型能力、
+确定性算子和组合工作流。接下来的重点是可靠性、本机执行效率与安装体验。
+深度估计和确定性几何继续作为核心能力；空间智能进入独立观察名单，未来的
+3D 生成通过显式安装的重型可选包扩展。[范围与路线图](docs/core-scope.md)。
 
 这样的分层让想法更快变成可上线的功能：可以用当前最合适的模型启动，随着质量和
 成本变化替换 Provider，同时保持业务 API 稳定，让智能层持续进化。
@@ -105,7 +110,7 @@ Runtime 数据默认保存在 `~/.specialist/`。可以通过 `SPECIALIST_HOME` 
 | `vision.detect` | YOLO | 在实时或录制图像中识别人、车辆、商品和安全事件 | `specialist detect` |
 | `vision.segment` | SAM | 生成精确到像素的目标掩码，用于编辑、质检和机器人流程 | `specialist segment` |
 | `vision.ocr` | PaddleOCR | 把发票、表单和截图转成可搜索的结构化文字 | `specialist ocr` |
-| `vision.depth` | Depth Anything V2 | 为 AR、导航和场景自动化提供空间理解 | `specialist depth` |
+| `vision.depth` | Depth Anything V2 | 估计场景相对深度，辅助前后层次分析与视觉处理 | `specialist depth` |
 | `screen.parse` | OmniParser | 把屏幕解析成 Agent 和测试可以操作的 UI 目标 | `specialist parse-screen` |
 | `document.parse` | MinerU | 从 PDF 和办公文档中提取版面、表格和正文 | `specialist parse-document` |
 | `audio.transcribe` | whisper.cpp | 把会议、通话和媒体内容接入搜索与流程自动化 | `specialist transcribe` |

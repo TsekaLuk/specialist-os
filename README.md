@@ -6,7 +6,7 @@
 
 **Turn specialist intelligence into product capabilities.**
 
-The capability layer between AI applications and specialist intelligence.
+A local-first machine perception, media, and specialist computation layer for LLMs.
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
@@ -32,6 +32,13 @@ The open-source `specialist-os` implementation discovers providers, chooses
 the right execution path for the request, and returns one result contract that
 your application can build on. Your product talks to a capability; the runtime
 handles models, hardware, isolation and provider changes underneath it.
+
+Core 15 brings together 15 capability families across perception and media,
+with 56 APIs for models, operators and composed workflows. Our next milestones
+focus on reliability, faster local execution and smoother installation.
+Depth and deterministic geometry remain part of this foundation. Spatial research
+follows a dedicated watchlist, while future 3D generation belongs to explicit
+optional heavy packs. [Scope and roadmap](docs/core-scope.md).
 
 That separation shortens the path from an idea to a shippable feature. Teams can
 launch with the best available model, switch providers as quality or economics
@@ -113,7 +120,7 @@ result contract and the same routing, caching and deployment surface.
 | `vision.detect` | YOLO | Find people, vehicles, products and safety events in live or recorded images | `specialist detect` |
 | `vision.segment` | SAM | Turn an object into a precise pixel mask for editing, inspection or robotics | `specialist segment` |
 | `vision.ocr` | PaddleOCR | Convert invoices, forms and screenshots into searchable structured text | `specialist ocr` |
-| `vision.depth` | Depth Anything V2 | Add spatial understanding to AR, navigation and scene automation | `specialist depth` |
+| `vision.depth` | Depth Anything V2 | Estimate relative scene depth for layer ordering and visual analysis | `specialist depth` |
 | `screen.parse` | OmniParser | Turn a screen into actionable UI targets for agents and testing | `specialist parse-screen` |
 | `document.parse` | MinerU | Extract layout, tables and content from PDFs and office documents | `specialist parse-document` |
 | `audio.transcribe` | whisper.cpp | Bring meetings, calls and media into search and workflow automation | `specialist transcribe` |

@@ -1,5 +1,16 @@
 # Architecture
 
+## Product boundary
+
+Specialist OS is a local-first machine perception, media, and specialist
+computation layer for LLMs. [ADR-003](adr/003-defer-spatial-3d-core.md) freezes
+Core 15, represented by 56 existing APIs in `specialist/core.py`. Core install
+membership is explicit and does not grow with the registry. See
+[Core scope and roadmap](core-scope.md) for the family mapping and compatibility
+contract, and the [spatial watchlist](spatial-watchlist.md) for future evaluation.
+Depth and existing OpenCV operations stay Core. Spatial experiments and future
+heavy generative providers are separate tracks, without Core world-model logic.
+
 The runtime has four small layers:
 
 1. `specialist.registry` loads and validates the checked-in model registry,
@@ -31,8 +42,8 @@ contract contains no base64 audio. `VoiceRegistry` stores provider-neutral
 
 ## Adding a provider
 
-Implement the protocol in `specialist/providers/base.py`, add a `CapabilitySpec`
-to `specialist/registry.py`, then pass the provider via
+Implement the protocol in `specialist/providers/base.py`, add model metadata
+to `registry/models.yaml`, then pass the provider via
 `SpecialistRuntime(provider_overrides={"capability.name": provider})` while
 integrating. Keep output schemas backward compatible and record upstream model
 license and checksum metadata in `registry/models.yaml`.

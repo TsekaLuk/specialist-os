@@ -268,6 +268,55 @@ developer machines and GitHub runners.
 
 ---
 
+## ADR-003 Core Admission Contract
+
+### 1. Scope / Trigger
+
+Apply when changing registry entries, capability packs, install targets or public
+product scope. Core 15 is 15 families containing 56 baseline APIs, not 15 models.
+
+### 2. Signatures
+
+`core_install_targets(registered_names: Iterable[str]) -> list[str]` in
+`specialist/core.py` selects the frozen allowlist while preserving registry order.
+`registry_snapshot()` adds `core: bool` and `core_family: str | None`.
+
+### 3. Contracts
+
+`CORE_FAMILIES` and `CORE_CAPABILITIES` are the admission owner. `install core`
+and `pack install core` use that baseline, never all registry entries. Preserve
+`spatial.depth` as a depth alias and `pack install spatial` as the `depth-vision`
+compatibility alias. Unknown future providers do not get ready markers.
+Spatial experiments and generative 3D stay outside Core. Existing result schemas
+remain unchanged. Heavy optional provider absence must not create Core warnings.
+
+### 4. Validation & Error Matrix
+
+| Condition | Behavior |
+| --- | --- |
+| Frozen capability absent from registry | Raise `RegistryError` on registry load |
+| Newly registered name outside baseline | Excluded from Core install target |
+| Legacy depth/pack alias | Resolve to existing capability/pack |
+| Unregistered `generate-3d` install | CLI exit 2, unknown target, no ready result |
+
+### 5. Good / Base / Bad Cases
+
+Good: replace a depth provider without changing its output semantics.
+Base: track an unassessed model in the watchlist, with no invented metrics.
+Bad: admit all `spatial.*` names or generated meshes as metric geometry.
+
+### 6. Tests Required
+
+Run `tests/test_core_scope.py`: 15 families, 56 unique names, ordered selection
+excluding future spatial/generative names, retained aliases, discovery metadata,
+and CLI rejection of unimplemented packs. Run unit and E2E regression suites.
+
+### 7. Wrong vs Correct
+
+Wrong: `BUNDLES["core"] = list(CAPABILITIES)`.
+Correct: `BUNDLES["core"] = core_install_targets(CAPABILITIES)`.
+Changing the baseline requires a new reviewed Core admission ADR.
+
 ## Forbidden Patterns
 
 <!-- Patterns that should never be used and why -->
