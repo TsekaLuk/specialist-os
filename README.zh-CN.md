@@ -148,6 +148,11 @@ Runtime 数据默认保存在 `~/.specialist/`。可以通过 `SPECIALIST_HOME` 
 画廊使用的输入素材和许可信息一并放在<a href="docs/assets/e2e/README.md">素材说明</a>中，
 方便复现和替换场景。
 
+每个能力也都有独立的 Workspace。打开
+`output/demo/core15-20260907/workspace.html`，可以在 56 个能力之间切换，查看输入与
+结果、参数、运行状态和完整执行证据。Workspace 与画廊使用同一份真实 CLI 清单生成，
+不会补写或虚构结果。
+
 同一轮运行生成的音频可以直接播放：
 
 | Capability | Provider | 播放 |

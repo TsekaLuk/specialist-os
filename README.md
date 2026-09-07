@@ -159,6 +159,12 @@ reusable media artifacts.
 The source set is kept with the gallery so the scenarios stay reproducible:
 <a href="docs/assets/e2e/README.md">input and license notes</a>.
 
+Every capability also has a focused workspace in the local demo export. Open
+`output/demo/core15-20260907/workspace.html` to move between all 56 capabilities,
+inspect the input/result area, review parameters and open the exact execution
+evidence for the selected run. The workspace is generated from the same real CLI
+manifest as the gallery, so it never invents a result.
+
 Audio outputs are available as playable artifacts from the same run:
 
 | Capability | Provider | Listen |
