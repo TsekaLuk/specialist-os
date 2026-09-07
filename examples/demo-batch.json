@@ -1,0 +1,17 @@
+[
+  {
+    "capability": "media.probe",
+    "input": "docs/assets/e2e/video-input.mp4",
+    "options": {"no_cache": true}
+  },
+  {
+    "capability": "vision.detect",
+    "input": "docs/assets/e2e/bus-input.jpg",
+    "options": {"no_cache": true, "device": "cpu"}
+  },
+  {
+    "capability": "vision.detect",
+    "input": "docs/assets/e2e/bus-input.jpg",
+    "options": {"no_cache": true, "device": "cpu"}
+  }
+]

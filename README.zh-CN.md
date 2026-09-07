@@ -71,12 +71,21 @@ Specialist OS 位于 Agent Framework、Chatbot、RAG 产品和各类模型应用
 
 ## 快速开始
 
+### Codex Agent Skill
+
+安装 Skill：`npx skills add https://github.com/TsekaLuk/specialist-os --skill specialist-os`。
+在 Codex 中使用 `$specialist-os`，提供本机图片、文档或录音和期望结果。
+Skill 会发现所需能力，按需准备本机模型；连续任务可通过
+`specialist batch requests.json` 复用模型进程。
+
+内部分享见 [15 分钟讲解与 10 分钟演示路径](docs/demo-runbook.zh-CN.md)。
+
 使用 [uv](https://docs.astral.sh/uv/) 从源码安装：
 
 ```bash
 git clone https://github.com/TsekaLuk/specialist-os.git
 cd specialist-os
-uv tool install .
+uv tool install --python 3.12 .
 
 specialist doctor
 specialist capabilities --json

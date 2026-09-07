@@ -157,7 +157,7 @@
       "modality": "audio",
       "description": "Find speech activity intervals.",
       "bundle": "audio",
-      "optional_dependency": "torch",
+      "optional_dependency": "silero-vad",
       "source_url": "https://github.com/snakers4/silero-vad",
       "license": {"weights": "MIT", "commercial": true},
       "models": [
@@ -328,7 +328,7 @@
     },
     {
       "name": "vision.geometry.calibrate_camera", "command": "geometry-calibrate-camera", "provider": "opencv", "model": "opencv-5", "modality": "geometry",
-      "description": "Estimate camera intrinsics from image dimensions and calibration points.", "bundle": "vision-operators", "optional_dependency": null, "source_url": "https://opencv.org/",
+      "description": "Calibrate camera intrinsics and distortion from at least three views of 3D/2D correspondences.", "bundle": "vision-operators", "optional_dependency": "opencv", "source_url": "https://opencv.org/",
       "license": {"weights": "Apache-2.0", "commercial": true}, "determinism": "deterministic", "models": [{"id": "opencv-5", "recommended": true, "memory_mb": 256, "disk_mb": 0, "platforms": ["macos-arm64", "linux-x64", "windows-x64"], "devices": ["cpu"], "artifact": {"url": null, "sha256": null, "kind": "server", "managed_by": "os"}}]
     },
     {

@@ -221,7 +221,9 @@ class ProductionBoundaryTests(unittest.TestCase):
         # corrupt and made production installs unusable.
         from specialist.environments import PROVIDER_IMPORTS, REQUIREMENT_IMPORTS
 
-        self.assertEqual(PROVIDER_IMPORTS["mineru"], ["mineru"])
+        self.assertIn("mineru", PROVIDER_IMPORTS["mineru"])
+        self.assertNotIn("magic_pdf", PROVIDER_IMPORTS["mineru"])
+        self.assertTrue({"torch", "torchvision", "transformers"}.issubset(PROVIDER_IMPORTS["mineru"]))
         self.assertEqual(REQUIREMENT_IMPORTS["mineru"], "mineru")
 
     def test_isolated_worker_path_contains_provider_environment_bin(self):
@@ -400,7 +402,7 @@ class ProductionBoundaryTests(unittest.TestCase):
             self.assertFalse(captured["use_textline_orientation"])
             self.assertFalse(captured["enable_mkldnn"])
 
-    def test_whisper_rejects_invalid_audio_and_removes_stale_sidecar(self):
+    def test_whisper_rejects_invalid_audio_and_preserves_user_sidecar(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             cache = Cache(root / "home")
@@ -427,13 +429,16 @@ class ProductionBoundaryTests(unittest.TestCase):
             sidecar = audio.with_suffix(".json")
             sidecar.write_text("{\"stale\": true}", encoding="utf-8")
             executable = root / "whisper-cli"
-            executable.write_text("#!/bin/sh\nprintf '%s' '{\"segments\":[{\"timestamps\":{\"from\":0,\"to\":1},\"text\":\" hello \"}]}' > \"$4.json\"\n", encoding="utf-8")
+            executable.write_text("#!/bin/sh\nprintf '%s' '{\"segments\":[{\"timestamps\":{\"from\":0,\"to\":1},\"text\":\" hello \"}]}' > \"$7.json\"\n", encoding="utf-8")
             executable.chmod(0o755)
             provider = WhisperCppProvider(binary=str(executable))
             provider._cache = cache
             result, _warnings = provider.infer(audio, {}, cache)
             self.assertEqual(result["text"], "hello")
             self.assertEqual(result["segments"][0]["start"], 0)
+            self.assertEqual(json.loads(sidecar.read_text()), {"stale": True})
+            self.assertFalse(Path(str(audio) + ".json").exists())
+            self.assertEqual(list(cache.results.glob("whisper-*")), [])
 
     def test_corrupt_artifact_is_reported_by_models_and_doctor(self):
         with tempfile.TemporaryDirectory() as temp:

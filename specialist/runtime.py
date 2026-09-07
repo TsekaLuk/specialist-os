@@ -673,7 +673,7 @@ class SpecialistRuntime:
         values = []
         for index in range(int(runs)):
             started = time.perf_counter()
-            result = self.run(canonical, input_path, {**(options or {}), "_benchmark_run": index})
+            result = self.run(canonical, input_path, {**(options or {}), "no_cache": True, "_benchmark_run": index})
             if result.get("error"):
                 raise ValueError(f"benchmark input failed: {result['error'].get('code')}: {result['error'].get('message')}")
             measured = (time.perf_counter() - started) * 1000
@@ -1043,7 +1043,7 @@ class SpecialistRuntime:
         if hasattr(provider, "model"):
             provider.model = selected_model
         key = self.cache.result_key(path, canonical, provider.name, selected_model, options)
-        cache_allowed = spec.privacy_level not in {"sensitive", "restricted"} or options.get("allow_sensitive_cache") is True
+        cache_allowed = options.get("no_cache") is not True and (spec.privacy_level not in {"sensitive", "restricted"} or options.get("allow_sensitive_cache") is True)
         cached = self.cache.read_result(key) if cache_allowed else None
         if cached:
             try:

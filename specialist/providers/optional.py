@@ -12,6 +12,7 @@ import json
 import os
 import shutil
 import subprocess
+import tempfile
 import wave
 from collections.abc import Mapping
 from pathlib import Path
@@ -878,26 +879,24 @@ class WhisperCppProvider(OptionalProvider):
             raise WorkerError("whisper.cpp requires a valid PCM WAV input", code="unsupported_audio_format", retryable=False) from exc
         model_path = self.artifact_path() or self.model
         model_path = str(model_path)
-        # Remove stale sidecar output so a failed invocation cannot be
-        # mistaken for a successful result from an earlier request.
-        candidates = [Path(str(input_path) + ".json"), input_path.with_suffix(".json")]
-        for candidate in candidates:
-            candidate.unlink(missing_ok=True)
-        command = [self.binary, "-m", model_path, "-f", str(input_path), "--output-json", "--no-prints"]
-        try:
-            completed = _run_external(command, timeout=float(options.get("timeout_seconds", 300)))
-        except subprocess.TimeoutExpired as exc:
-            raise WorkerError("whisper.cpp timed out", code="provider_timeout") from exc
-        if completed.returncode:
-            raise WorkerError(completed.stderr.strip()[-2000:] or "whisper.cpp failed", code="provider_error", retryable=True)
         parsed = None
-        for candidate in candidates:
+        cache.ensure_dirs()
+        # Each invocation owns its output directory, never a user-side JSON file.
+        with tempfile.TemporaryDirectory(prefix="whisper-", dir=cache.results) as temporary:
+            output_prefix = Path(temporary) / "transcript"
+            candidate = output_prefix.with_suffix(".json")
+            command = [self.binary, "-m", model_path, "-f", str(input_path), "--output-json", "--output-file", str(output_prefix), "--no-prints"]
+            try:
+                completed = _run_external(command, timeout=float(options.get("timeout_seconds", 300)))
+            except subprocess.TimeoutExpired as exc:
+                raise WorkerError("whisper.cpp timed out", code="provider_timeout") from exc
+            if completed.returncode:
+                raise WorkerError(completed.stderr.strip()[-2000:] or "whisper.cpp failed", code="provider_error", retryable=True)
             if candidate.is_file():
                 try:
                     parsed = json.loads(candidate.read_text(encoding="utf-8"))
-                    break
                 except (OSError, ValueError):
-                    continue
+                    pass
         if parsed is None:
             try:
                 parsed = json.loads(completed.stdout.strip()) if completed.stdout.strip() else {}

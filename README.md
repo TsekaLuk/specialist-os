@@ -78,12 +78,20 @@ perception and specialist computation.
 
 ## Quick start
 
+### Codex Agent Skill
+
+Install the local-first skill: `npx skills add https://github.com/TsekaLuk/specialist-os --skill specialist-os`.
+Ask Codex to use `$specialist-os` with a local image, document or recording.
+The skill discovers the required capability and prepares its local model on demand.
+Consecutive requests can share workers through `specialist batch requests.json`.
+
+
 Install from a checkout with [uv](https://docs.astral.sh/uv/):
 
 ```bash
 git clone https://github.com/TsekaLuk/specialist-os.git
 cd specialist-os
-uv tool install .
+uv tool install --python 3.12 .
 
 specialist doctor
 specialist capabilities --json

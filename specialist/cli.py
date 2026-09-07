@@ -7,10 +7,11 @@ import atexit
 import json
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 from . import __version__
-from .registry import CAPABILITIES, get_spec
+from .registry import CAPABILITIES, get_spec, registry_snapshot
 from .runtime import SpecialistRuntime
 from .server import serve_http, serve_mcp
 from .providers.ipc import WorkerError, run_worker
@@ -86,9 +87,22 @@ def build_parser():
     parser.add_argument("--allow-unverified-models", action="store_true", default=None, help="Allow optional providers to download weights without a SHA256 artifact")
     parser.add_argument("--max-loaded", type=int, default=4, help="Maximum simultaneously loaded providers")
     sub = parser.add_subparsers(dest="command", required=True)
+    experimental = sub.add_parser("experimental", help="Run an explicitly provisioned non-Core evaluation")
+    experimental.add_argument("experiment", choices=("generate-3d", "scene-geometry"))
+    experimental.add_argument("input")
+    experimental.add_argument("--source", required=True, help="Reviewed upstream source checkout")
+    experimental.add_argument("--checkpoint", required=True, help="Pinned local checkpoint directory")
+    experimental.add_argument("--output-dir", required=True, help="New output directory")
+    experimental.add_argument("--device", choices=("cpu", "mps", "cuda"), default="cpu")
+    experimental.add_argument("--resolution", type=int, default=128, help="Mesh grid resolution for generation")
 
     capabilities = sub.add_parser("capabilities", help="List the stable capability registry")
+    capabilities.add_argument("target", nargs="?", help="Capability name or command")
+    capabilities.add_argument("--compact", action="store_true", help="Return only names, commands and descriptions")
     capabilities.add_argument("--json", action="store_true", dest="as_json")
+    batch = sub.add_parser("batch", help="Execute a JSON request list with reusable provider workers")
+    batch.add_argument("requests", help="JSON file with capability, input and options for each request")
+    batch.add_argument("--keep-going", action="store_true", help="Continue after a capability error")
     doctor = sub.add_parser("doctor", help="Inspect system, dependencies and provider state")
     doctor.add_argument("--fix", action="store_true", help="Install safe local fallback markers")
     doctor.add_argument("--strict", action="store_true", help="Exit non-zero unless every capability is ready")
@@ -227,13 +241,43 @@ def build_parser():
 
 def main(argv=None):
     args = build_parser().parse_args(argv)
+    if args.command == "experimental":
+        from .experimental.spatial import execute
+
+        result = execute(args)
+        _json_dump(result)
+        return int(bool(result.get("error")))
+    if args.command == "capabilities":
+        try:
+            target = get_spec(args.target).name if args.target else None
+        except KeyError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        values = [item for item in registry_snapshot() if target is None or item["capability"] == target]
+        if args.compact:
+            values = [{key: item[key] for key in ("capability", "command", "description")} for item in values]
+        _json_dump(values)
+        return 0
+    if args.command == "batch":
+        from .batch import load_requests, run_batch
+
+        try:
+            requests = load_requests(Path(args.requests))
+        except (OSError, ValueError, KeyError) as exc:
+            print(f"Invalid batch: {exc}", file=sys.stderr)
+            return 2
     runtime = SpecialistRuntime(home=args.home, isolate=args.isolate or args.command == "serve", backend=args.backend, with_dependencies=args.with_dependencies, max_loaded=args.max_loaded, allow_unverified_models=args.allow_unverified_models)
     # Ensure persistent worker threads are joined before interpreter teardown,
     # including command paths that return early after printing JSON.
     atexit.register(runtime.close)
-    if args.command == "capabilities":
-        _json_dump(runtime.capabilities())
-        return 0
+    if args.command == "batch":
+        started = time.perf_counter()
+        try:
+            results = run_batch(runtime, requests, keep_going=args.keep_going)
+        finally:
+            runtime.close()
+        _json_dump({"results": results, "wall_ms": round((time.perf_counter() - started) * 1000, 2)})
+        return int(any(item.get("error") for item in results))
     if args.command == "doctor":
         value = runtime.doctor(fix=args.fix)
         failed = any(item.get("status") != "ready" for item in value.get("capabilities", []))

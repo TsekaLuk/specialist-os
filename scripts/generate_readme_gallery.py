@@ -27,6 +27,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "docs" / "assets" / "e2e"
+INPUT_FILES = (
+    "bus-input.jpg", "boats-input.jpg", "ocr-table.png", "person-input.jpg",
+    "hand-input.jpg", "specialist-github-screen.png", "meeting-two-speaker.wav",
+    "meeting-two-speaker-noisy.wav", "audio-source.wav", "video-input.mp4", "brief-input.pdf",
+)
 
 
 def _font(size: int, bold: bool = False):
@@ -60,8 +65,9 @@ class Gallery:
         ASSETS.mkdir(parents=True, exist_ok=True)
 
     def run(self, capability: str, command: str, source: Path | str, options: dict[str, Any] | None = None, *, title: str | None = None):
+        print(f"Running {capability}", file=sys.stderr, flush=True)
         args = [self.python, "-m", "specialist", "--home", str(self.home), "--backend", self.backend, "--isolate", command]
-        run_options = dict(options or {})
+        run_options = {"no_cache": True, **(options or {})}
         if command == "clone-voice":
             text = run_options.get("text")
             if not isinstance(text, str) or not text.strip():
@@ -122,6 +128,8 @@ class Gallery:
             "provider": envelope.get("provider"),
             "model": envelope.get("model"),
             "input_sha256": input_record.get("sha256"),
+            "performance": envelope.get("performance"),
+            "command": args,
         }
         if envelope.get("error"):
             record["error"] = envelope["error"]
@@ -190,6 +198,8 @@ def _tile(image: Image.Image, title: str, subtitle: str = "") -> Image.Image:
         draw.text((16, 39), subtitle[:52], fill="#54707a", font=FONT_SMALL)
     preview = _fit_image(image, (328, 218))
     canvas.paste(preview, (16, 60))
+    canvas.info["title"] = title
+    canvas.info["subtitle"] = subtitle
     return canvas
 
 
@@ -428,7 +438,7 @@ def build(args: argparse.Namespace) -> int:
     anchor_a = _center(bus_item) or ((bus_corners[0][0] + bus_corners[2][0]) / 2, (bus_corners[0][1] + bus_corners[2][1]) / 2)
     anchor_b = people[0] if people else (bus_corners[0][0], bus_corners[0][1])
     anchor_c = people[1] if len(people) > 1 else (bus_corners[2][0], bus_corners[2][1])
-    segment = gallery.run("vision.segment", "segment", city_scene, {"point": [420, 360]}, title="SAM segmentation")
+    segment = gallery.run("vision.segment", "segment", city_scene, {"bbox": bus_box}, title="SAM segmentation")
     tiles.append(_tile(_annotated_image(city_scene, segment["result"], "sam"), "Vehicle cutout · SAM", "pixel mask for inspection"))
     ocr = gallery.run("vision.ocr", "ocr", ocr_input, title="PaddleOCR")
     tiles.append(_tile(_annotated_image(ocr_input, ocr["result"], "ocr"), "Operations table · PaddleOCR", f"{len(ocr['result'].get('blocks', []))} text regions"))
@@ -436,7 +446,7 @@ def build(args: argparse.Namespace) -> int:
     preview_uri = (depth.get("result") or {}).get("preview")
     if preview_uri:
         depth_path = _copy_artifact(gallery, preview_uri, ASSETS / "depth-preview.png")
-        tiles.append(_tile(Image.open(depth_path), "Scene layout · Depth Anything", "relative depth map for navigation"))
+        tiles.append(_tile(Image.open(depth_path), "Scene layout · Depth Anything", "relative depth and layer ordering"))
     pose = gallery.run("human.pose", "pose", hand_input, title="MediaPipe pose")
     tiles.append(_tile(_annotated_image(hand_input, pose["result"], "pose"), "Motion coaching · MediaPipe pose", "33 full-body landmarks"))
     face = gallery.run("human.face_landmarks", "face-landmarks", face_input, title="MediaPipe face landmarks")
@@ -529,8 +539,6 @@ def build(args: argparse.Namespace) -> int:
         ("vision.geometry.contour", "geometry-contour", {"points": bus_corners, "closed": True}),
         ("vision.geometry.homography", "geometry-homography", {"source": bus_corners, "destination": [[0, 0], [city_width, 0], [city_width, city_height], [0, city_height]]}),
         ("vision.geometry.perspective_transform", "geometry-perspective-transform", {"points": [list(anchor_a)], "matrix": [[1, 0, 12], [0, 1, 8], [0, 0, 1]]}),
-        ("vision.geometry.calibrate_camera", "geometry-calibrate-camera", {"image_size": [city_width, city_height], "object_points": [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]], "image_points": bus_corners}),
-        ("vision.geometry.solve_pnp", "geometry-solve-pnp", {"object_points": [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]], "image_points": bus_corners, "camera_matrix": [[900, 0, city_width / 2], [0, 900, city_height / 2], [0, 0, 1]], "distortion": [0, 0, 0, 0, 0]}),
         ("vision.geometry.match_features", "geometry-match-features", {"image_a": str(city_scene), "image_b": str(boats_scene)}),
     ]
     geometry_titles = {
@@ -549,6 +557,21 @@ def build(args: argparse.Namespace) -> int:
         if result.get("error"):
             continue
         tiles.append(_tile(_geometry_card(capability, result["result"], city_scene, options), geometry_titles.get(capability, capability), "scene-linked OpenCV measurement"))
+    from rehearse_geometry import prepare_inputs
+
+    board_photo, calibration_options = prepare_inputs(ASSETS / "calibration-inputs")
+    calibration = gallery.run("vision.geometry.calibrate_camera", "geometry-calibrate-camera", board_photo, calibration_options)
+    if not calibration.get("error"):
+        camera = calibration["result"]
+        pose_options = {
+            "object_points": calibration_options["object_points"][0],
+            "image_points": calibration_options["image_points"][0],
+            "camera_matrix": camera["camera_matrix"], "distortion": camera["distortion"],
+        }
+        pose = gallery.run("vision.geometry.solve_pnp", "geometry-solve-pnp", board_photo, pose_options)
+        for capability, envelope in [("vision.geometry.calibrate_camera", calibration), ("vision.geometry.solve_pnp", pose)]:
+            if not envelope.get("error"):
+                tiles.append(_tile(_json_card(envelope["result"]), geometry_titles[capability], "photographed chessboard / board-square units"))
     for capability, command, options in [
         ("vision.transform.crop", "transform-crop", {"x": int(bus_corners[0][0]), "y": int(bus_corners[0][1]), "width": int(bus_corners[1][0] - bus_corners[0][0]), "height": int(bus_corners[2][1] - bus_corners[0][1])}),
         ("vision.transform.resize", "transform-resize", {"width": 960, "height": 640}),
@@ -618,7 +641,7 @@ def build(args: argparse.Namespace) -> int:
     speak = gallery.run(
         "speech.synthesize",
         "speak",
-        "Specialist OS has finished the inspection. All production checks passed.",
+        "Specialist OS has prepared the inspection results for your review.",
         {
             "format": "wav",
             "provider": "fish_audio",
@@ -658,6 +681,7 @@ def build(args: argparse.Namespace) -> int:
     sheet = Image.new("RGB", (columns * 360, rows * 286), "#e8eff1")
     for index, tile in enumerate(tiles):
         sheet.paste(tile, ((index % columns) * 360, (index // columns) * 286))
+        tile.save(ASSETS / f"tile-{index + 1:02d}.png")
     sheet.save(ASSETS / "capability-gallery.png", optimize=True)
     (ASSETS / "capability-gallery.json").write_text(
         json.dumps(
@@ -667,6 +691,7 @@ def build(args: argparse.Namespace) -> int:
                 "backend": gallery.backend,
                 "records": gallery.records,
                 "audio": audio_files,
+                "tiles": [{"image": f"tile-{i + 1:02d}.png", "title": tile.info.get("title"), "subtitle": tile.info.get("subtitle")} for i, tile in enumerate(tiles)],
             },
             ensure_ascii=False,
             indent=2,
@@ -676,7 +701,8 @@ def build(args: argparse.Namespace) -> int:
     )
     from build_audio_gallery import build as build_audio_gallery
 
-    build_audio_gallery()
+    if ASSETS == ROOT / "docs/assets/e2e":
+        build_audio_gallery()
     print(json.dumps({"gallery": str(ASSETS / "capability-gallery.png"), "tiles": len(tiles), "audio": audio_files, "records": gallery.records}, ensure_ascii=False, indent=2))
     return 0
 
@@ -689,7 +715,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--timeout-seconds", type=float, default=180, help="Per-capability CLI timeout (default: 180)")
     parser.add_argument("--allow-errors", action="store_true", help="Record provider errors instead of stopping; no error tile is presented as a result")
     parser.add_argument("--skip-optional", action="store_true", help="Skip heavyweight provider calls while iterating on deterministic gallery rendering")
-    return build(parser.parse_args(argv))
+    parser.add_argument("--output-dir", type=Path, help="Write a separate rehearsal into a new directory, preserving the published gallery")
+    args = parser.parse_args(argv)
+    if args.output_dir:
+        global ASSETS
+        target = args.output_dir.resolve()
+        target.mkdir(parents=True, exist_ok=False)
+        for filename in INPUT_FILES:
+            shutil.copyfile(ASSETS / filename, target / filename)
+        ASSETS = target
+    return build(args)
 
 
 if __name__ == "__main__":

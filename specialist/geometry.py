@@ -157,13 +157,41 @@ def calibrate_camera(image_size: Any, object_points: Any = None, image_points: A
     height = int(_number(image_size[1], "image_size[1]"))
     if width <= 0 or height <= 0:
         raise GeometryError("image_size must be positive")
-    if object_points is not None or image_points is not None:
-        object_values = points(object_points, "object_points", minimum=4)
-        image_values = points(image_points, "image_points", minimum=4)
-        if len(object_values) != len(image_values):
-            raise GeometryError("object_points and image_points must have equal lengths")
-    focal = float(max(width, height))
-    return {"camera_matrix": [[focal, 0.0, width / 2], [0.0, focal, height / 2], [0.0, 0.0, 1.0]], "distortion": [0.0, 0.0, 0.0, 0.0, 0.0], "image_size": [width, height], "estimated": True, "deterministic": True}
+    if not isinstance(object_points, (list, tuple)) or not isinstance(image_points, (list, tuple)):
+        raise GeometryError("camera calibration requires object_points and image_points from at least three views")
+    if len(object_points) < 3 or len(object_points) != len(image_points):
+        raise GeometryError("camera calibration requires matching sets from at least three views")
+    objects, images = [], []
+    for index, (object_view, image_view) in enumerate(zip(object_points, image_points)):
+        object_values = points(object_view, f"object_points[{index}]", minimum=6)
+        image_values = points(image_view, f"image_points[{index}]", minimum=6)
+        if len(object_values) != len(image_values) or len(object_values[0]) != 3 or len(image_values[0]) != 2:
+            raise GeometryError("each calibration view needs matching 3D object and 2D image points")
+        objects.append(object_values)
+        images.append(image_values)
+    try:
+        import cv2
+        import numpy as np
+    except ImportError as exc:
+        raise GeometryDependencyError("camera calibration requires OpenCV") from exc
+    try:
+        rms, camera, distortion, rotations, translations = cv2.calibrateCamera(
+            [np.asarray(view, dtype=np.float32) for view in objects],
+            [np.asarray(view, dtype=np.float32) for view in images],
+            (width, height), None, None,
+        )
+    except cv2.error as exc:
+        raise GeometryError(f"OpenCV camera calibration failed: {exc}") from exc
+    if not math.isfinite(rms) or not np.isfinite(camera).all() or not np.isfinite(distortion).all():
+        raise GeometryError("camera calibration returned non-finite parameters")
+    return {
+        "camera_matrix": camera.tolist(), "distortion": distortion.reshape(-1).tolist(),
+        "image_size": [width, height], "estimated": False, "deterministic": True,
+        "method": "opencv.calibrateCamera", "reprojection_error": float(rms),
+        "view_count": len(objects),
+        "rotation_vectors": [value.reshape(-1).tolist() for value in rotations],
+        "translation_vectors": [value.reshape(-1).tolist() for value in translations],
+    }
 
 
 def solve_pnp(object_points: Any, image_points: Any, camera_matrix: Any, distortion: Any = None) -> dict[str, Any]:

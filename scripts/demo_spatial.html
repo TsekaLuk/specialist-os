@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Specialist OS / 3D</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      letter-spacing: 0;
+    }
+    body {
+      margin: 0;
+      font:
+        15px/1.5 -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      color: #2b3034;
+      background: #f1f3f2;
+    }
+    header {
+      height: 82px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 28px;
+      background: white;
+      border-bottom: 1px solid #d6dcd9;
+    }
+    header img {
+      width: 60px;
+      height: 60px;
+      max-height: 65px;
+      object-fit: contain;
+    }
+    h1 {
+      font-size: 23px;
+      margin: 0;
+    }
+    header span {
+      color: #637369;
+      margin-left: auto;
+    }
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      height: calc(100dvh - 82px);
+    }
+    .stage {
+      position: relative;
+      min-width: 0;
+      min-height: 400px;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+    .tools {
+      position: absolute;
+      left: 24px;
+      top: 22px;
+      display: flex;
+      gap: 8px;
+      z-index: 2;
+    }
+    .tools button {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border: 1px solid #c4cec7;
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: #2b3034;
+    }
+    .tools button:hover {
+      background: #e7edbd;
+    }
+    .tools svg {
+      width: 19px;
+      height: 19px;
+    }
+    .tools select {
+      max-width: 240px;
+      border: 1px solid #c4cec7;
+      background: white;
+      padding: 8px;
+      font: inherit;
+      border-radius: 4px;
+    }
+    .status {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      font-size: 13px;
+      background: #fff;
+      padding: 8px 12px;
+      max-width: calc(100% - 48px);
+      overflow-wrap: anywhere;
+    }
+    aside {
+      background: white;
+      border-left: 1px solid #d6dcd9;
+      padding: 24px;
+      overflow: auto;
+    }
+    aside h2 {
+      font-size: 20px;
+      margin: 0 0 4px;
+    }
+    aside p {
+      color: #65736c;
+      margin: 0 0 20px;
+      font-size: 13px;
+    }
+    .input {
+      width: 100%;
+      height: 225px;
+      object-fit: contain;
+      background: #f2f4f3;
+      display: block;
+      margin: 20px 0;
+    }
+    dl {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 8px;
+      font-size: 13px;
+    }
+    dt {
+      color: #637369;
+    }
+    dd {
+      margin: 0;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+    fieldset {
+      border: 0;
+      border-top: 1px solid #d6dcd9;
+      padding: 18px 0;
+      margin: 20px 0;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    input {
+      accent-color: #28624a;
+    }
+    a {
+      color: #28624a;
+      text-underline-offset: 4px;
+    }
+    .links {
+      display: flex;
+      gap: 18px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 760px) {
+      header {
+        padding: 0 16px;
+        height: 72px;
+        gap: 10px;
+      }
+      header span {
+        display: none;
+      }
+      h1 {
+        font-size: 20px;
+      }
+      main {
+        height: auto;
+        grid-template-columns: 1fr;
+      }
+      .stage {
+        height: 62dvh;
+        min-height: 390px;
+      }
+      aside {
+        border-left: 0;
+        border-top: 1px solid #d6dcd9;
+        padding: 20px;
+      }
+      .input {
+        height: 200px;
+      }
+      .tools {
+        left: 12px;
+        top: 12px;
+        gap: 5px;
+      }
+      .tools select {
+        max-width: 180px;
+        font-size: 13px;
+      }
+      .tools button {
+        width: 36px;
+        height: 38px;
+      }
+      .status {
+        left: 12px;
+        bottom: 12px;
+      }
+      dl {
+        max-width: 460px;
+      }
+    }
+  </style>
+  <header>
+    <img src="logo.png" alt="Specialist OS" />
+    <h1>Specialist OS</h1>
+    <span>3D / Spatial Lab</span>
+  </header>
+  <main>
+    <section class="stage">
+      <div class="tools">
+        <select id="view" aria-label="案例"></select
+        ><button id="reset" title="恢复视角" aria-label="恢复视角">
+          <i data-lucide="scan"></i></button
+        ><button id="zoom-in" title="放大" aria-label="放大">
+          <i data-lucide="zoom-in"></i></button
+        ><button id="zoom-out" title="缩小" aria-label="缩小">
+          <i data-lucide="zoom-out"></i>
+        </button>
+      </div>
+      <div id="status" class="status">正在加载</div>
+    </section>
+    <aside>
+      <h2 id="title"></h2>
+      <p id="provider"></p>
+      <img id="input" class="input" alt="输入与结果对照" />
+      <dl id="metrics"></dl>
+      <fieldset>
+        <label><input id="rotate" type="checkbox" />自动旋转</label
+        ><label><input id="wire" type="checkbox" />线框</label>
+      </fieldset>
+      <div class="links">
+        <a id="evidence" target="_blank">执行结果</a
+        ><a id="download" download>下载 GLB</a>
+      </div>
+    </aside>
+  </main>
+  <script src="vendor/lucide.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three/build/three.module.js",
+        "three/addons/": "./vendor/three/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+    lucide.createIcons();
+    const stage = document.querySelector(".stage"),
+      status = document.querySelector("#status");
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      preserveDrawingBuffer: true,
+    });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0xf1f3f2);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    stage.prepend(renderer.domElement);
+    const scene = new THREE.Scene(),
+      camera = new THREE.PerspectiveCamera(42, 1, 0.01, 1000),
+      controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.autoRotateSpeed = 1.2;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xa9b9ac, 2.4));
+    const light = new THREE.DirectionalLight(0xffffff, 2.0);
+    light.position.set(3, 6, 8);
+    scene.add(light);
+    let object,
+      selected,
+      version = 0,
+      homePosition = new THREE.Vector3(),
+      homeTarget = new THREE.Vector3();
+    function resize() {
+      renderer.setSize(stage.clientWidth, stage.clientHeight);
+      camera.aspect = stage.clientWidth / stage.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(resize).observe(stage);
+    function dispose(item) {
+      item.traverse((n) => {
+        n.geometry?.dispose();
+        for (const m of [].concat(n.material || [])) m.dispose();
+      });
+      scene.remove(item);
+    }
+    function frame() {
+      const box = new THREE.Box3().setFromObject(object),
+        center = box.getCenter(new THREE.Vector3()),
+        size = box.getSize(new THREE.Vector3());
+      const extent = Math.max(size.x, size.y, size.z);
+      const distance =
+        ((extent / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))) *
+          1.35) /
+        Math.min(1, camera.aspect);
+      camera.near = Math.max(0.001, distance / 1000);
+      camera.far = distance * 100;
+      camera.updateProjectionMatrix();
+      controls.target.copy(center);
+      camera.position
+        .copy(center)
+        .add(
+          new THREE.Vector3(
+            selected.id === "generation" ? distance * 0.65 : distance * 0.25,
+            selected.id === "generation" ? distance * 0.3 : distance * 0.15,
+            distance,
+          ),
+        );
+      homePosition.copy(camera.position);
+      homeTarget.copy(center);
+      controls.update();
+    }
+    function poseObject(result) {
+      const group = new THREE.Group();
+      const positions = result.object_points.flat();
+      const g = new THREE.BufferGeometry();
+      g.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(positions, 3),
+      );
+      group.add(
+        new THREE.Points(
+          g,
+          new THREE.PointsMaterial({ color: 0x28624a, size: 0.14 }),
+        ),
+      );
+      const lines = [];
+      for (let y = 0; y < 6; y++)
+        for (let x = 0; x < 9; x++) {
+          const i = y * 9 + x;
+          if (x < 8)
+            lines.push(
+              ...result.object_points[i],
+              ...result.object_points[i + 1],
+            );
+          if (y < 5)
+            lines.push(
+              ...result.object_points[i],
+              ...result.object_points[i + 9],
+            );
+        }
+      const grid = new THREE.BufferGeometry();
+      grid.setAttribute("position", new THREE.Float32BufferAttribute(lines, 3));
+      group.add(
+        new THREE.LineSegments(
+          grid,
+          new THREE.LineBasicMaterial({ color: 0x90a898 }),
+        ),
+      );
+      group.add(new THREE.AxesHelper(3));
+      const [w, h] = result.image_size,
+        K = result.camera_matrix,
+        R = result.pose.rotation_matrix,
+        t = result.pose.translation_vector;
+      const c = new THREE.PerspectiveCamera(
+        THREE.MathUtils.radToDeg(2 * Math.atan(h / (2 * K[1][1]))),
+        w / h,
+        0.3,
+        3,
+      );
+      const extrinsic = new THREE.Matrix4().set(
+        ...R[0],
+        t[0],
+        ...R[1],
+        t[1],
+        ...R[2],
+        t[2],
+        0,
+        0,
+        0,
+        1,
+      );
+      const cvToGl = new THREE.Matrix4().makeScale(1, -1, -1);
+      c.matrix.copy(extrinsic.invert().multiply(cvToGl));
+      c.matrixAutoUpdate = false;
+      group.add(c);
+      group.updateMatrixWorld(true);
+      group.add(new THREE.CameraHelper(c));
+      return group;
+    }
+    function metric(label, value) {
+      const dt = document.createElement("dt"),
+        dd = document.createElement("dd");
+      dt.textContent = label;
+      dd.textContent = value;
+      document.querySelector("#metrics").append(dt, dd);
+    }
+    async function load(record) {
+      const token = ++version;
+      selected = record;
+      status.textContent = "正在加载";
+      window.demoReady = null;
+      window.demoError = null;
+      document.querySelector("#title").textContent = record.title;
+      document.querySelector("#provider").textContent = record.provider;
+      document.querySelector("#input").src = record.image;
+      document.querySelector("#metrics").replaceChildren();
+      document.querySelector("#evidence").href = record.evidence;
+      const download = document.querySelector("#download");
+      download.hidden = !record.mesh;
+      if (record.mesh) download.href = record.mesh;
+      document.querySelector("#wire").checked = false;
+      document.querySelector("#wire").disabled = !record.mesh;
+      if (object) {
+        dispose(object);
+        object = null;
+      }
+      try {
+        const next = record.mesh
+          ? (await new GLTFLoader().loadAsync(record.mesh)).scene
+          : poseObject(record.result);
+        if (record.id === "generation") next.rotation.x = -Math.PI / 2;
+        if (token !== version) {
+          dispose(next);
+          return;
+        }
+        next.traverse((n) => {
+          if (n.isMesh) {
+            for (const m of [].concat(n.material)) {
+              m.side = THREE.DoubleSide;
+              m.roughness = 0.8;
+              m.metalness = 0;
+            }
+          }
+        });
+        object = next;
+        scene.add(object);
+        frame();
+        if (record.id === "calibration") {
+          metric("观测照片", record.result.views);
+          metric(
+            "标定 RMS",
+            record.result.calibration_rms_px.toFixed(3) + " px",
+          );
+          metric("PnP RMS", record.result.pnp_rms_px.toFixed(3) + " px");
+          status.textContent = "棋盘格坐标，单位为格宽";
+        } else {
+          metric("顶点", record.result.vertices.toLocaleString());
+          metric("三角面", record.result.faces.toLocaleString());
+          metric("设备", record.performance.device.toUpperCase());
+          metric(
+            "执行耗时",
+            (record.performance.wall_ms / 1000).toFixed(2) + " s",
+          );
+          status.textContent =
+            record.id === "generation"
+              ? "生成资产 / 对象坐标"
+              : "单目场景估计 / 模型估计尺度";
+        }
+        window.demoReady = record.id;
+      } catch (error) {
+        status.textContent = "加载失败：" + error.message;
+        window.demoError = error.message;
+      }
+    }
+    document.querySelector("#reset").onclick = () => {
+      camera.position.copy(homePosition);
+      controls.target.copy(homeTarget);
+      controls.update();
+    };
+    document.querySelector("#zoom-in").onclick = () => {
+      camera.position
+        .sub(controls.target)
+        .multiplyScalar(0.8)
+        .add(controls.target);
+    };
+    document.querySelector("#zoom-out").onclick = () => {
+      camera.position
+        .sub(controls.target)
+        .multiplyScalar(1.25)
+        .add(controls.target);
+    };
+    document.querySelector("#rotate").onchange = (e) =>
+      (controls.autoRotate = e.target.checked);
+    document.querySelector("#wire").onchange = (e) =>
+      object?.traverse((n) => {
+        if (n.isMesh)
+          for (const m of [].concat(n.material)) m.wireframe = e.target.checked;
+      });
+    renderer.setAnimationLoop(() => {
+      controls.update();
+      renderer.render(scene, camera);
+    });
+    try {
+      const response = await fetch("data.json");
+      if (!response.ok) throw new Error(response.status);
+      const data = await response.json(),
+        select = document.querySelector("#view");
+      for (const record of data) {
+        const option = document.createElement("option");
+        option.value = record.id;
+        option.textContent = record.title;
+        select.append(option);
+      }
+      select.onchange = () => load(data.find((r) => r.id === select.value));
+      await load(data[0]);
+    } catch (error) {
+      status.textContent = error.message;
+    }
+  </script>
+</html>

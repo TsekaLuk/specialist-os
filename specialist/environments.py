@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import hashlib
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -24,7 +25,7 @@ PROVIDER_REQUIREMENTS = {
     "torch": ["torch==2.14.0"],
     "transformers": ["transformers==4.57.3", "Pillow==12.3.0", "torch==2.14.0"],
     "silero-vad": ["silero-vad==6.2.1", "torch==2.14.0"],
-    "mineru": ["mineru==3.4.5"],
+    "mineru": ["mineru[pipeline]==3.4.5", "torch==2.8.0", "torchvision==0.23.0", "transformers==4.57.3", "six==1.17.0"],
     "omniparser": [
         "ultralytics==8.3.70",
         "transformers==4.49.0",
@@ -38,8 +39,8 @@ PROVIDER_REQUIREMENTS = {
     ],
     "mediapipe": ["mediapipe==0.10.21"],
     "pyannote.audio": ["pyannote.audio==4.0.7", "torch==2.8.0", "torchaudio==2.8.0", "torchcodec==0.7.0", "soundfile==0.13.1"],
-    "deepfilternet": ["DeepFilterNet==0.5.6"],
-    "open_clip": ["open_clip_torch==2.31.0", "Pillow==12.3.0", "torch==2.4.1"],
+    "deepfilternet": ["DeepFilterNet==0.5.6", "torch==2.4.1", "torchaudio==2.4.1", "soundfile==0.13.1"],
+    "open_clip": ["open_clip_torch==2.31.0", "Pillow==12.3.0", "torch==2.4.1", "socksio==1.0.0", "transformers==4.57.3", "sentencepiece==0.2.0"],
     "insightface": ["insightface==0.7.3", "onnxruntime==1.19.2"],
     "opencv": ["opencv-python-headless==4.10.0.84"],
 }
@@ -50,12 +51,12 @@ PROVIDER_IMPORTS = {
     "torch": ["torch"],
     "transformers": ["transformers", "PIL", "torch"],
     "silero-vad": ["silero_vad", "torch"],
-    "mineru": ["mineru"],
+    "mineru": ["mineru", "torch", "torchvision", "transformers", "six"],
     "omniparser": ["ultralytics", "transformers", "torch", "torchvision", "paddleocr", "paddle", "PIL"],
     "mediapipe": ["mediapipe"],
     "pyannote.audio": ["pyannote", "torch", "soundfile"],
-    "deepfilternet": ["df"],
-    "open_clip": ["open_clip", "PIL", "torch"],
+    "deepfilternet": ["df", "torch", "torchaudio", "soundfile"],
+    "open_clip": ["open_clip", "PIL", "torch", "socksio", "transformers", "sentencepiece"],
     "insightface": ["insightface"],
     "opencv": ["cv2"],
 }
@@ -65,6 +66,9 @@ REQUIREMENT_IMPORTS = {
     "Pillow": "PIL",
     "silero-vad": "silero_vad",
     "mineru": "mineru",
+    "opencv-python-headless": "cv2",
+    "open_clip_torch": "open_clip",
+    "DeepFilterNet": "df",
 }
 
 
@@ -126,7 +130,8 @@ class ProviderEnvironmentManager:
             return False
         modules = PROVIDER_IMPORTS.get(provider)
         if modules is None:
-            modules = [REQUIREMENT_IMPORTS.get(requirement, requirement.replace("-", "_")) for requirement in (requirements or [])]
+            names = [re.split(r"[\[<>=!~; @]", requirement, maxsplit=1)[0] for requirement in (requirements or [])]
+            modules = [REQUIREMENT_IMPORTS.get(name, name.replace("-", "_")) for name in names]
         if not modules:
             return True
         probe = "import importlib.util, sys; missing=[m for m in %r if importlib.util.find_spec(m) is None]; sys.exit(1 if missing else 0)" % modules
