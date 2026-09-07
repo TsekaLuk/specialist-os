@@ -1,7 +1,13 @@
-# Specialist OS 内部分享
+# LLM 也能做，为什么还要专业模型？
+
+用 Specialist OS 让 Agent 按需调用本地专业能力。
 
 目标：工程团队完成首次接入，产品同事选择一个可验证的业务场景。
-时间：15 分钟 Slides，10 分钟 Codex 演示。
+时间：15 分钟 Slides，10 分钟 Agent 演示。
+
+主线：通用模型可以参与这些任务，Agent 根据交付要求选择直接处理或调用
+专业实现。每个案例说明产物如何进入下一步业务，现场数据不作为 LLM 与
+专业模型的同题性能对比。
 
 ## 会前准备
 
@@ -12,7 +18,8 @@ uv tool install --python 3.12 .
 npx skills add https://github.com/TsekaLuk/specialist-os --skill specialist-os
 ```
 
-在新的 Codex 会话中调用 `$specialist-os`。确认 Skill 出现在可用列表。
+在支持 Skills 的 Agent 会话中加载 `specialist-os`，确认它出现在可用列表。
+其他宿主可通过 CLI 或 MCP 接入，使用各自的工具配置方式。
 按本次任务安装模型，使用 Python 3.12。第一次安装与推理可能包括下载和
 框架初始化，必须提前完成完整彩排。现场可展示轻量能力的首次安装，重型
 模型使用已准备环境，推理时传 `no_cache: true`。
@@ -40,19 +47,80 @@ python scripts/rehearse_demo.py document
 
 ## 10 分钟主线：把一组业务资料变成可操作结果
 
-| 时间 | 发给 Codex 的提示 | 打开的结果 |
+| 时间 | 发给 Agent 的提示 | 打开的结果 |
 | --- | --- | --- |
-| 0:00–1:00 | 使用 $specialist-os，检查视频 docs/assets/e2e/video-input.mp4 的格式、时长和音轨。仅准备本任务需要的本地组件。 | 媒体结构与能力简表 |
-| 1:00–3:00 | 对 bus-input.jpg 检测目标，把返回的公交车 bbox 传给 SAM，再生成相对深度图。关闭结果缓存并展示图片。 | 检测框、整车 mask、深度图 |
-| 3:00–5:00 | 提取 ocr-table.png 的文字，解析 brief-input.pdf 的表格，再解析 specialist-github-screen.png。 | OCR 区域、文档表格、界面元素 |
-| 5:00–7:00 | 转写 meeting-two-speaker.wav 并区分说话人。对 meeting-two-speaker-noisy.wav 降噪，播放处理前后音频。 | 转写、时间线、音频对照 |
-| 7:00–8:30 | 打开本轮结果页，按能力族查看检索、人体、身份与几何结果，说明 PnP 的输入对应点与输出位姿。 | 检索排序、关键点、几何结果 |
-| 8:30–9:15 | 打开 3D Spatial Lab，依次查看图片生成 3D、单目场景几何与相机标定/PnP。 | GLB、场景表面、棋盘格与相机位姿 |
-| 9:15–9:40 | 将检测能力连续调用三次，使用同一批处理和 no_cache=true，展示冷启动与热调用耗时。 | 批处理性能 |
+| 0:00–0:30 | 使用 $specialist-os，检查视频 docs/assets/e2e/video-input.mp4 的格式、时长和音轨。仅准备本任务需要的本地组件。 | 媒体结构与能力简表 |
+| 0:30–2:15 | 对 bus-input.jpg 检测目标，把返回的公交车 bbox 传给 SAM，再生成相对深度图。关闭结果缓存并展示图片。 | 检测框、整车 mask、深度图 |
+| 2:15–3:45 | 提取 ocr-table.png 的文字，解析 brief-input.pdf 的表格，再解析 specialist-github-screen.png。 | OCR 区域、文档表格、界面元素 |
+| 3:45–5:15 | 转写 meeting-two-speaker.wav 并区分说话人。对 meeting-two-speaker-noisy.wav 降噪，播放处理前后音频。 | 转写、时间线、音频对照 |
+| 5:15–7:15 | 检查开场发起的歌曲工作流，试听 Let's Go Fishin' 原曲、人声与伴奏，查看演唱旋律和六条乐器轨道，再试听生成配乐。 | 歌词、音符时间线、多轨 MIDI、配乐 WAV |
+| 7:15–8:00 | 打开本轮结果页，查看检索、人体、身份与几何结果。 | 检索排序、关键点、几何结果 |
+| 8:00–9:00 | 打开 3D Spatial Lab，查看图片生成 3D、单目场景几何与相机标定/PnP。 | GLB、场景表面、棋盘格与相机位姿 |
+| 9:00–9:40 | 将检测能力连续调用三次，使用同一批处理和 no_cache=true，展示冷启动与热调用耗时。 | 批处理性能 |
 | 9:40–10:00 | 给出把 vision.ocr 接入 Python 项目的最小代码。 | 接入代码与试点场景 |
 
-表中短文件名均位于 `docs/assets/e2e/`。能力之间需要传递结果时，让 Codex
+表中短文件名均位于 `docs/assets/e2e/`。能力之间需要传递结果时，让 Agent
 读取上一步的 artifact，通过 SDK 解析本机路径，再发下一条命令。
+
+音乐素材位于 `output/music-rehearsal/vibe-ace.ogg`。会前运行：
+
+```bash
+.venv/bin/python scripts/rehearse_music.py --python output/music-research/essentia-env/bin/python --notes-python output/music-research/basic-pitch-env/bin/python --separation-python output/music-research/separator-env/bin/python --multitrack-python output/music-research/muscriptor-env/bin/python
+.venv/bin/python scripts/build_music_showcase.py
+.venv/bin/python scripts/serve_demo.py --port 8744
+```
+
+音乐完整交付页：`http://127.0.0.1:8744/music-singing/index.html`，服务支持音频跳转。
+包含 Let's Go Fishin' 的原曲、人声／伴奏、ROSVOT 旋律、六个 MuScriptor 乐器轨道，
+以及唱段解析、完整转写两条组合工作流。独立 ACE-Step 案例提供 15 秒原创配乐。
+完整转写实测 141.83 秒，唱段解析 32.20 秒，带参考音频的配乐生成 36.94 秒，均为关闭缓存、
+模型已准备的本机执行。长任务在演示开场发起，解释其他结果时继续运行。
+
+```bash
+.venv/bin/python scripts/build_music_showcase.py \
+  --source output/music-singing-rehearsal --output output/demo/music-singing \
+  --generation output/music-generation-controls --workflows output/music-workflow-rehearsal
+```
+
+爵士乐对照页仍保留在 `http://127.0.0.1:8744/music/index.html`。
+现场让 Agent 复跑上述命令后刷新页面。图中的音符和可下载 MIDI 来自同一次
+Basic Pitch 调用。指纹比较目前演示同一录音的一致性，不作为检索准确率。
+接着展示 MuScriptor 的电贝斯、电钢琴、鼓轨道，下载完整多轨 MIDI，并试听分离的
+人声／伴奏。此曲为器乐录音，人声轨主要用于检查串音，不把它当作人声分离质量基准。
+MuScriptor 本机 MPS 单次约 31 秒，分轨 CPU 约 17 秒，可在解释分析结果时运行。
+
+Slides：`output/demo/slides/final/Specialist-OS-AHA-v5.pptx`，共 17 页、15 分钟。
+讲稿：`output/demo/slides/final/Specialist-OS-AHA-v5-Speaker-Notes.md`。
+[下载内嵌音频版](slides/Specialist-OS-AHA-v5.pptx) ·
+[讲稿](slides/Specialist-OS-AHA-v5-Speaker-Notes.md)。
+第 9 页内嵌降噪前后音频，第 12 页内嵌原曲、人声、伴奏和生成配乐。
+音频以 MP3 192 kbps 随 PPTX 打包，放映时点击波形播放，无需启动 demo 服务。
+演示页保留原始 WAV 和 MIDI 文件。投影前需在实际使用的演示软件中检查播放。
+
+开场先发起完整歌曲工作流，让推理与其他案例讲解交错进行：
+
+```bash
+.venv/bin/python scripts/rehearse_music_workflows.py \
+  output/music-singing-rehearsal/singing.ogg \
+  --home output/music-rehearsal/home --output output/music-workflow-rehearsal
+```
+
+生成配乐的带参考音频命令见 [Music 文档](music.md#generation-controls)。
+Slides 构建入口为 `scripts/build_aha_slides.mjs`，音频打包入口为
+`scripts/prepare_slide_media.py` 与 `scripts/embed_slide_audio.py`。
+
+## 静默录制路径
+
+录制主体是 Codex 接到任务、发现能力、调用真实 CLI、检查输出并打开交付页面的
+完整过程。Remotion 负责字幕、局部放大和明确标注的等待加速，保留实际耗时。
+不重建聊天或终端，不用结果图轮播替代执行过程。
+
+音乐任务提示：把这首歌做成练习素材，分离人声和伴奏，提取演唱旋律，生成
+多乐器 MIDI，整理为可以试听和下载的工作区。保留 CLI 命令和每步产物来源。
+
+静默录制不抢焦点、不采集麦克风或其他应用。模型产物音频直接用于后期，不在
+录制时外放。先验证系统能持续捕获被遮挡的 Codex 窗口，再开始正式录制。
+Music 验收和交付页面修复完成前不启动录制。
 
 ## 全量能力菜单
 

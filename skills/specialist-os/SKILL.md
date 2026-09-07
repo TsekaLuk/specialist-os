@@ -1,6 +1,6 @@
 ---
 name: specialist-os
-description: Process local images, documents, screens, speech and media with Specialist OS. Use for detection, segmentation, OCR, transcription, depth, landmarks, visual retrieval, measurement and media conversion, or combining these into an agent workflow.
+description: Process local images, documents, screens, speech, music and media with Specialist OS. Use for perception, OCR, transcription, music analysis and MIDI, source separation, visual retrieval, measurement and media conversion, or combining these into an agent workflow.
 ---
 
 # Specialist OS
@@ -48,6 +48,9 @@ server: `specialist --backend real --isolate serve --mcp`. Read
 [integration.md](references/integration.md) when configuring MCP or building an app.
 
 ## Deliver results
+
+For music analysis, separation or MIDI tasks, read
+[music.md](references/music.md) for capability selection, licensing and output handling.
 
 Return the result relevant to the user's goal, not the complete diagnostic envelope.
 Resolve output artifact URIs using the SDK ArtifactStore before displaying local

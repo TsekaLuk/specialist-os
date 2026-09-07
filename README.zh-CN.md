@@ -39,6 +39,17 @@ Core 15 汇集感知与媒体领域的 15 个能力族，通过 56 个 API 提�
 这样的分层让想法更快变成可上线的功能：可以用当前最合适的模型启动，随着质量和
 成本变化替换 Provider，同时保持业务 API 稳定，让智能层持续进化。
 
+## 音乐智能
+
+按节奏与调性整理音乐素材，核对录音指纹，分离人声与伴奏，把录音转成多乐器 MIDI。
+Essentia、Chromaprint、Basic Pitch、audio-separator、MuScriptor 与 ROSVOT 通过
+同一套本地 CLI 调用。组合歌词与演唱旋律、细化分轨转写，也可以通过独立安装的
+ACE-Step 生成配乐。试听音频、检查音符时间线，再把产物带入编曲与练习工具。
+[音乐能力与现场演示](docs/music.md)。
+
+[15 分钟团队分享与演示路线](docs/demo-runbook.zh-CN.md)把这些产物串成应用场景，
+slides 内嵌音频，可直接对照试听。
+
 ## 为什么团队选择 Specialist OS
 
 | | 产品价值 |

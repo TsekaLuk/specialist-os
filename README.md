@@ -45,6 +45,20 @@ launch with the best available model, switch providers as quality or economics
 change, and keep the application API stable while the intelligence layer keeps
 improving.
 
+## Music Intelligence
+
+Organize a music library by tempo and key, compare recording fingerprints,
+separate vocals from accompaniment, and turn recordings into editable MIDI.
+Essentia, Chromaprint, Basic Pitch, audio-separator, MuScriptor and ROSVOT share
+the same local CLI workflow. Combine lyrics with sung notes, refine separated
+tracks, or create a soundtrack with the independently installed ACE-Step pack.
+Listen to the audio, inspect note timelines, and take the artifacts into your
+arranging or practice tools.
+[Music capabilities and live demo](docs/music.md).
+
+The [15-minute team presentation and demo route](docs/demo-runbook.zh-CN.md)
+connect these outputs to application scenarios, with audio embedded in the slides.
+
 ## Why teams build on Specialist OS
 
 | | Product value |

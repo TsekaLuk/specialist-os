@@ -1,0 +1,1089 @@
+{
+  "schema_version": 1,
+  "fixture_manifest": "tests/fixtures/music/benchmark.json",
+  "reproduce": "scripts/benchmark_music.py",
+  "records": [
+    {
+      "category": "solo_piano",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "d906c2bbeac95347e077c831de55b8acf9af9ec26ac73f288c126be82b5038d7",
+      "result_sha256": "06d787efe28765742e5f85f316d32cf5d21407052f5b71fbe4e6de9e9f0ee751",
+      "performance": {
+        "latency_ms": 9672,
+        "device": "cpu",
+        "memory_mb": 35.1,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_piano",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "d906c2bbeac95347e077c831de55b8acf9af9ec26ac73f288c126be82b5038d7",
+      "result_sha256": "1f6e97aa6e06ed3e7e15b6267102a431894765e2b771875afd6567364bc62e96",
+      "performance": {
+        "latency_ms": 12258,
+        "device": "cpu",
+        "memory_mb": 33.3,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_piano",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "d906c2bbeac95347e077c831de55b8acf9af9ec26ac73f288c126be82b5038d7",
+      "result_sha256": "4569335725e511af3cf384ac867172b1cf68eb5224eb43b18a739f71aceea88b",
+      "performance": {
+        "latency_ms": 6874,
+        "device": "cpu",
+        "memory_mb": 33.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_guitar",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "1823aeacc8fdcde9719e6e9440eb38b7d7f7a27eb8f73e4582ba421dc60bc01b",
+      "result_sha256": "d46756bd7ee0bd368761d62051a914447d5948a165d29385c1c7e1bde956fa8b",
+      "performance": {
+        "latency_ms": 8248,
+        "device": "cpu",
+        "memory_mb": 33.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_guitar",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "1823aeacc8fdcde9719e6e9440eb38b7d7f7a27eb8f73e4582ba421dc60bc01b",
+      "result_sha256": "41708c7adbf42d6fa7e6a52b6962a50ebd861b90d0ddf490756e62a7626dff1a",
+      "performance": {
+        "latency_ms": 8613,
+        "device": "cpu",
+        "memory_mb": 35.2,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_guitar",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "1823aeacc8fdcde9719e6e9440eb38b7d7f7a27eb8f73e4582ba421dc60bc01b",
+      "result_sha256": "8dd9e0f812724de83c5dd2a595895209e0ab659543bbdfcf962221fa85f7b7b9",
+      "performance": {
+        "latency_ms": 5813,
+        "device": "cpu",
+        "memory_mb": 33.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_bass",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "ec2ba3fde31695fac18a17a7af7cf042996de4547d82062aa1077c55a15c0fbd",
+      "result_sha256": "9748f6d18968a8c8fc9a0ff27585a433a3c4edb40d2022ad3f59f58d3888f5ae",
+      "performance": {
+        "latency_ms": 6454,
+        "device": "cpu",
+        "memory_mb": 33.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_bass",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "ec2ba3fde31695fac18a17a7af7cf042996de4547d82062aa1077c55a15c0fbd",
+      "result_sha256": "e17002611e3d392bc112c0ad89e080cd51cde6eb32a71a09f4cf2710079bc404",
+      "performance": {
+        "latency_ms": 6738,
+        "device": "cpu",
+        "memory_mb": 32.7,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_bass",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "ec2ba3fde31695fac18a17a7af7cf042996de4547d82062aa1077c55a15c0fbd",
+      "result_sha256": "be88cdb8024c37bc9e276e4f7e76332df76455badfdff990cb98df066450e8d7",
+      "performance": {
+        "latency_ms": 4975,
+        "device": "cpu",
+        "memory_mb": 33.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "clean_vocal",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "d07cdfaa2d96944b8af1cee7ccd328ebcc3816940f2f2bca29ba7353ec2621fe",
+      "result_sha256": "a8a10159d7ce824169a11492ba25d48085008cb1e97b4232a5315323b23ea948",
+      "performance": {
+        "latency_ms": 5745,
+        "device": "cpu",
+        "memory_mb": 32.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "clean_vocal",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "d07cdfaa2d96944b8af1cee7ccd328ebcc3816940f2f2bca29ba7353ec2621fe",
+      "result_sha256": "85999abb19b01b785165516189b7681363e71f063f5e10820579a6f963652842",
+      "performance": {
+        "latency_ms": 4040,
+        "device": "cpu",
+        "memory_mb": 32.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "clean_vocal",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "d07cdfaa2d96944b8af1cee7ccd328ebcc3816940f2f2bca29ba7353ec2621fe",
+      "result_sha256": "7ea6ff5bc8f80289fce4c007188f02c229fd9002dc361590a744971abb218a3b",
+      "performance": {
+        "latency_ms": 5068,
+        "device": "cpu",
+        "memory_mb": 33.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "vocal_with_backing",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "3c17619bae64704290a5f73d7d264b342dfef558176a05214a891219bfede374",
+      "result_sha256": "b56735a9b7a89a90402fe66797b2ef54f79bc442496c70b58d30d033fada893a",
+      "performance": {
+        "latency_ms": 9601,
+        "device": "cpu",
+        "memory_mb": 36.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "vocal_with_backing",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "3c17619bae64704290a5f73d7d264b342dfef558176a05214a891219bfede374",
+      "result_sha256": "bbd8af59d161e2c4b246ac659bb0a2c0f82e18b5d83b33b1d170ad23299c9c5a",
+      "performance": {
+        "latency_ms": 45025,
+        "device": "cpu",
+        "memory_mb": 35.0,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "vocal_with_backing",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "3c17619bae64704290a5f73d7d264b342dfef558176a05214a891219bfede374",
+      "result_sha256": "0753a9038868bc0a6ddc3707690e26dc5b553bfd5fcb8b85ed68c82b98c9bf56",
+      "performance": {
+        "latency_ms": 5681,
+        "device": "cpu",
+        "memory_mb": 33.7,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "pop_full_mix",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "1edd3c955aba9bc65079d1e466c0baa93f559e60044ca251cd52bfe7797b4731",
+      "result_sha256": "b300ae086f1f382000b866dc4a8772e973893fd7a5c0ab8d6e46f6b7ac931707",
+      "performance": {
+        "latency_ms": 5901,
+        "device": "cpu",
+        "memory_mb": 33.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "pop_full_mix",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "1edd3c955aba9bc65079d1e466c0baa93f559e60044ca251cd52bfe7797b4731",
+      "result_sha256": "a1bbef428bb17c6cc2fdde01a320251ced7a5a50870793cc76b324431097f772",
+      "performance": {
+        "latency_ms": 13366,
+        "device": "cpu",
+        "memory_mb": 32.7,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "pop_full_mix",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "1edd3c955aba9bc65079d1e466c0baa93f559e60044ca251cd52bfe7797b4731",
+      "result_sha256": "261604d44c276b1862b292cf1c92baff4c0086ff0fceba44bffbf3cacced9f17",
+      "performance": {
+        "latency_ms": 5002,
+        "device": "cpu",
+        "memory_mb": 32.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rock_full_mix",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "cb40dcac1a8684c110989e50e95e91b8fd89882777253fc2421de28138cb67dd",
+      "result_sha256": "223436336fcef4f52e0d1542ad9b7eea8cc62208abc1f5a68b52b4b9204d52fa",
+      "performance": {
+        "latency_ms": 5415,
+        "device": "cpu",
+        "memory_mb": 32.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rock_full_mix",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "cb40dcac1a8684c110989e50e95e91b8fd89882777253fc2421de28138cb67dd",
+      "result_sha256": "a3917cdf0a97faad1ceb0cc8ed73825c18213619f27e958e2829ec476cf238e3",
+      "performance": {
+        "latency_ms": 12560,
+        "device": "cpu",
+        "memory_mb": 33.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rock_full_mix",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "cb40dcac1a8684c110989e50e95e91b8fd89882777253fc2421de28138cb67dd",
+      "result_sha256": "c89904751f5e95e347e069501b1d552830e11ae2732c1003ec9ab9d21503780c",
+      "performance": {
+        "latency_ms": 4822,
+        "device": "cpu",
+        "memory_mb": 32.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "electronic",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "11a3b56562bddf77a410ef10a44a5b17321bf8f1ede0a72ebc7d797787d14768",
+      "result_sha256": "cb36b39fe3a37747933013b2e622d2ef5047ccec3e2b6ed4893cc2a1d8ed75ce",
+      "performance": {
+        "latency_ms": 7951,
+        "device": "cpu",
+        "memory_mb": 33.4,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "electronic",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "11a3b56562bddf77a410ef10a44a5b17321bf8f1ede0a72ebc7d797787d14768",
+      "result_sha256": "6c6abdd5d20800efac49f71b315435be3295b92475ca145df6e9bae705a67e42",
+      "performance": {
+        "latency_ms": 9455,
+        "device": "cpu",
+        "memory_mb": 34.1,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "electronic",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "11a3b56562bddf77a410ef10a44a5b17321bf8f1ede0a72ebc7d797787d14768",
+      "result_sha256": "3013d2a4c99aa284d228382c40acb9c111c7847d971df22a636dbc1e697cf692",
+      "performance": {
+        "latency_ms": 5265,
+        "device": "cpu",
+        "memory_mb": 35.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "classical",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "051441d91f5b588939cb9ca28f8b3d7572974d3ce6012b88adfaf323a0b7fe2a",
+      "result_sha256": "e56c83061eddde04d6762486a7d29d3db5349684e5b3fab9138bfcb9466047a1",
+      "performance": {
+        "latency_ms": 8272,
+        "device": "cpu",
+        "memory_mb": 33.2,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "classical",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "051441d91f5b588939cb9ca28f8b3d7572974d3ce6012b88adfaf323a0b7fe2a",
+      "result_sha256": "966261bca3aad48c734a4297e144ee707a9f9e55cf765173e503c0b29407be3b",
+      "performance": {
+        "latency_ms": 33822,
+        "device": "cpu",
+        "memory_mb": 35.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "classical",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "051441d91f5b588939cb9ca28f8b3d7572974d3ce6012b88adfaf323a0b7fe2a",
+      "result_sha256": "027661f7faa457ccc785e3c08e8ba74df80085d828bb5ed2e8642a4950273f6b",
+      "performance": {
+        "latency_ms": 5332,
+        "device": "cpu",
+        "memory_mb": 34.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "jazz",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "3a1c3d0d539c463dfec22575aca6bf8f338ffde14ca4060ddfca5d86ebdfdc7a",
+      "result_sha256": "58e689b01e55b4ef02caeb5cc03517d3c9afc6ff82554446fa7b57b9be30b96f",
+      "performance": {
+        "latency_ms": 8293,
+        "device": "cpu",
+        "memory_mb": 33.4,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "jazz",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "3a1c3d0d539c463dfec22575aca6bf8f338ffde14ca4060ddfca5d86ebdfdc7a",
+      "result_sha256": "c9e6947c6002dd4fb999e1359842122068532596f1dd2f7c911f8bef5e4dfd61",
+      "performance": {
+        "latency_ms": 24866,
+        "device": "cpu",
+        "memory_mb": 35.7,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "jazz",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "3a1c3d0d539c463dfec22575aca6bf8f338ffde14ca4060ddfca5d86ebdfdc7a",
+      "result_sha256": "fd6d915433d98142692e06ef5e3c2b62f2db5cd7dec9b0ebe08a0189c4db8008",
+      "performance": {
+        "latency_ms": 5462,
+        "device": "cpu",
+        "memory_mb": 33.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rubato",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "a6f97b9a94456aba6492d0b18b596e64c7a6ebc4be8fa66c9271f305000b96ca",
+      "result_sha256": "90785bbbb02cc5f6d6e005567f5ce04215e2c1888b43d6f40f9cd3893567a6c5",
+      "performance": {
+        "latency_ms": 7992,
+        "device": "cpu",
+        "memory_mb": 35.1,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rubato",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "a6f97b9a94456aba6492d0b18b596e64c7a6ebc4be8fa66c9271f305000b96ca",
+      "result_sha256": "0b3dbedb49a851b82e9cfd4d5b03d1fda3c999568b364c0c6c94a0bd6e687e52",
+      "performance": {
+        "latency_ms": 5885,
+        "device": "cpu",
+        "memory_mb": 35.2,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rubato",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "a6f97b9a94456aba6492d0b18b596e64c7a6ebc4be8fa66c9271f305000b96ca",
+      "result_sha256": "33af53bcd698f8d4ede695e1239a9810b5228a29e6ea5ccb034530f0d8a7fb36",
+      "performance": {
+        "latency_ms": 5275,
+        "device": "cpu",
+        "memory_mb": 33.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "low_quality_recording",
+      "capability": "music.separate",
+      "provider": "audio_separator",
+      "model": "uvr-mdx-inst-hq3",
+      "input_sha256": "8fecaa0ab1acc5b11fd28815a811e40a98c8cbd368e8cb22b28185f08c8be7c8",
+      "result_sha256": "974feebdac68c57ace2173503f76e9f3694539a9dce9d893d371adc037a9d93f",
+      "performance": {
+        "latency_ms": 8773,
+        "device": "cpu",
+        "memory_mb": 31.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "low_quality_recording",
+      "capability": "music.transcribe_multitrack",
+      "provider": "muscriptor",
+      "model": "muscriptor-medium-f3223696",
+      "input_sha256": "8fecaa0ab1acc5b11fd28815a811e40a98c8cbd368e8cb22b28185f08c8be7c8",
+      "result_sha256": "3468ddfa6cab992d86c6271dd5a9fa3eca0a3e0579c0aa2d2bf2adc7430e777d",
+      "performance": {
+        "latency_ms": 24173,
+        "device": "cpu",
+        "memory_mb": 31.9,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "low_quality_recording",
+      "capability": "music.transcribe_vocal",
+      "provider": "rosvot",
+      "model": "rosvot-m4singer-202406",
+      "input_sha256": "8fecaa0ab1acc5b11fd28815a811e40a98c8cbd368e8cb22b28185f08c8be7c8",
+      "result_sha256": "575c6556a96460fcd2c0ca733539b58a0a18c28d75a10c147efbb248ba8e7193",
+      "performance": {
+        "latency_ms": 5514,
+        "device": "cpu",
+        "memory_mb": 31.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_piano",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "d906c2bbeac95347e077c831de55b8acf9af9ec26ac73f288c126be82b5038d7",
+      "result_sha256": "59337f2de1bf3c7d5155282a798928a03281bbd5e4ce286f2771068ad43770f4",
+      "performance": {
+        "latency_ms": 907,
+        "device": "cpu",
+        "memory_mb": 33.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_piano",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "d906c2bbeac95347e077c831de55b8acf9af9ec26ac73f288c126be82b5038d7",
+      "result_sha256": "14a0d907c757e0eaae9419fe529ab5d83c6fa2bee4085704106394d8d25ce30f",
+      "performance": {
+        "latency_ms": 148,
+        "device": "cpu",
+        "memory_mb": 33.9,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_piano",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "d906c2bbeac95347e077c831de55b8acf9af9ec26ac73f288c126be82b5038d7",
+      "result_sha256": "e5f27b82b6a9bfc6310e384414ff08533cc5edd918fc0de927fc1b196f2d2ea4",
+      "performance": {
+        "latency_ms": 1743,
+        "device": "cpu",
+        "memory_mb": 33.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_guitar",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "1823aeacc8fdcde9719e6e9440eb38b7d7f7a27eb8f73e4582ba421dc60bc01b",
+      "result_sha256": "854034a3e510a76e52c1e82c3a30a0be9c1dde4fbb9b4e0845b9f78a1565062d",
+      "performance": {
+        "latency_ms": 940,
+        "device": "cpu",
+        "memory_mb": 34.0,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_guitar",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "1823aeacc8fdcde9719e6e9440eb38b7d7f7a27eb8f73e4582ba421dc60bc01b",
+      "result_sha256": "3f0a3bcb3f73090beca9d5d3542d1bfa1dcc5223a404e787a142750e49d5ccfd",
+      "performance": {
+        "latency_ms": 178,
+        "device": "cpu",
+        "memory_mb": 34.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_guitar",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "1823aeacc8fdcde9719e6e9440eb38b7d7f7a27eb8f73e4582ba421dc60bc01b",
+      "result_sha256": "5f35ff9471e20b9d02f459b4fef9d6ee34185ec262792356f0cc6bab4956d85a",
+      "performance": {
+        "latency_ms": 1667,
+        "device": "cpu",
+        "memory_mb": 34.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_bass",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "ec2ba3fde31695fac18a17a7af7cf042996de4547d82062aa1077c55a15c0fbd",
+      "result_sha256": "4c7ea61077bcaa0770b0ee9c767bf26f1ac1080149b7ead1afc9e422c7fe1926",
+      "performance": {
+        "latency_ms": 851,
+        "device": "cpu",
+        "memory_mb": 33.4,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_bass",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "ec2ba3fde31695fac18a17a7af7cf042996de4547d82062aa1077c55a15c0fbd",
+      "result_sha256": "ce63ba0f7ad8309208209371aedfc2fe45b970a1ca7347c46cd4b5d4207132dc",
+      "performance": {
+        "latency_ms": 136,
+        "device": "cpu",
+        "memory_mb": 32.9,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "solo_bass",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "ec2ba3fde31695fac18a17a7af7cf042996de4547d82062aa1077c55a15c0fbd",
+      "result_sha256": "488a0574a27e8db01deec88537ccb31537f2a460394f67debcc49de830c06613",
+      "performance": {
+        "latency_ms": 1649,
+        "device": "cpu",
+        "memory_mb": 32.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "clean_vocal",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "d07cdfaa2d96944b8af1cee7ccd328ebcc3816940f2f2bca29ba7353ec2621fe",
+      "result_sha256": "7e00995c87763730ac9cead50014d4eb99c5f7e8cbb61c3aa9025c1d2b134c89",
+      "performance": {
+        "latency_ms": 801,
+        "device": "cpu",
+        "memory_mb": 32.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "clean_vocal",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "d07cdfaa2d96944b8af1cee7ccd328ebcc3816940f2f2bca29ba7353ec2621fe",
+      "result_sha256": "dd8ca9b9ddb3c7973efa10aa4d6a0839865ee21fcb5223321001455e4508a2bd",
+      "performance": {
+        "latency_ms": 167,
+        "device": "cpu",
+        "memory_mb": 32.7,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "clean_vocal",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "d07cdfaa2d96944b8af1cee7ccd328ebcc3816940f2f2bca29ba7353ec2621fe",
+      "result_sha256": "67f2b1f35415d839df10750b2f0efa8d93134038a53e6e26829f950881a4dfc8",
+      "performance": {
+        "latency_ms": 1653,
+        "device": "cpu",
+        "memory_mb": 32.9,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "vocal_with_backing",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "3c17619bae64704290a5f73d7d264b342dfef558176a05214a891219bfede374",
+      "result_sha256": "e625fb597bfe2d99c49ec5c916d7be66bcbae3780583114854f07d6c75d316c0",
+      "performance": {
+        "latency_ms": 936,
+        "device": "cpu",
+        "memory_mb": 34.3,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "vocal_with_backing",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "3c17619bae64704290a5f73d7d264b342dfef558176a05214a891219bfede374",
+      "result_sha256": "348d198aeafc6dd593f1a48097abd04c4bbb94eb53f621521085994d7b94fadc",
+      "performance": {
+        "latency_ms": 160,
+        "device": "cpu",
+        "memory_mb": 33.4,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "vocal_with_backing",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "3c17619bae64704290a5f73d7d264b342dfef558176a05214a891219bfede374",
+      "result_sha256": "86ea76735ec85ffb3e7cfd1232e20e5e8d39605c1351de69ade6600b0caa8563",
+      "performance": {
+        "latency_ms": 1673,
+        "device": "cpu",
+        "memory_mb": 35.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "pop_full_mix",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "1edd3c955aba9bc65079d1e466c0baa93f559e60044ca251cd52bfe7797b4731",
+      "result_sha256": "2228ca15669e24ae96e642272557bd0c7095dc408160ed2644946f08dfb220f5",
+      "performance": {
+        "latency_ms": 802,
+        "device": "cpu",
+        "memory_mb": 33.0,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "pop_full_mix",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "1edd3c955aba9bc65079d1e466c0baa93f559e60044ca251cd52bfe7797b4731",
+      "result_sha256": "4b1bad4f15aff352022724ee0aa701b84a4e46c76e2b6a73d9215c396a1fd64e",
+      "performance": {
+        "latency_ms": 136,
+        "device": "cpu",
+        "memory_mb": 32.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "pop_full_mix",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "1edd3c955aba9bc65079d1e466c0baa93f559e60044ca251cd52bfe7797b4731",
+      "result_sha256": "a3edbb65fbb32b2c9f7ecb1cbab4183ef622753feb64dfde868ae5d93a29bb50",
+      "performance": {
+        "latency_ms": 1462,
+        "device": "cpu",
+        "memory_mb": 32.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rock_full_mix",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "cb40dcac1a8684c110989e50e95e91b8fd89882777253fc2421de28138cb67dd",
+      "result_sha256": "84968c973300c860c6f7b7af04127f58240277d612f852818f8a716bfac1502b",
+      "performance": {
+        "latency_ms": 762,
+        "device": "cpu",
+        "memory_mb": 32.7,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rock_full_mix",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "cb40dcac1a8684c110989e50e95e91b8fd89882777253fc2421de28138cb67dd",
+      "result_sha256": "c02dc290695cabdcd67f6ae075fda97e038679cf2ecde54daeacd516328ea943",
+      "performance": {
+        "latency_ms": 151,
+        "device": "cpu",
+        "memory_mb": 32.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rock_full_mix",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "cb40dcac1a8684c110989e50e95e91b8fd89882777253fc2421de28138cb67dd",
+      "result_sha256": "5b63103e8cc4f909c1a65090addb084dea4af80d8072d89465c873e9f95bd9fa",
+      "performance": {
+        "latency_ms": 1442,
+        "device": "cpu",
+        "memory_mb": 32.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "electronic",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "11a3b56562bddf77a410ef10a44a5b17321bf8f1ede0a72ebc7d797787d14768",
+      "result_sha256": "1158156ef300136e431ff307e15d47967c0743685ac9065e57e1827ffa48244e",
+      "performance": {
+        "latency_ms": 907,
+        "device": "cpu",
+        "memory_mb": 33.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "electronic",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "11a3b56562bddf77a410ef10a44a5b17321bf8f1ede0a72ebc7d797787d14768",
+      "result_sha256": "d19d443848c716ab9ad7044d63ba3826d2a7a1e45bdd042faaa5c332d8763bd1",
+      "performance": {
+        "latency_ms": 146,
+        "device": "cpu",
+        "memory_mb": 35.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "electronic",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "11a3b56562bddf77a410ef10a44a5b17321bf8f1ede0a72ebc7d797787d14768",
+      "result_sha256": "e36e5712db56a383df6807f170316193d404b2f6219d9c500be4f592b4a774d7",
+      "performance": {
+        "latency_ms": 1543,
+        "device": "cpu",
+        "memory_mb": 33.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "classical",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "051441d91f5b588939cb9ca28f8b3d7572974d3ce6012b88adfaf323a0b7fe2a",
+      "result_sha256": "5573aea43d614484d84a5dbd9eaa7c49188b290643c3c8a73281f5e9e87583ea",
+      "performance": {
+        "latency_ms": 905,
+        "device": "cpu",
+        "memory_mb": 33.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "classical",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "051441d91f5b588939cb9ca28f8b3d7572974d3ce6012b88adfaf323a0b7fe2a",
+      "result_sha256": "13f4f80f5ef42f09629f50bc24dac2c3df4c0ac700294cace59819f9edd50a87",
+      "performance": {
+        "latency_ms": 139,
+        "device": "cpu",
+        "memory_mb": 33.4,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "classical",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "051441d91f5b588939cb9ca28f8b3d7572974d3ce6012b88adfaf323a0b7fe2a",
+      "result_sha256": "edf38b83c5e7130aa2478a54aeb1eb20598d92d8c556044b9d13c93b51f3b287",
+      "performance": {
+        "latency_ms": 1502,
+        "device": "cpu",
+        "memory_mb": 34.7,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "jazz",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "3a1c3d0d539c463dfec22575aca6bf8f338ffde14ca4060ddfca5d86ebdfdc7a",
+      "result_sha256": "9b7f619a4a1069be17f77dfed5f60d6641af486eb6e22bd3350e915291cebffd",
+      "performance": {
+        "latency_ms": 879,
+        "device": "cpu",
+        "memory_mb": 33.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "jazz",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "3a1c3d0d539c463dfec22575aca6bf8f338ffde14ca4060ddfca5d86ebdfdc7a",
+      "result_sha256": "4f4c1ead2205df02b86f678eabab118a03278f4eb3823e0c8c0e616d8ad1f557",
+      "performance": {
+        "latency_ms": 134,
+        "device": "cpu",
+        "memory_mb": 33.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "jazz",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "3a1c3d0d539c463dfec22575aca6bf8f338ffde14ca4060ddfca5d86ebdfdc7a",
+      "result_sha256": "f27c93c5744070d626616d5fbdce71c5eaca256fda5d4c9c746c0d51695f5823",
+      "performance": {
+        "latency_ms": 1474,
+        "device": "cpu",
+        "memory_mb": 35.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rubato",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "a6f97b9a94456aba6492d0b18b596e64c7a6ebc4be8fa66c9271f305000b96ca",
+      "result_sha256": "821b476bb2be2b4b7ee4c690016e3c878c1a90af42f9aef495ecd67e608cd9e6",
+      "performance": {
+        "latency_ms": 883,
+        "device": "cpu",
+        "memory_mb": 33.5,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rubato",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "a6f97b9a94456aba6492d0b18b596e64c7a6ebc4be8fa66c9271f305000b96ca",
+      "result_sha256": "e8b308c85c36401134cc942f00ac4df822d2baa88c4de119253b8eb3f43add9b",
+      "performance": {
+        "latency_ms": 144,
+        "device": "cpu",
+        "memory_mb": 35.7,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "rubato",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "a6f97b9a94456aba6492d0b18b596e64c7a6ebc4be8fa66c9271f305000b96ca",
+      "result_sha256": "80bf7514aaed11768a3a8436d411b380721b970322ce42c0575ed6da39c1da96",
+      "performance": {
+        "latency_ms": 1558,
+        "device": "cpu",
+        "memory_mb": 35.6,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "low_quality_recording",
+      "capability": "music.analyze",
+      "provider": "essentia",
+      "model": "essentia-2.1b6.dev1389",
+      "input_sha256": "8fecaa0ab1acc5b11fd28815a811e40a98c8cbd368e8cb22b28185f08c8be7c8",
+      "result_sha256": "8ee16fc34e2f4a07bfe1ed2bab8543e7fd6de4c379f8f0b58e2011c136a98a25",
+      "performance": {
+        "latency_ms": 944,
+        "device": "cpu",
+        "memory_mb": 31.8,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "low_quality_recording",
+      "capability": "music.fingerprint",
+      "provider": "chromaprint",
+      "model": "chromaprint-1.6.1",
+      "input_sha256": "8fecaa0ab1acc5b11fd28815a811e40a98c8cbd368e8cb22b28185f08c8be7c8",
+      "result_sha256": "7317f0d14cf35fd6e043c7b6db73aa4c0a3510174402845f1658ea7665ac894d",
+      "performance": {
+        "latency_ms": 117,
+        "device": "cpu",
+        "memory_mb": 32.0,
+        "cached": false,
+        "cold_start": true
+      }
+    },
+    {
+      "category": "low_quality_recording",
+      "capability": "music.transcribe_notes",
+      "provider": "basic_pitch",
+      "model": "basic-pitch-icassp-2022-onnx",
+      "input_sha256": "8fecaa0ab1acc5b11fd28815a811e40a98c8cbd368e8cb22b28185f08c8be7c8",
+      "result_sha256": "6941225d3ccffa03695191d955b2b9a3964792e1a1887437ba4000e368f4cf01",
+      "performance": {
+        "latency_ms": 1602,
+        "device": "cpu",
+        "memory_mb": 32.1,
+        "cached": false,
+        "cold_start": true
+      }
+    }
+  ],
+  "accuracy": null,
+  "accuracy_reason": "Reference note/beat annotations are not part of this fixture set."
+}
