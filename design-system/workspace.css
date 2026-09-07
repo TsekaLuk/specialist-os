@@ -1,5 +1,3 @@
-@import url("tokens.css");
-
 * { box-sizing: border-box; letter-spacing: 0; }
 body.workspace { margin: 0; background: var(--color-neutral-50); color: var(--color-neutral-900); font: var(--font-size-md)/1.55 var(--font-sans); }
 .workspace .topbar { height: var(--workspace-header); display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-8); background: var(--color-neutral-0); border-bottom: var(--border-default); }
