@@ -1,6 +1,7 @@
 """Guard the publication boundary for real CLI demonstration evidence."""
 
 import importlib.util
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -13,6 +14,16 @@ spec.loader.exec_module(demo)
 
 
 class DemoEvidenceTests(unittest.TestCase):
+    def test_replay_command_uses_real_routing_and_input_identity(self):
+        envelope = json.loads((SCRIPTS.parent / 'docs/assets/e2e/vision-detect.json').read_text())
+        command = demo.replay_command(envelope)
+        self.assertIsNotNone(command)
+        self.assertEqual(command[4], 'detect')
+        routing = next(step for step in envelope['trace'] if step['stage'] == 'routing')
+        self.assertEqual(json.loads(command[-1]), routing['requested']['options'])
+        envelope['input']['sha256'] = '0' * 64
+        self.assertIsNone(demo.replay_command(envelope))
+
     def test_only_uncached_success_is_publishable(self):
         evidence = {"provider": "opencv", "result": {"distance": 3}, "performance": {"cached": False}, "warnings": []}
         self.assertTrue(demo.successful(evidence))
@@ -28,6 +39,13 @@ class DemoEvidenceTests(unittest.TestCase):
             with self.subTest(changes=changes):
                 self.assertFalse(demo.successful({**evidence, **changes}))
         self.assertFalse(demo.successful({}))
+
+    def test_recorded_cached_results_require_explicit_opt_in(self):
+        evidence = {"provider": "yolo", "result": {"items": []}, "performance": {"cached": True}}
+        self.assertFalse(demo.successful(evidence))
+        self.assertTrue(demo.successful(evidence, allow_cached=True))
+        self.assertFalse(demo.successful({**evidence, "error": {"code": "failed"}}, allow_cached=True))
+        self.assertFalse(demo.successful({**evidence, "warnings": ["fallback backend used"]}, allow_cached=True))
 
 
 if __name__ == "__main__":

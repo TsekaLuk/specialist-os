@@ -2,6 +2,7 @@
 
 import argparse
 import html
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -10,8 +11,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from specialist.artifacts import ArtifactStore
+from specialist.artifacts import ArtifactError, ArtifactStore
 from specialist.core import CORE_FAMILIES
+from specialist.registry import get_spec
 
 
 FAMILY_NAMES = {
@@ -23,18 +25,35 @@ FAMILY_NAMES = {
 }
 
 
-def successful(envelope):
+def replay_command(envelope):
+    """Reconstruct file-input CLI arguments from retained routing evidence."""
+    source = (envelope.get("input") or {}).get("path")
+    if not source or envelope.get("capability") == "speech.clone_voice":
+        return None
+    path = Path(source)
+    path = path if path.is_absolute() else ROOT / path
+    if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != envelope["input"].get("sha256"):
+        return None
+    routing = next((step for step in envelope.get("trace", []) if step.get("stage") == "routing"), {})
+    requested = routing.get("requested", {})
+    if requested.get("capability") != envelope["capability"] or not isinstance(requested.get("options"), dict):
+        return None
+    return ["specialist", "--backend", "real", "--isolate", get_spec(envelope["capability"]).command,
+        str(path), "--json", "--options", json.dumps(requested["options"])]
+
+
+def successful(envelope, *, allow_cached=False):
     return (
         bool(envelope.get("provider"))
         and isinstance(envelope.get("result"), dict)
         and not envelope.get("error")
         and envelope["result"].get("status") != "degraded"
-        and (envelope.get("performance") or {}).get("cached") is False
+        and (allow_cached or (envelope.get("performance") or {}).get("cached") is False)
         and not any("fallback" in str(warning).lower() for warning in envelope.get("warnings", []))
     )
 
 
-def render(assets: Path, home: Path):
+def render(assets: Path, home: Path, *, allow_cached=False):
     from generate_readme_gallery import _annotated_image, _slug
 
     manifest = json.loads((assets / "capability-gallery.json").read_text())
@@ -46,10 +65,24 @@ def render(assets: Path, home: Path):
     media_dir.mkdir(exist_ok=True)
     shutil.copyfile(ROOT / "docs/assets/brand/specialist-os-logo-b-transparent.png", assets / "logo.png")
     cards, export = [], []
+    missing_previews = set()
 
     def copy_uri(uri, name, suffix):
         destination = media_dir / f"{_slug(name)}{suffix}"
-        shutil.copyfile(store.resolve(uri), destination)
+        try:
+            source = store.resolve(uri)
+        except ArtifactError:
+            if not allow_cached:
+                raise
+            digest = uri.removeprefix("artifact://")
+            source = next((path for path in assets.rglob("*") if path.is_file()
+                and path.suffix.lower() in {".png", ".jpg", ".jpeg"}
+                and hashlib.sha256(path.read_bytes()).hexdigest() == digest), None)
+            if source is None:
+                missing_previews.add(name)
+                return None
+        if source.resolve() != destination.resolve():
+            shutil.copyfile(source, destination)
         return destination.relative_to(assets).as_posix()
 
     def image_tag(filename, alt):
@@ -64,7 +97,7 @@ def render(assets: Path, home: Path):
             if record is None:
                 raise ValueError(f"No execution record for {name}")
             envelope = json.loads((assets / record["json"]).read_text())
-            passed = record["status"] == "ok" and successful(envelope)
+            passed = record["status"] == "ok" and successful(envelope, allow_cached=allow_cached)
             payload = envelope.get("result") or {}
             preview = ""
             preview_path = None
@@ -141,7 +174,8 @@ def render(assets: Path, home: Path):
 <h2><a class="workspace-link" href="workspace.html#{html.escape(name, quote=True)}">{heading}</a></h2><p class="provider">{html.escape(str(record.get("provider") or ""))} · {html.escape(str(record.get("model") or ""))}</p>
 {preview}<footer><span>{seconds}</span><a href="assets/{html.escape(record["json"])}" target="_blank">结果 JSON</a></footer>
 <details><summary>执行证据</summary><pre>{html.escape(json.dumps({"input_sha256":record.get("input_sha256"),"performance":envelope.get("performance"),"command":record.get("command")}, ensure_ascii=False, indent=2))}</pre></details></article>''')
-            export.append({"capability": name, "family": family, "status": status, "preview": preview_path, "json": record["json"], "latency_ms": latency, "command": record.get("command")})
+            command = record.get("command") or replay_command(envelope)
+            export.append({"capability": name, "family": family, "status": status, "preview": preview_path, "preview_unavailable": name in missing_previews, "json": record["json"], "latency_ms": latency, "cached": bool((envelope.get("performance") or {}).get("cached")), "command": command, "command_origin": "recorded" if record.get("command") else "reconstructed" if command else None})
     passed = sum(item["status"] == "ok" for item in export)
     options = ''.join(f'<option value="{key}">{value}</option>' for key, value in FAMILY_NAMES.items())
     document = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -174,6 +208,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--assets", required=True, type=Path)
     parser.add_argument("--home", type=Path, default=Path.home() / ".specialist")
+    parser.add_argument("--allow-cached", action="store_true", help="Display recorded cached outputs, retaining their cached flag; does not count as a fresh rehearsal")
     args = parser.parse_args()
-    report = render(args.assets.resolve(), args.home.resolve())
+    report = render(args.assets.resolve(), args.home.resolve(), allow_cached=args.allow_cached)
     print(json.dumps({"passed": report["passed"], "total": report["total"], "page": str(args.assets.resolve().parent / "index.html")}))

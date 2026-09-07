@@ -16,6 +16,8 @@ def publish(build: Path, destination: Path):
         if path.is_file() and path.suffix.lower() in {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".mp4", ".webm"}:
             media_by_hash[hashlib.sha256(path.read_bytes()).hexdigest()] = path.name
     for item in manifest["results"]:
+        if item.get("preview") and not (assets / item["preview"]).is_file():
+            raise ValueError(f"Missing preview for {item['capability']}: {item['preview']}")
         envelope = json.loads((assets / item["json"]).read_text())
         references = envelope.get("artifacts", [])
         item["media"] = []
@@ -27,6 +29,7 @@ def publish(build: Path, destination: Path):
             if digest in media_by_hash:
                 item["media"].append({"src": media_by_hash[digest], "mime": mime, "sha256": digest})
     shutil.copytree(build, destination, dirs_exist_ok=True)
+    shutil.copyfile(build / "index.html", destination / "workspace.html")
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
     print(json.dumps({"capabilities": len(manifest["results"]),
         "media": sum(len(item["media"]) for item in manifest["results"])}))
