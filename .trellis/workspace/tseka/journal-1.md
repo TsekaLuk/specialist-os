@@ -139,3 +139,36 @@ Upgraded the SBOM artifact upload action from v4 to v7 after the final CI expose
 ### Next Steps
 
 - None - task complete
+
+
+## Session 5: ADR-003 Core scope freeze
+
+**Date**: 2026-09-07
+**Task**: ADR-003 Core scope freeze
+**Branch**: `main`
+
+### Summary
+
+Frozen Core 15 membership, retained depth and pack aliases, documented spatial watchlist and optional heavy track; full regression and real OpenCV checks passed.
+
+### Main Changes
+
+- Detailed change bullets were not supplied; see the summary above.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `8b231f9` | (see git log) |
+
+### Testing
+
+- Validation was not recorded for this session.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

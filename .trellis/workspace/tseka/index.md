@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 4
-- **Last Active**: 2026-09-05
+- **Total Sessions**: 5
+- **Last Active**: 2026-09-07
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~141 | Active |
+| `journal-1.md` | ~174 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 5 | 2026-09-07 | ADR-003 Core scope freeze | `8b231f9` | `main` |
 | 4 | 2026-09-05 | GitHub Actions Node 24 completion | `b94e7f0` | `main` |
 | 3 | 2026-09-05 | Release attestation v3 cleanup | `a84b572` | `main` |
 | 2 | 2026-09-05 | Release supply-chain convergence | `aa098cb` | `main` |
