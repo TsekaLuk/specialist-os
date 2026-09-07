@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/brand/specialist-os-logo-b.png" alt="Specialist OS" width="128">
+<img src="docs/assets/brand/specialist-os-logo-small.png" alt="Specialist OS" width="128">
 
 # Specialist OS
 
@@ -136,19 +136,18 @@ Runtime 数据默认保存在 `~/.specialist/`。可以通过 `SPECIALIST_HOME` 
 
 同一轮运行生成的音频可以直接播放：
 
-<table>
-<tr><th>能力</th><th>本地结果</th></tr>
-<tr><td><code>audio.vad</code> · Silero VAD</td><td><audio controls preload="metadata" style="width:100%" aria-label="Silero VAD 输入"><source src="./docs/assets/e2e/meeting-two-speaker.wav" type="audio/wav"><a href="./docs/assets/e2e/meeting-two-speaker.wav">打开 WAV</a></audio></td></tr>
-<tr><td><code>audio.transcribe</code> · whisper.cpp</td><td><audio controls preload="metadata" style="width:100%" aria-label="whisper.cpp 输入"><source src="./docs/assets/e2e/meeting-two-speaker.wav" type="audio/wav"><a href="./docs/assets/e2e/meeting-two-speaker.wav">打开 WAV</a></audio></td></tr>
-<tr><td><code>audio.denoise</code> · DeepFilterNet balanced</td><td><audio controls preload="metadata" style="width:100%" aria-label="DeepFilterNet 输出"><source src="./docs/assets/e2e/audio-denoised-balanced.wav" type="audio/wav"><a href="./docs/assets/e2e/audio-denoised-balanced.wav">打开 WAV</a></audio></td></tr>
-<tr><td><code>speech.synthesize</code> · Fish Audio S2</td><td><audio controls preload="metadata" style="width:100%" aria-label="Fish Audio S2 合成语音"><source src="./docs/assets/e2e/speech-synthesize.wav" type="audio/wav"><a href="./docs/assets/e2e/speech-synthesize.wav">打开 WAV</a></audio></td></tr>
-<tr><td><code>speech.clone_voice</code> · Fish Audio S2</td><td><audio controls preload="metadata" style="width:100%" aria-label="Fish Audio S2 声音克隆"><source src="./docs/assets/e2e/speech-clone-voice.wav" type="audio/wav"><a href="./docs/assets/e2e/speech-clone-voice.wav">打开 WAV</a></audio></td></tr>
-<tr><td><code>media.audio.extract</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="提取的音频"><source src="./docs/assets/e2e/media-audio-extract.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-extract.wav">打开 WAV</a></audio></td></tr>
-<tr><td><code>media.audio.trim</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="裁剪后的音频"><source src="./docs/assets/e2e/media-audio-trim.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-trim.wav">打开 WAV</a></audio></td></tr>
-<tr><td><code>media.audio.resample</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="重采样后的音频"><source src="./docs/assets/e2e/media-audio-resample.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-resample.wav">打开 WAV</a></audio></td></tr>
-<tr><td><code>media.audio.convert</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="转换后的音频"><source src="./docs/assets/e2e/media-audio-convert.flac" type="audio/flac"><a href="./docs/assets/e2e/media-audio-convert.flac">打开 FLAC</a></audio></td></tr>
-<tr><td><code>media.audio.normalize</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="归一化后的音频"><source src="./docs/assets/e2e/media-audio-normalize.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-normalize.wav">打开 WAV</a></audio></td></tr>
-</table>
+| Capability | Provider | 播放 |
+| --- | --- | --- |
+| `audio.vad` | Silero VAD | [播放](https://tsekaluk.github.io/specialist-os/audio/#audio.vad) |
+| `audio.transcribe` | whisper.cpp | [播放](https://tsekaluk.github.io/specialist-os/audio/#audio.transcribe) |
+| `audio.denoise` | DeepFilterNet balanced | [播放](https://tsekaluk.github.io/specialist-os/audio/#audio.denoise) |
+| `speech.synthesize` | Fish Audio S2 | [播放](https://tsekaluk.github.io/specialist-os/audio/#speech.synthesize) |
+| `speech.clone_voice` | Fish Audio S2 | [播放](https://tsekaluk.github.io/specialist-os/audio/#speech.clone_voice) |
+| `media.audio.extract` | FFmpeg | [播放](https://tsekaluk.github.io/specialist-os/audio/#media.audio.extract) |
+| `media.audio.trim` | FFmpeg | [播放](https://tsekaluk.github.io/specialist-os/audio/#media.audio.trim) |
+| `media.audio.resample` | FFmpeg | [播放](https://tsekaluk.github.io/specialist-os/audio/#media.audio.resample) |
+| `media.audio.convert` | FFmpeg | [播放](https://tsekaluk.github.io/specialist-os/audio/#media.audio.convert) |
+| `media.audio.normalize` | FFmpeg | [播放](https://tsekaluk.github.io/specialist-os/audio/#media.audio.normalize) |
 
 在已配置 Provider 环境的机器上复现同一条生产流程：
 

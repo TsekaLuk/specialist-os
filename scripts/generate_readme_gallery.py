@@ -674,6 +674,9 @@ def build(args: argparse.Namespace) -> int:
         + "\n",
         encoding="utf-8",
     )
+    from build_audio_gallery import build as build_audio_gallery
+
+    build_audio_gallery()
     print(json.dumps({"gallery": str(ASSETS / "capability-gallery.png"), "tiles": len(tiles), "audio": audio_files, "records": gallery.records}, ensure_ascii=False, indent=2))
     return 0
 

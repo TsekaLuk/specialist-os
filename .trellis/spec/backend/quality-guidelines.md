@@ -50,8 +50,10 @@ the run.
   `error`. A `degraded` result is a valid envelope with an unavailable child;
   it is never rendered as a showcase tile.
 - Binary outputs are copied from `artifact://` URIs in the local content-
-  addressed store. README audio uses HTML5 `<audio controls>` with a matching
-  `<source type>` and a direct file link.
+  addressed store. GitHub README links to the GitHub Pages audio gallery:
+  GitHub strips inline audio elements from Markdown. The Pages gallery uses
+  HTML5 `<audio controls>` with a matching `<source type>` and direct file links.
+  Run `python scripts/build_audio_gallery.py --check` to verify synchronization.
 - Audio output extensions are derived from the CLI result MIME (`audio/flac`
   produces `.flac`, not `.wav`). Compressed audio previews may be decoded to
   PCM by FFmpeg for the contact sheet; the served artifact remains unchanged.

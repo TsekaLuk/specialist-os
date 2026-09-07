@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/brand/specialist-os-logo-b.png" alt="Specialist OS" width="128">
+<img src="docs/assets/brand/specialist-os-logo-small.png" alt="Specialist OS" width="128">
 
 # Specialist OS
 
@@ -146,19 +146,18 @@ The source set is kept with the gallery so the scenarios stay reproducible:
 
 Audio outputs are available as playable artifacts from the same run:
 
-<table>
-<tr><th>Capability</th><th>Local result</th></tr>
-<tr><td><code>audio.vad</code> · Silero VAD</td><td><audio controls preload="metadata" style="width:100%" aria-label="Silero VAD input"><source src="./docs/assets/e2e/meeting-two-speaker.wav" type="audio/wav"><a href="./docs/assets/e2e/meeting-two-speaker.wav">Open WAV</a></audio></td></tr>
-<tr><td><code>audio.transcribe</code> · whisper.cpp</td><td><audio controls preload="metadata" style="width:100%" aria-label="whisper.cpp input"><source src="./docs/assets/e2e/meeting-two-speaker.wav" type="audio/wav"><a href="./docs/assets/e2e/meeting-two-speaker.wav">Open WAV</a></audio></td></tr>
-<tr><td><code>audio.denoise</code> · DeepFilterNet balanced</td><td><audio controls preload="metadata" style="width:100%" aria-label="DeepFilterNet output"><source src="./docs/assets/e2e/audio-denoised-balanced.wav" type="audio/wav"><a href="./docs/assets/e2e/audio-denoised-balanced.wav">Open WAV</a></audio></td></tr>
-<tr><td><code>speech.synthesize</code> · Fish Audio S2</td><td><audio controls preload="metadata" style="width:100%" aria-label="Fish Audio S2 synthesis output"><source src="./docs/assets/e2e/speech-synthesize.wav" type="audio/wav"><a href="./docs/assets/e2e/speech-synthesize.wav">Open WAV</a></audio></td></tr>
-<tr><td><code>speech.clone_voice</code> · Fish Audio S2</td><td><audio controls preload="metadata" style="width:100%" aria-label="Fish Audio S2 voice clone output"><source src="./docs/assets/e2e/speech-clone-voice.wav" type="audio/wav"><a href="./docs/assets/e2e/speech-clone-voice.wav">Open WAV</a></audio></td></tr>
-<tr><td><code>media.audio.extract</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Extracted audio"><source src="./docs/assets/e2e/media-audio-extract.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-extract.wav">Open WAV</a></audio></td></tr>
-<tr><td><code>media.audio.trim</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Trimmed audio"><source src="./docs/assets/e2e/media-audio-trim.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-trim.wav">Open WAV</a></audio></td></tr>
-<tr><td><code>media.audio.resample</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Resampled audio"><source src="./docs/assets/e2e/media-audio-resample.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-resample.wav">Open WAV</a></audio></td></tr>
-<tr><td><code>media.audio.convert</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Converted audio"><source src="./docs/assets/e2e/media-audio-convert.flac" type="audio/flac"><a href="./docs/assets/e2e/media-audio-convert.flac">Open FLAC</a></audio></td></tr>
-<tr><td><code>media.audio.normalize</code> · FFmpeg</td><td><audio controls preload="metadata" style="width:100%" aria-label="Normalized audio"><source src="./docs/assets/e2e/media-audio-normalize.wav" type="audio/wav"><a href="./docs/assets/e2e/media-audio-normalize.wav">Open WAV</a></audio></td></tr>
-</table>
+| Capability | Provider | Listen |
+| --- | --- | --- |
+| `audio.vad` | Silero VAD | [Listen](https://tsekaluk.github.io/specialist-os/audio/#audio.vad) |
+| `audio.transcribe` | whisper.cpp | [Listen](https://tsekaluk.github.io/specialist-os/audio/#audio.transcribe) |
+| `audio.denoise` | DeepFilterNet balanced | [Listen](https://tsekaluk.github.io/specialist-os/audio/#audio.denoise) |
+| `speech.synthesize` | Fish Audio S2 | [Listen](https://tsekaluk.github.io/specialist-os/audio/#speech.synthesize) |
+| `speech.clone_voice` | Fish Audio S2 | [Listen](https://tsekaluk.github.io/specialist-os/audio/#speech.clone_voice) |
+| `media.audio.extract` | FFmpeg | [Listen](https://tsekaluk.github.io/specialist-os/audio/#media.audio.extract) |
+| `media.audio.trim` | FFmpeg | [Listen](https://tsekaluk.github.io/specialist-os/audio/#media.audio.trim) |
+| `media.audio.resample` | FFmpeg | [Listen](https://tsekaluk.github.io/specialist-os/audio/#media.audio.resample) |
+| `media.audio.convert` | FFmpeg | [Listen](https://tsekaluk.github.io/specialist-os/audio/#media.audio.convert) |
+| `media.audio.normalize` | FFmpeg | [Listen](https://tsekaluk.github.io/specialist-os/audio/#media.audio.normalize) |
 
 Run the same production-shaped flow with a provisioned provider environment:
 
