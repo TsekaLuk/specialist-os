@@ -156,7 +156,11 @@ def _embedding(value, field="result.embedding", nullable=False):
 
 
 def _validate_capability_result(capability: str, result: dict[str, Any]) -> None:
-    if capability == "vision.detect":
+    if capability.startswith("music."):
+        from .music import validate_music_result
+
+        validate_music_result(capability, result)
+    elif capability == "vision.detect":
         for index, item in enumerate(_array(result, "items")):
             if not isinstance(item, dict) or not isinstance(item.get("label"), str):
                 raise ValueError(f"result.items[{index}] requires a string label")

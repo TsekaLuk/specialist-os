@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "sources": {
+    "musdb": {"url": "https://github.com/sigsep/sigsep-mus-db/releases/download/v0.4.0/MUSDB18-7-STEMS.zip", "sha256": "365f66acffc57282e474a4c24b32afec3678258c50b8d45646ac849b0a287df3", "license": "CC-BY-NC-SA-4.0 (selected MedleyDB tracks only)", "attribution": "Music Delta; MedleyDB; MUSDB18", "license_source": "https://github.com/sigsep/website/blob/master/content/datasets/assets/tracklist.csv"},
+    "piano": {"url": "https://librosa.org/data/audio/442789__lena-orsa__happy-music-pistachio-ice-cream-ragtime.hq.ogg", "sha256": "1cc83b775e640a8dd409da9e29f5b5e0124bc5ec9bb4fda975919d31d1d893b8", "license": "CC-BY-NC-3.0", "attribution": "Pistachio Ice Cream Ragtime, Lena Orsa", "license_source": "https://librosa.org/data/audio/442789__lena-orsa__happy-music-pistachio-ice-cream-ragtime.txt"},
+    "guitar": {"url": "https://zenodo.org/api/records/3371780/files/audio_mono-mic.zip/content", "member": "00_SS3-84-Bb_comp_mic.wav", "sha256": "ece4c3e67d8ab31ca6665ef8cd143a61aedeeb6145e45fa4b74120630024039b", "license": "CC-BY-4.0", "attribution": "GuitarSet, Qingyang Xi et al., performer 00", "license_source": "https://doi.org/10.5281/zenodo.3371780"},
+    "singing": {"url": "https://librosa.org/data/audio/Karissa_Hobbs_-_Lets_Go_Fishin.hq.ogg", "sha256": "85901bde0bc5f2cad28acb83487ccf99bd6908d7359f1a449fd799d8bebb3319", "license": "CC-BY-3.0", "attribution": "Let's Go Fishin', Karissa Hobbs", "license_source": "https://librosa.org/data/audio/Karissa_Hobbs_-_Lets_Go_Fishin.txt"},
+    "electronic": {"url": "https://librosa.org/data/audio/admiralbob77_-_Choice_-_Drum-bass.hq.ogg", "sha256": "57b4d95473b92a8441c1d3ab20f836a3e0cbf501bf3afe1ce7a5d0d98d7d4576", "license": "CC-BY-NC (source lists 3.0 and 4.0)", "attribution": "Choice, Admiral Bob featuring Snowflake; drum/bass excerpt by Brian McFee", "license_source": "https://librosa.org/data/audio/admiralbob77_-_Choice_-_Drum-bass.txt"},
+    "classical": {"url": "https://librosa.org/data/audio/Hungarian_Dance_number_5_-_Allegro_in_F_sharp_minor_(string_orchestra).hq.ogg", "sha256": "8e93ff0182a93168b15346c497b164cb49d2a97bf1e987a1149ea579e914532e", "license": "Public Domain", "attribution": "Hungarian Dance No. 5, Brahms / US Army Strings", "license_source": "https://librosa.org/data/audio/Hungarian_Dance_number_5_-_Allegro_in_F_sharp_minor_(string_orchestra).txt"},
+    "jazz": {"url": "https://librosa.org/data/audio/Kevin_MacLeod_-_Vibe_Ace.hq.ogg", "sha256": "73d6443ef90a7c022f164e5aa90e56c2291585930b39b1656d0765abbc1f1779", "license": "CC-BY-3.0", "attribution": "Vibe Ace, Kevin MacLeod", "license_source": "https://librosa.org/data/audio/Kevin_MacLeod_-_Vibe_Ace.txt"},
+    "rubato": {"url": "https://librosa.org/data/audio/drese-tempo.hq.ogg", "sha256": "c248e4523125bafd8f38c4cc856e64ef764f55b25312bf641190245a66a1f089", "license": "CC-BY-4.0", "attribution": "Jesu geh voran, Adam Drese / Stefan Balke", "license_source": "https://librosa.org/data/audio/drese-tempo.toml"}
+  },
+  "fixtures": [
+    {"category": "solo_piano", "source": "piano", "duration": 20},
+    {"category": "solo_guitar", "source": "guitar", "duration": 20},
+    {"category": "solo_bass", "source": "musdb", "member": "train/Music Delta - 80s Rock.stem.mp4", "stream": 2, "duration": 7, "description": "Isolated original bass stem, not a model separation"},
+    {"category": "clean_vocal", "source": "musdb", "member": "train/Music Delta - Britpop.stem.mp4", "stream": 4, "duration": 7, "description": "Original vocal stem; possible microphone bleed remains"},
+    {"category": "vocal_with_backing", "source": "singing", "start": 20, "duration": 20},
+    {"category": "pop_full_mix", "source": "musdb", "member": "train/Music Delta - Britpop.stem.mp4", "stream": 0, "duration": 7},
+    {"category": "rock_full_mix", "source": "musdb", "member": "train/Music Delta - 80s Rock.stem.mp4", "stream": 0, "duration": 7},
+    {"category": "electronic", "source": "electronic", "duration": 20, "description": "Drum/bass arrangement excerpt; narrow coverage of electronic music"},
+    {"category": "classical", "source": "classical", "duration": 20},
+    {"category": "jazz", "source": "jazz", "duration": 20},
+    {"category": "rubato", "source": "rubato", "duration": 20, "description": "Performed tempo variation, as documented by the source"},
+    {"category": "low_quality_recording", "source": "singing", "start": 20, "duration": 20, "degradation": "8kHz mono PCM", "description": "Controlled bandwidth degradation of a real recording, not a field recording"}
+  ]
+}

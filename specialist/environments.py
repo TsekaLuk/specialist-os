@@ -17,6 +17,12 @@ class EnvironmentError(RuntimeError):
 
 
 PROVIDER_REQUIREMENTS = {
+    "ace_step": ["ace-step @ git+https://github.com/ace-step/ACE-Step-1.5.git@ca1e85fe9430179831e6bc6be790c332190a3866"],
+    "basic_pitch": ["basic-pitch[onnx]==0.4.0", "setuptools==80.9.0"],
+    "essentia": ["essentia==2.1b6.dev1389"],
+    "muscriptor": ["muscriptor==0.3.0", "pretty-midi==0.2.11", "soundfile==0.14.0"],
+    "audio_separator": ["audio-separator[cpu]==0.30.2"],
+    "rosvot": ["torch==2.2.2", "torchaudio==2.2.2", "numpy==1.26.4", "librosa==0.10.2.post1", "pretty-midi==0.2.11", "pyworld==0.3.5", "setuptools==80.9.0", "matplotlib==3.11.1", "pyyaml==6.0.3", "einops==0.8.2", "pyloudnorm==0.2.0", "tqdm==4.67.3"],
     # Keep provider environments reproducible and aligned with the artifact
     # formats recorded in registry/models.yaml. These versions are tested on
     # the supported Python 3.12 macOS/Linux matrix.
@@ -46,6 +52,12 @@ PROVIDER_REQUIREMENTS = {
 }
 
 PROVIDER_IMPORTS = {
+    "ace_step": ["acestep", "torch", "soundfile"],
+    "basic_pitch": ["basic_pitch", "onnxruntime", "pretty_midi"],
+    "essentia": ["essentia"],
+    "muscriptor": ["muscriptor", "pretty_midi", "soundfile"],
+    "audio_separator": ["audio_separator", "onnxruntime", "soundfile"],
+    "rosvot": ["torch", "librosa", "pyworld", "pretty_midi", "yaml", "einops", "tqdm"],
     "ultralytics": ["ultralytics"],
     "paddleocr": ["paddleocr"],
     "torch": ["torch"],
@@ -70,6 +82,8 @@ REQUIREMENT_IMPORTS = {
     "open_clip_torch": "open_clip",
     "DeepFilterNet": "df",
 }
+
+PROVIDER_PYTHON = {"basic_pitch": "3.11", "audio_separator": "3.11", "muscriptor": "3.12", "rosvot": "3.11", "ace_step": "3.11"}
 
 
 class ProviderEnvironmentManager:
@@ -103,13 +117,16 @@ class ProviderEnvironmentManager:
         requirements = PROVIDER_REQUIREMENTS.get(provider, [provider]) if requirements is None else list(requirements)
         if existing.get("status") == "ready" and existing.get("requirements") == requirements and self.verify(provider, requirements):
             return existing
+        uv = shutil.which("uv")
+        host_python = f"{sys.version_info.major}.{sys.version_info.minor}"
+        if not uv and provider in PROVIDER_PYTHON and host_python != PROVIDER_PYTHON[provider]:
+            raise EnvironmentError(f"{provider} requires Python {PROVIDER_PYTHON[provider]}; install uv to manage its interpreter")
         root = self.path(provider)
         root.parent.mkdir(parents=True, exist_ok=True)
         if root.exists():
             shutil.rmtree(root)
-        uv = shutil.which("uv")
         if uv:
-            self._run([uv, "venv", "--python", sys.executable, str(root)])
+            self._run([uv, "venv", "--python", PROVIDER_PYTHON.get(provider, sys.executable), str(root)])
             python = self.python(provider)
             if requirements:
                 self._run([uv, "pip", "install", "--python", str(python), *requirements])
@@ -119,7 +136,7 @@ class ProviderEnvironmentManager:
                 self._run([str(self.python(provider)), "-m", "pip", "install", *requirements])
         if not self.verify(provider, requirements):
             raise EnvironmentError(f"provider environment '{provider}' was created but imports are not usable")
-        metadata = {"provider": provider, "status": "ready", "path": str(root), "python": str(self.python(provider)), "python_version": f"{sys.version_info.major}.{sys.version_info.minor}", "requirements": requirements, "requirements_sha256": hashlib.sha256(json.dumps(requirements, separators=(",", ":")).encode()).hexdigest()}
+        metadata = {"provider": provider, "status": "ready", "path": str(root), "python": str(self.python(provider)), "python_version": PROVIDER_PYTHON.get(provider, host_python), "requirements": requirements, "requirements_sha256": hashlib.sha256(json.dumps(requirements, separators=(",", ":")).encode()).hexdigest()}
         marker = root / "specialist-environment.json"
         self.cache._atomic_write(marker, json.dumps(metadata, indent=2) + "\n")
         return metadata
@@ -134,7 +151,10 @@ class ProviderEnvironmentManager:
             modules = [REQUIREMENT_IMPORTS.get(name, name.replace("-", "_")) for name in names]
         if not modules:
             return True
-        probe = "import importlib.util, sys; missing=[m for m in %r if importlib.util.find_spec(m) is None]; sys.exit(1 if missing else 0)" % modules
+        required_python = PROVIDER_PYTHON.get(provider)
+        probe = ("import importlib.util, sys; missing=[m for m in %r if importlib.util.find_spec(m) is None]; "
+                 "required=%r; valid=required is None or '.'.join(map(str, sys.version_info[:2])) == required; "
+                 "sys.exit(1 if missing or not valid else 0)") % (modules, required_python)
         try:
             completed = subprocess.run([str(python), "-c", probe], capture_output=True, text=True, timeout=30, check=False)
         except (OSError, subprocess.SubprocessError):

@@ -25,9 +25,9 @@ def _missing(package):
     raise WorkerError(f"optional dependency '{package}' is not installed; install it in the provider environment with `specialist --with-dependencies install <capability>`", code="dependency_missing", retryable=False)
 
 
-def _run_external(command, *, timeout, env=None):
+def _run_external(command, *, timeout, env=None, cwd=None):
     """Run a provider command and terminate its whole process group on timeout."""
-    kwargs = {"stdout": subprocess.PIPE, "stderr": subprocess.PIPE, "text": True, "env": env}
+    kwargs = {"stdout": subprocess.PIPE, "stderr": subprocess.PIPE, "text": True, "env": env, "cwd": cwd}
     if os.name == "posix":
         kwargs["start_new_session"] = True
     process = subprocess.Popen(command, **kwargs)

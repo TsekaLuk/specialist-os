@@ -11,6 +11,10 @@ from .expansion import EXPANSION_PROVIDERS
 from .optional_expansion import OPTIONAL_EXPANSION_PROVIDERS
 from .optional import CommandDocumentProvider, OmniParserProvider, PaddleOCRProvider, SileroVADProvider, TransformersDepthProvider, UltralyticsSegmentProvider, WhisperCppProvider, YOLOProvider
 from .fish_audio import FishAudioProvider, SystemTTSProvider
+from .music import AudioSeparatorProvider, BasicPitchProvider, ChromaprintProvider, EssentiaProvider, MuScriptorProvider
+from .rosvot import RosvotProvider
+from .music_composite import MusicCompositeProvider
+from .ace_step import AceStepProvider
 
 
 def _module_available(module: str) -> bool:
@@ -24,6 +28,16 @@ def _module_available(module: str) -> bool:
 def provider_map(backend="auto"):
     selected = dict(BUILTIN_PROVIDERS)
     selected.update(EXPANSION_PROVIDERS)
+    selected["music.analyze"] = EssentiaProvider()
+    selected["music.transcribe_notes"] = BasicPitchProvider()
+    selected["music.transcribe_multitrack"] = MuScriptorProvider()
+    selected["music.separate"] = AudioSeparatorProvider()
+    selected["music.transcribe_vocal"] = RosvotProvider()
+    selected["music.generate"] = AceStepProvider()
+    for capability in ("music.parse_singing", "music.transcribe_full"):
+        selected[capability] = MusicCompositeProvider(capability)
+    for capability in ("music.fingerprint", "music.compare_recording"):
+        selected[capability] = ChromaprintProvider(capability)
     if backend == "fallback":
         selected["speech.synthesize"] = FishAudioProvider("speech.synthesize")
         selected["speech.clone_voice"] = FishAudioProvider("speech.clone_voice")

@@ -68,12 +68,20 @@ def _human_doctor(value):
             print(f"{label:<16} {value_text}")
     print("\nCapabilities")
     for item in value.get("capabilities", []):
+        if item.get("capability", "").startswith("music."):
+            continue
         marker = item.get("status", "unknown")
         print(f"{item['capability']:<22} {marker:<16} provider={item['provider']}")
         if item.get("provider") == "fish_audio":
             print(f"  model={item.get('model')} server={item.get('endpoint') or item.get('server_endpoint') or 'not configured'} state={item.get('state', 'unknown')} license={item.get('license_mode', 'research_only')}")
             if item.get("recommended_execution"):
                 print(f"  recommended execution: {item['recommended_execution']}")
+    by_name = {item["capability"]: item for item in value.get("capabilities", [])}
+    for group, names in value.get("music_groups", {}).items():
+        print(f"\nMusic / {group}")
+        for name in names:
+            item = by_name[name]
+            print(f"{name:<28} {item.get('status', 'unknown'):<16} provider={item['provider']}")
     return 0
 
 

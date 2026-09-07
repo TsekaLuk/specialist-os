@@ -124,7 +124,7 @@ class ProductionBoundaryTests(unittest.TestCase):
                     self.assertGreaterEqual(len(model.artifact_files), 1)
                     self.assertTrue(all(item.url.startswith("https://") and len(item.sha256) == 64 for item in model.artifact_files))
                 else:
-                    if spec.provider == "fish_audio" or model.artifact_kind == "server":
+                    if spec.provider == "fish_audio" or model.artifact_kind in {"server", "native"}:
                         self.assertIsNone(model.artifact_url)
                         self.assertIsNone(model.artifact_sha256)
                     else:

@@ -35,6 +35,12 @@ from .voices import VoiceRegistry
 
 class SpecialistRuntime:
     TIMEOUTS = {
+        "music.generate": 1800,
+        "music.separate": 900,
+        "music.transcribe_multitrack": 900,
+        "music.transcribe_vocal": 900,
+        "music.parse_singing": 2700,
+        "music.transcribe_full": 4500,
         "vision.detect": 120,
         "vision.segment": 120,
         "vision.ocr": 120,
@@ -159,7 +165,7 @@ class SpecialistRuntime:
                 if environment.get("status") == "ready":
                     selected = real_providers[name]
                     selected._allow_unverified_models = self.allow_unverified_models
-                    self.providers[name] = self._worker_provider(name, selected, environment["python"], requires_verified_artifact=True)
+                    self.providers[name] = self._worker_provider(name, selected, environment["python"], requires_verified_artifact=spec.model_spec().artifact_kind != "native")
 
     def capabilities(self):
         return registry_snapshot()
@@ -359,7 +365,7 @@ class SpecialistRuntime:
                 elif installation and installation.get("status") in {"corrupt", "error"}:
                     state = installation["status"]
                     reason = installation.get("message") or f"model state is {installation['status']}"
-                elif self.backend == "real" or getattr(provider, "requires_verified_artifact", False):
+                elif model_spec.artifact_kind != "native" and (self.backend == "real" or getattr(provider, "requires_verified_artifact", False)):
                     artifact = installation.get("artifact_path") if installation else None
                     digest = installation.get("sha256") if installation else None
                     if not artifact or not digest:
@@ -413,7 +419,7 @@ class SpecialistRuntime:
             "details": capability_states,
         }
 
-    def install(self, target: str, source: str | None = None, sha256: str | None = None, with_dependencies=None, model: str | None = None, provider_override=None) -> list[dict[str, Any]]:
+    def install(self, target: str, source: str | None = None, sha256: str | None = None, with_dependencies=None, model: str | None = None, provider_override=None, defer_models=None) -> list[dict[str, Any]]:
         names = BUNDLES.get(target.lower())
         if names is None:
             names = [resolve_capability(target)]
@@ -422,12 +428,14 @@ class SpecialistRuntime:
         if source and source.lower().startswith(("http://", "https://")) and not sha256:
             raise ValueError("remote model sources require --sha256")
         install_dependencies = self.with_dependencies if with_dependencies is None else with_dependencies
+        if defer_models is None:
+            defer_models = target in {"music", "music-experimental", "music-generation"}
         installed = []
         for name in names:
             spec = CAPABILITIES[name]
             with self.cache.capability_lock(name):
                 existing = self.cache.installation(name)
-                if existing and not source and not install_dependencies and (provider_override is None or existing.get("provider") == getattr(provider_override, "name", spec.provider)):
+                if existing and existing.get("status") == "ready" and model is None and not source and not install_dependencies and (provider_override is None or existing.get("provider") == getattr(provider_override, "name", spec.provider)):
                     installed.append({"capability": name, "provider": existing.get("provider", spec.provider), "model": existing.get("model", spec.model), "status": existing.get("status", "ready"), "already_installed": True})
                     continue
                 provider = provider_override if provider_override is not None and len(names) == 1 else self.providers[name]
@@ -443,6 +451,12 @@ class SpecialistRuntime:
                     else self._model_for(spec, existing)
                 )
                 model_spec = spec.model_spec(selected_model)
+                if defer_models and model_spec.artifact_kind != "native" and not source:
+                    environment = self.environments.ensure(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency]) if install_dependencies else self.environments.status(spec.provider)
+                    installed.append({"capability": name, "provider": spec.provider, "model": selected_model,
+                                      "status": "runtime_ready" if environment.get("status") == "ready" else "not installed",
+                                      "environment": environment, "downloaded": False, "model_state": "on_demand"})
+                    continue
                 if provider_override is not None and len(names) == 1:
                     # Alternate providers (for example system_tts) live under
                     # a qualified key so installing one route never replaces
@@ -462,7 +476,7 @@ class SpecialistRuntime:
                             provider = provider_map("real")[name]
                             provider._allow_unverified_models = self.allow_unverified_models
                         dependency_env = self.environments.ensure(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency])
-                        provider = self._worker_provider(name, provider, dependency_env["python"], requires_verified_artifact=True)
+                        provider = self._worker_provider(name, provider, dependency_env["python"], requires_verified_artifact=model_spec.artifact_kind != "native")
                         self.providers[name] = provider
                     details = provider.install(self.cache, spec)
                     if details is None:
@@ -502,7 +516,8 @@ class SpecialistRuntime:
                         if dependency_env and artifact_path.suffix == ".whl":
                             details["provider_artifact"] = self.environments.install_artifact(spec.provider, artifact_path)
                         self.cache.mark_installed(name, provider.name, selected_model, status="ready", license_name=spec.license, source=auto_source, sha256=artifact["sha256"], artifact_path=artifact_path, commercial=spec.commercial, source_url=spec.source_url, **marker_fields)
-                        details.update({"artifact": artifact, "verification": "sha256"})
+                        details.update({"artifact": artifact, "verification": "sha256", "status": "ready", "downloaded": True})
+                        details.pop("note", None)
                     installed.append({"capability": name, "provider": getattr(provider, "name", spec.provider), "model": selected_model, "environment": dependency_env, "registry_model": {"source_url": spec.source_url, "memory_mb": model_spec.memory_mb, "disk_mb": model_spec.disk_mb, "platforms": list(model_spec.platforms), "devices": list(model_spec.devices), "artifact_url": model_spec.artifact_url, "artifact_sha256": model_spec.artifact_sha256, "artifact_kind": model_spec.artifact_kind, "artifact_entrypoint": model_spec.artifact_entrypoint, "artifact_files": [{"path": item.path, "url": item.url, "sha256": item.sha256} for item in model_spec.artifact_files]}, **details})
                 except Exception as exc:
                     self.cache.mark_error(name, provider.name, selected_model, str(exc), source=source)
@@ -549,7 +564,7 @@ class SpecialistRuntime:
                         provider = provider_map("real")[spec.name]
                         provider._allow_unverified_models = self.allow_unverified_models
                     environment = self.environments.ensure(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency])
-                    provider = self._worker_provider(spec.name, provider, environment["python"], requires_verified_artifact=True)
+                    provider = self._worker_provider(spec.name, provider, environment["python"], requires_verified_artifact=model_spec.artifact_kind != "native")
                     self.providers[spec.name] = provider
                     details = provider.doctor(hardware)
                 except EnvironmentError as exc:
@@ -585,8 +600,16 @@ class SpecialistRuntime:
                 state = "unavailable"
             capabilities.append({"capability": spec.name, "provider": getattr(provider, "name", spec.provider), "model": self._model_for(spec, installation, hardware), "installation": installation, "error": error_state, "environment": environment, "verification": verification, "registry": {"source_url": spec.source_url, "models": [model.id for model in spec.models]}, **details, "status": state})
         from . import __version__
-
-        return {"version": __version__, "home": str(self.cache.home), "system": hardware, "capabilities": capabilities, "fixes": fixes, "warnings": warnings}
+        from .music import music_classification
+        music_groups = {"Stable": [], "Experimental": [], "Heavy Generative": []}
+        for item in capabilities:
+            classification = music_classification(item["capability"])
+            if classification:
+                item.update(classification)
+                group = "Heavy Generative" if classification["execution_class"] == "heavy_generative" else classification["maturity"].title()
+                music_groups[group].append(item["capability"])
+        return {"version": __version__, "home": str(self.cache.home), "system": hardware, "capabilities": capabilities,
+                "music_groups": music_groups, "fixes": fixes, "warnings": warnings}
 
     def models(self):
         output = []
@@ -732,7 +755,8 @@ class SpecialistRuntime:
         pack = get_pack(name)
         values = []
         for capability in pack.capabilities:
-            values.extend(self.install(capability, with_dependencies=with_dependencies))
+            values.extend(self.install(capability, with_dependencies=with_dependencies,
+                                       defer_models=pack.name in {"music", "music-experimental", "music-generation"}))
         return values
 
     def close(self):
@@ -959,6 +983,26 @@ class SpecialistRuntime:
         if not isinstance(raw_options, dict):
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, {"type": CAPABILITIES[canonical].modality, "path": str(input_path)}, "invalid_options", "options must be an object").to_dict())
         options = dict(raw_options)
+        if canonical == "music.generate" and options.get("reference_audio") is not None:
+            from .providers.optional_expansion import _resolve_file
+
+            try:
+                reference = _resolve_file(options["reference_audio"], self.cache, "reference_audio")
+                options["reference_audio"] = str(reference.resolve())
+                options["reference_audio_sha256"] = self.cache.input_hash(reference)
+            except (WorkerError, OSError, ValueError) as exc:
+                return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info,
+                    getattr(exc, "code", "invalid_input"), str(exc)).to_dict())
+        if canonical == "music.compare_recording":
+            from .providers.optional_expansion import _resolve_file
+
+            try:
+                other = _resolve_file(options.get("other_input"), self.cache, "other_input")
+                options["other_input"] = str(other.resolve())
+                options["other_input_sha256"] = self.cache.input_hash(other)
+            except (WorkerError, OSError, ValueError) as exc:
+                return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info,
+                    getattr(exc, "code", "invalid_input"), str(exc)).to_dict())
         if "allow_sensitive_cache" in options and not isinstance(options["allow_sensitive_cache"], bool):
             return self._finish(ResultEnvelope.failure(canonical, spec.provider, spec.model, input_info, "invalid_options", "allow_sensitive_cache must be a boolean").to_dict())
         # Secondary image inputs may be returned by an earlier capability as

@@ -13,6 +13,7 @@ import sys
 from typing import Any
 
 from .core import CORE_CAPABILITIES, CORE_FAMILY_BY_CAPABILITY, core_install_targets
+from .music import MUSIC_CAPABILITIES, music_classification, music_schemas
 
 
 class RegistryError(RuntimeError):
@@ -133,8 +134,8 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
             if (url is None) != (checksum is None):
                 raise RegistryError(f"{name}: artifact.url and artifact.sha256 must be specified together")
             kind = artifact.get("kind", "file")
-            if kind not in {"file", "bundle", "server"}:
-                raise RegistryError(f"{name}: artifact.kind must be 'file', 'bundle' or 'server'")
+            if kind not in {"file", "bundle", "server", "native"}:
+                raise RegistryError(f"{name}: artifact.kind must be file, bundle, server or native")
             filename = artifact.get("filename")
             if filename is not None and (not isinstance(filename, str) or not filename or Path(filename).name != filename):
                 raise RegistryError(f"{name}: artifact.filename must be a simple file name")
@@ -157,8 +158,8 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
                 raise RegistryError(f"{name}: bundle artifacts require at least one file")
             if kind == "bundle" and (url is not None or checksum is not None):
                 raise RegistryError(f"{name}: bundle artifacts must use per-file digests and leave top-level URL/SHA256 null")
-            if kind == "server" and (url is not None or checksum is not None or artifact.get("files")):
-                raise RegistryError(f"{name}: server-managed artifacts cannot declare downloadable files")
+            if kind in {"server", "native"} and (url is not None or checksum is not None or artifact.get("files")):
+                raise RegistryError(f"{name}: {kind} artifacts cannot declare downloadable files")
             model_id = model.get("id")
             platforms = model.get("platforms")
             devices = model.get("devices")
@@ -210,8 +211,8 @@ def _load_registry() -> tuple[dict[str, CapabilitySpec], dict[str, Any]]:
             privacy_level=str(item.get("privacy_level") or "safe"),
             determinism=str(item.get("determinism") or "provider_defined"),
             providers=tuple(str(value) for value in providers if str(value).strip()),
-            input_schema=dict(item.get("input_schema") or {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}, "options": {"type": "object"}}}),
-            output_schema=dict(item.get("output_schema") or {"type": "object"}),
+            input_schema=dict(item.get("input_schema") or (music_schemas(name)[0] if name in MUSIC_CAPABILITIES else {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}, "options": {"type": "object"}}})),
+            output_schema=dict(item.get("output_schema") or (music_schemas(name)[1] if name in MUSIC_CAPABILITIES else {"type": "object"})),
         )
     return result, payload
 
@@ -226,7 +227,7 @@ BUNDLES = {
     "audio": [name for name, spec in CAPABILITIES.items() if spec.bundle == "audio"],
     "document": [name for name, spec in CAPABILITIES.items() if spec.bundle == "document"],
 }
-for bundle_name in ("human", "identity", "audio-plus", "retrieval", "media", "vision-operators", "speech"):
+for bundle_name in ("human", "identity", "audio-plus", "retrieval", "media", "vision-operators", "speech", "music", "music-experimental", "music-generation", "music-workflows"):
     BUNDLES[bundle_name] = [name for name, spec in CAPABILITIES.items() if spec.bundle == bundle_name]
 BUNDLES["audio-plus"] = [name for name, spec in CAPABILITIES.items() if spec.bundle in {"audio-plus", "speech"} or name in {"audio.denoise", "speech.diarize"}]
 # ADR-003 freezes admission, while preserving the existing registry order.
@@ -259,6 +260,7 @@ def registry_snapshot() -> list[dict[str, Any]]:
     return [
         {
             "capability": spec.name,
+            **music_classification(spec.name),
             "command": spec.command,
             "provider": spec.provider,
             "model": spec.model,

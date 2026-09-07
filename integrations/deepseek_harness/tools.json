@@ -1,5 +1,15 @@
 {
   "tools": [
+    {"name": "music_generate", "capability": "music.generate"},
+    {"name": "music_parse_singing", "capability": "music.parse_singing"},
+    {"name": "music_transcribe_full", "capability": "music.transcribe_full"},
+    {"name": "music_transcribe_vocal", "capability": "music.transcribe_vocal"},
+    {"name": "music_separate", "capability": "music.separate"},
+    {"name": "music_transcribe_multitrack", "capability": "music.transcribe_multitrack"},
+    {"name": "music_transcribe_notes", "capability": "music.transcribe_notes"},
+    {"name": "music_analyze", "capability": "music.analyze"},
+    {"name": "music_fingerprint", "capability": "music.fingerprint"},
+    {"name": "music_compare_recording", "capability": "music.compare_recording"},
     {"name": "vision_detect", "capability": "vision.detect"},
     {"name": "vision_segment", "capability": "vision.segment"},
     {"name": "vision_ocr", "capability": "vision.ocr"},

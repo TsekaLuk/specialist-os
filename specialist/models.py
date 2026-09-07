@@ -10,6 +10,7 @@ import tempfile
 import time
 import urllib.request
 import urllib.error
+import urllib.parse
 import json
 from pathlib import Path
 
@@ -19,6 +20,26 @@ class ModelArtifactError(RuntimeError):
 
 
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
+
+
+def model_request(url: str, headers: dict) -> urllib.request.Request:
+    request = urllib.request.Request(url, headers=headers)
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme != "https" or parsed.netloc != "huggingface.co":
+        return request
+    token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+    if not token:
+        root = Path(os.environ.get("HF_HOME", str(Path(os.environ.get("XDG_CACHE_HOME", str(Path.home() / ".cache"))) / "huggingface")))
+        token_path = Path(os.environ.get("HF_TOKEN_PATH", str(root / "token"))).expanduser()
+        try:
+            with token_path.open(encoding="utf-8") as stream:
+                token = stream.read(4096).strip()
+        except (OSError, UnicodeError):
+            token = None
+    if token and re.fullmatch(r"[A-Za-z0-9_-]{1,4096}", token):
+        # urllib does not copy unredirected headers to CDN requests.
+        request.add_unredirected_header("Authorization", f"Bearer {token}")
+    return request
 
 
 class ModelManager:
@@ -159,7 +180,7 @@ class ModelManager:
                 if remote and existing_size:
                     headers["Range"] = f"bytes={existing_size}-"
                 try:
-                    request = urllib.request.Request(url, headers=headers)
+                    request = model_request(url, headers)
                     with urllib.request.urlopen(request, timeout=self.timeout) as response:
                         final_url = response.geturl()
                         if url.startswith("https://") and final_url.startswith("http://"):

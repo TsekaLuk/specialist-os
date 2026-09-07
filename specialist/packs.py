@@ -19,6 +19,10 @@ class CapabilityPack:
 
 
 PACKS = (
+    CapabilityPack("music", "Music analysis, separation, fingerprints and transcription runtimes; model weights download on first use", tuple(BUNDLES["music"])),
+    CapabilityPack("music-experimental", "Optional experimental vocal transcription", tuple(BUNDLES["music-experimental"])),
+    CapabilityPack("music-generation", "Independent heavy music generation", tuple(BUNDLES["music-generation"])),
+    CapabilityPack("music-workflows", "Evidence-preserving singing and full-mix workflows", tuple(BUNDLES["music-workflows"])),
     CapabilityPack("vision-core", "Detection, segmentation, OCR and depth", ("vision.detect", "vision.segment", "vision.ocr", "vision.depth")),
     CapabilityPack("document", "Document parsing and structure recovery", ("document.parse",)),
     CapabilityPack("voice", "Speech synthesis, voice cloning, transcription and activity detection", ("speech.synthesize", "speech.clone_voice", "audio.transcribe", "audio.vad")),
