@@ -70,23 +70,25 @@ def embed(source, destination, manifest):
         for index, (picture, props) in enumerate(pictures, 2):
             key = props.get('descr')[6:]
             item = media[key]
-            payload = Path(item['audio']).read_bytes()
+            kind = 'video' if 'video' in item else 'audio'
+            extension_name = 'mp4' if kind == 'video' else 'mp3'
+            payload = Path(item[kind]).read_bytes()
             if hashlib.sha256(payload).hexdigest() != item['sha256']:
                 raise ValueError('Audio derivative checksum mismatch')
-            target = f'../media/specialist-{key}.mp3'
-            parts[f'ppt/media/specialist-{key}.mp3'] = payload
+            target = f'../media/specialist-{key}.{extension_name}'
+            parts[f'ppt/media/specialist-{key}.{extension_name}'] = payload
             audio_id, media_id = f'rIdSpecialistAudio{index}', f'rIdSpecialistMedia{index}'
             existing_ids = {rel.get('Id') for rel in rels}
             if audio_id in existing_ids or media_id in existing_ids:
                 raise ValueError('Audio relationship id collision')
-            add(rels, 'rel:Relationship', {'Id': audio_id, 'Type': NS['r'] + '/audio', 'Target': target})
+            add(rels, 'rel:Relationship', {'Id': audio_id, 'Type': NS['r'] + '/' + kind, 'Target': target})
             add(rels, 'rel:Relationship', {'Id': media_id, 'Type': 'http://schemas.microsoft.com/office/2007/relationships/media', 'Target': target})
             add(props, 'a:hlinkClick', {'action': 'ppaction://media'})
             nv = picture.find('p:nvPicPr/p:nvPr', NS)
-            add(nv, 'a:audioFile', {'{' + NS['r'] + '}link': audio_id})
+            add(nv, 'a:' + kind + 'File', {'{' + NS['r'] + '}link': audio_id})
             extension = add(add(nv, 'p:extLst'), 'p:ext', {'uri': '{DAA4B4D4-6D71-4841-9C94-3DE7FCFB9230}'})
             add(extension, 'p14:media', {'{' + NS['r'] + '}embed': media_id})
-            node = add(add(children, 'p:audio'), 'p:cMediaNode', {'vol': '100000'})
+            node = add(add(children, 'p:' + kind), 'p:cMediaNode', {'vol': '100000'})
             ctn = add(node, 'p:cTn', {'id': str(index), 'fill': 'hold', 'display': '0'})
             add(add(ctn, 'p:stCondLst'), 'p:cond', {'delay': 'indefinite'})
             add(add(node, 'p:tgtEl'), 'p:spTgt', {'spid': props.get('id')})
@@ -98,6 +100,8 @@ def embed(source, destination, manifest):
     types = ET.fromstring(parts['[Content_Types].xml'])
     if not any(item.get('Extension') == 'mp3' for item in types):
         add(types, 'ct:Default', {'Extension': 'mp3', 'ContentType': 'audio/mpeg'})
+    if any('video' in item for item in media.values()) and not any(item.get('Extension') == 'mp4' for item in types):
+        add(types, 'ct:Default', {'Extension': 'mp4', 'ContentType': 'video/mp4'})
     ET.register_namespace('', NS['ct'])
     parts['[Content_Types].xml'] = ET.tostring(types, encoding='utf-8', xml_declaration=True)
     with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED) as archive:

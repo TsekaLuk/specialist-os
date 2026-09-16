@@ -50,6 +50,9 @@ ACE-Step 生成配乐。试听音频、检查音符时间线，再把产物带�
 [15 分钟团队分享与演示路线](docs/demo-runbook.zh-CN.md)把这些产物串成应用场景，
 slides 内嵌音频，可直接对照试听。
 
+[观看 CLI 演示视频](docs/assets/demo/specialist-os-e2e.mp4)：2 分 19 秒，
+看本地命令执行、视觉结果交付，以及降噪和音乐分轨的试听对比。
+
 ## 为什么团队选择 Specialist OS
 
 | | 产品价值 |

@@ -1,0 +1,13 @@
+{
+  "name": "specialist-os-demo-video",
+  "private": true,
+  "type": "module",
+  "scripts": {"record": "node record.mjs", "render": "node render.mjs"},
+  "dependencies": {
+    "@remotion/bundler": "4.0.409",
+    "@remotion/renderer": "4.0.409",
+    "remotion": "4.0.409",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  }
+}

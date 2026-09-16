@@ -89,10 +89,10 @@ Basic Pitch 调用。指纹比较目前演示同一录音的一致性，不作�
 人声／伴奏。此曲为器乐录音，人声轨主要用于检查串音，不把它当作人声分离质量基准。
 MuScriptor 本机 MPS 单次约 31 秒，分轨 CPU 约 17 秒，可在解释分析结果时运行。
 
-Slides：`output/demo/slides/final/Specialist-OS-AHA-v5.pptx`，共 17 页、15 分钟。
-讲稿：`output/demo/slides/final/Specialist-OS-AHA-v5-Speaker-Notes.md`。
-[下载内嵌音频版](slides/Specialist-OS-AHA-v5.pptx) ·
-[讲稿](slides/Specialist-OS-AHA-v5-Speaker-Notes.md)。
+Slides：`docs/slides/Specialist-OS-AHA-v6.pptx`，17 页讲解、15 分钟，
+另附第 18 页的 2 分 19 秒演示视频。
+[下载内嵌视频与音频版](slides/Specialist-OS-AHA-v6.pptx) ·
+[讲稿](slides/Specialist-OS-AHA-v6-Speaker-Notes.md)。
 第 9 页内嵌降噪前后音频，第 12 页内嵌原曲、人声、伴奏和生成配乐。
 音频以 MP3 192 kbps 随 PPTX 打包，放映时点击波形播放，无需启动 demo 服务。
 演示页保留原始 WAV 和 MIDI 文件。投影前需在实际使用的演示软件中检查播放。
@@ -111,16 +111,19 @@ Slides 构建入口为 `scripts/build_aha_slides.mjs`，音频打包入口为
 
 ## 静默录制路径
 
-录制主体是 Codex 接到任务、发现能力、调用真实 CLI、检查输出并打开交付页面的
-完整过程。Remotion 负责字幕、局部放大和明确标注的等待加速，保留实际耗时。
-不重建聊天或终端，不用结果图轮播替代执行过程。
+备用视频为 2 分 19 秒的 CLI 与结果页实录，覆盖检测、分割、深度、转写、
+降噪和音乐分轨。模型已提前准备，关闭结果缓存，以 1 倍速度播放。
+命令输出在进程运行时直接送入录制页面，随后录制对应结果页操作。
+Remotion 合成章节标题与同步试听音轨。
+
+[播放视频](assets/demo/specialist-os-e2e.mp4) · [复现录制](demo-video.md)
 
 音乐任务提示：把这首歌做成练习素材，分离人声和伴奏，提取演唱旋律，生成
 多乐器 MIDI，整理为可以试听和下载的工作区。保留 CLI 命令和每步产物来源。
 
-静默录制不抢焦点、不采集麦克风或其他应用。模型产物音频直接用于后期，不在
-录制时外放。先验证系统能持续捕获被遮挡的 Codex 窗口，再开始正式录制。
-Music 验收和交付页面修复完成前不启动录制。
+录制使用独立的无头浏览器，不采集 Codex 窗口、麦克风或其他应用。
+试听音轨来自相应 CLI 产物，按播放器实际播放位置同步。
+现场先讲 15 分钟，再做 10 分钟交互演示；备用视频用于快速总览或现场切换。
 
 ## 全量能力菜单
 

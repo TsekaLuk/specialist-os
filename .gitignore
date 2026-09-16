@@ -11,3 +11,5 @@ rust-core/target/
 .DS_Store
 .specialist/
 output/
+.remotion/
+.cache/

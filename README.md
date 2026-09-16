@@ -59,6 +59,9 @@ arranging or practice tools.
 The [15-minute team presentation and demo route](docs/demo-runbook.zh-CN.md)
 connect these outputs to application scenarios, with audio embedded in the slides.
 
+[Watch the CLI demo](docs/assets/demo/specialist-os-e2e.mp4): local execution,
+visual results and playable audio, in 2 minutes 19 seconds.
+
 ## Why teams build on Specialist OS
 
 | | Product value |
