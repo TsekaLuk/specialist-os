@@ -7,6 +7,7 @@ import threading
 import os
 import sys
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -28,9 +29,15 @@ from .streaming import SessionManager
 from .benchmark import BenchmarkRecord, BenchmarkRegistry
 from .node import NodeRegistry
 from .provider_manifest import ProviderCatalog, builtin_manifests
+from .requirements import DEFAULT_ENDPOINT_TIMEOUT, describe_group, evaluate_requirements, probe_endpoint_url
 from .remote import RemoteNodeProvider
 from .packs import get_pack
 from .voices import VoiceRegistry
+
+# Per-endpoint budget for the readiness path. An orchestrator polls this route
+# on a short interval, so a probe is worth only about a second per distinct
+# endpoint - not the 3s a provider self-check allows itself.
+READINESS_ENDPOINT_TIMEOUT = 1.0
 
 
 class SpecialistRuntime:
@@ -149,6 +156,8 @@ class SpecialistRuntime:
         self.benchmarks = BenchmarkRegistry(self.cache.metadata / "benchmarks.json")
         self.nodes = NodeRegistry(self.cache.home / "nodes")
         self.provider_catalog = ProviderCatalog(self.cache.home / "providers")
+        self._requirement_index = None
+        self._requirement_index_warnings: list[str] = []
         self._attach_remote_nodes()
 
         # On a subsequent process start, reuse an already-created provider
@@ -333,9 +342,107 @@ class SpecialistRuntime:
                 return exc.explanation
             raise
 
-    def readiness(self):
+    def _provider_requirements(self, provider_name: str):
+        """Read declared prerequisites without importing provider code."""
+        self._ensure_requirement_index()
+        return self._requirement_index.get(provider_name, ())
+
+    def _ensure_requirement_index(self) -> list[str]:
+        """Build the requirement index, reporting manifests that were skipped.
+
+        A malformed third-party manifest only drops its own requirements. The
+        inverse failure - dropping every provider's prerequisites because one
+        file is bad - would report an unusable host as fully satisfied.
+        """
+        if self._requirement_index is None:
+            index = {item.provider: item.requirements for item in builtin_manifests()}
+            warnings: list[str] = []
+            try:
+                manifests, errors = self.provider_catalog.scan()
+            except Exception as exc:
+                manifests, errors = [], [{"path": str(self.provider_catalog.root), "message": str(exc)}]
+            index.update({item.provider: item.requirements for item in manifests})
+            for error in errors:
+                warnings.append(f"Skipped unreadable provider manifest {error['path']}: {error['message']}. Its declared prerequisites are not checked.")
+            self._requirement_index = index
+            self._requirement_index_warnings = warnings
+        return self._requirement_index_warnings
+
+    def _provider_doctor(self, provider, hardware, *, probe_endpoints: bool = False, endpoint_timeout: float | None = None,
+                         probe_cache: dict[tuple[str, str], tuple[bool, str, str]] | None = None) -> dict[str, Any]:
+        """Run a provider self-check, keeping endpoint contact opt-in.
+
+        A provider that contacts a network endpoint in ``doctor`` is skipped on
+        the default path: a registered but offline node would otherwise stall
+        the whole report for seconds per capability. The endpoint is reported as
+        declared-but-unprobed and the first real call surfaces reachability.
+
+        When a caller does need reachability and also needs a bounded cost - the
+        HTTP readiness probe - it passes ``endpoint_timeout`` and a
+        ``probe_cache``. The declared health URL is then contacted directly with
+        that budget, at most once per distinct URL, instead of running the
+        provider self-check once per capability against the same host.
+        """
+        try:
+            if getattr(provider, "doctor_probes_endpoint", False):
+                local = getattr(provider, "doctor_local", None)
+                base = (local(hardware) or {}) if callable(local) else {}
+                if not probe_endpoints:
+                    return base or {"status": "unprobed", "endpoint_probe": {"status": "unprobed", "reason": "self-check does not contact endpoints; use --probe-endpoints"}}
+                if endpoint_timeout is not None:
+                    descriptor = getattr(provider, "doctor_endpoint", None)
+                    target = descriptor() if callable(descriptor) else None
+                    url = (target or {}).get("url") if isinstance(target, Mapping) else None
+                    if url:
+                        # The provider's own health predicate travels with the
+                        # URL, so a bounded probe reaches the same verdict its
+                        # ``doctor`` would: a node that answers while reporting
+                        # itself unhealthy is not ready, and never opens the
+                        # traffic gate just because the socket accepted.
+                        ok, probe_state, detail = probe_endpoint_url(url, timeout=endpoint_timeout, headers=(target or {}).get("headers"),
+                                                                     expect=(target or {}).get("expect"), probe_cache=probe_cache)
+                        value = {**base, "status": "ready" if ok else "not ready",
+                                 "endpoint_probe": {"status": probe_state, "endpoint": url, "timeout_seconds": endpoint_timeout, "reason": detail}}
+                        if not ok:
+                            value["error"] = {"code": "endpoint_unhealthy" if probe_state == "unhealthy" else "endpoint_unreachable", "message": detail}
+                        return value
+            return provider.doctor(hardware) or {}
+        except Exception as exc:
+            return {"status": "not ready", "error": {"code": "provider_doctor_failed", "message": str(exc)}}
+
+    def _requirement_state(self, provider, details: dict[str, Any], *, probe_endpoints: bool = False,
+                           endpoint_timeout: float = DEFAULT_ENDPOINT_TIMEOUT, probe_cache: dict[tuple[str, str], tuple[bool, str, str]] | None = None) -> dict[str, Any] | None:
+        """Evaluate declared prerequisites for the provider actually in use."""
+        if details.get("backend") == "builtin-fallback":
+            # A dependency-free fallback does not use the real provider's
+            # prerequisites, so reporting them would be a false alarm.
+            return None
+        requirements = self._provider_requirements(getattr(provider, "name", ""))
+        if not requirements:
+            return None
+        # Probe in the environment the provider actually runs in. An isolated
+        # worker prepends its provider environment to PATH, so a console script
+        # installed there (mineru, for example) is invisible to the parent
+        # process; probing the parent PATH would report a working capability as
+        # degraded.
+        provider_env = getattr(provider, "env", None)
+        environ = {**os.environ, **provider_env} if isinstance(provider_env, Mapping) else None
+        return evaluate_requirements(requirements, probe_endpoints=probe_endpoints, environ=environ, endpoint_timeout=endpoint_timeout, probe_cache=probe_cache)
+
+    def readiness(self, *, probe_endpoints: bool = False, endpoint_timeout: float = READINESS_ENDPOINT_TIMEOUT):
+        """Report the traffic gate.
+
+        The Python default stays unprobed so an interactive or embedded caller
+        never blocks on an unreachable host. A load-balancer readiness probe -
+        the HTTP ``/ready`` route - opts in, because testing reachability is the
+        reason that route exists. With probing on, each distinct endpoint is
+        contacted at most once per call with ``endpoint_timeout``, so the worst
+        case is (distinct endpoints x timeout), not (capabilities x timeout).
+        """
         hardware = detect_hardware()
         capability_states = []
+        probe_cache: dict[tuple[str, str], tuple[bool, str, str]] = {}
+        warnings = list(self._ensure_requirement_index())
         for spec in CAPABILITIES.values():
             installation = self.cache.installation(spec.name)
             provider = self._provider_for_installation(spec.name, installation)
@@ -347,19 +454,16 @@ class SpecialistRuntime:
                 state = "error"
                 reason = error.get("message", "capability has a persisted error state")
             else:
-                try:
-                    check = provider.doctor(hardware) or {}
-                except Exception as exc:
-                    check = {"status": "not ready", "error": {"code": "provider_doctor_failed", "message": str(exc)}}
+                check = self._provider_doctor(provider, hardware, probe_endpoints=probe_endpoints, endpoint_timeout=endpoint_timeout if probe_endpoints else None, probe_cache=probe_cache)
                 model_spec = spec.model_spec(self._model_for(spec, installation, hardware))
                 platform = target_id(hardware)
                 if platform not in model_spec.platforms:
                     check = {**check, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
                 effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
                 provider_uses_managed_resources = self._provider_uses_managed_resources(provider)
-                if check.get("status") == "ready" and not provider_uses_managed_resources and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
+                if check.get("status") in {"ready", "unprobed"} and not provider_uses_managed_resources and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
                     check = {**check, "status": "not ready", "error": {"code": "insufficient_memory", "message": f"model requires {model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB"}}
-                if check.get("status") != "ready":
+                if check.get("status") not in {"ready", "unprobed"}:
                     state = "unavailable"
                     reason = (check.get("error") or {}).get("message") or check.get("message") or "provider is not ready"
                 elif installation and installation.get("status") in {"corrupt", "error"}:
@@ -377,6 +481,14 @@ class SpecialistRuntime:
                         except Exception as exc:
                             state = "corrupt"
                             reason = str(exc)
+            requirements = self._requirement_state(provider, check, probe_endpoints=probe_endpoints, endpoint_timeout=endpoint_timeout, probe_cache=probe_cache) if not error else None
+            if requirements and state == "ready" and requirements["unmet"]:
+                # Installed and routable, but a declared non-optional
+                # prerequisite is missing: the call is accepted and fails at
+                # execution, which is a different operator action from
+                # "not installed" and from "load failed".
+                state = "degraded"
+                reason = "missing required prerequisite: " + "; ".join(describe_group(item) for item in requirements["unmet"])
             capability_states.append({
                 "capability": spec.name,
                 "provider": getattr(provider, "name", spec.provider),
@@ -385,6 +497,7 @@ class SpecialistRuntime:
                 "reason": reason,
                 "installation": installation,
                 "check": check,
+                "requirements": requirements,
             })
         ready_count = sum(item["status"] == "ready" for item in capability_states)
         unready = len(capability_states) - ready_count
@@ -416,6 +529,10 @@ class SpecialistRuntime:
             "unready_capabilities": unready,
             "backend": self.backend,
             "isolate": self.isolate,
+            # Only the URL is reported: a cache key also fingerprints the
+            # credentials used to reach it, which never belong in a report.
+            "probed_endpoints": sorted({url for url, _fingerprint in probe_cache}),
+            "warnings": warnings,
             "details": capability_states,
         }
 
@@ -531,11 +648,12 @@ class SpecialistRuntime:
                     raise
         return installed
 
-    def doctor(self, fix=False) -> dict[str, Any]:
+    def doctor(self, fix=False, *, probe_endpoints: bool = False) -> dict[str, Any]:
         hardware = detect_hardware()
         capabilities = []
         fixes = []
         warnings = ["Core capabilities are available through local adapters. Add a provider package and verified model artifact when a managed model deployment is required."]
+        warnings.extend(self._ensure_requirement_index())
         if not hardware.get("ffmpeg"):
             warnings.append("FFmpeg is not available; audio and document providers may not work. Install it with the system package manager.")
         if not hardware.get("supported_target"):
@@ -543,17 +661,14 @@ class SpecialistRuntime:
         for spec in CAPABILITIES.values():
             installation = self.cache.installation(spec.name)
             provider = self._provider_for_installation(spec.name, installation)
-            try:
-                details = provider.doctor(hardware) or {}
-            except Exception as exc:
-                details = {"status": "not ready", "error": {"code": "provider_doctor_failed", "message": str(exc)}}
+            details = self._provider_doctor(provider, hardware, probe_endpoints=probe_endpoints)
             model_spec = spec.model_spec(self._model_for(spec, installation, hardware))
             platform = target_id(hardware)
             if platform not in model_spec.platforms:
                 details = {**details, "status": "not ready", "error": {"code": "unsupported_platform", "message": f"model is not published for {platform}"}}
             effective_memory_mb = min((hardware.get("memory_gb") or 0) * 1024, (hardware.get("memory_limit_gb") or hardware.get("memory_gb") or 0) * 1024)
             provider_uses_managed_resources = self._provider_uses_managed_resources(provider)
-            if details.get("status") == "ready" and not provider_uses_managed_resources and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
+            if details.get("status") in {"ready", "unprobed"} and not provider_uses_managed_resources and effective_memory_mb and effective_memory_mb < model_spec.memory_mb:
                 details = {**details, "status": "not ready", "error": {"code": "insufficient_memory", "message": f"model requires {model_spec.memory_mb} MiB but host budget is {round(effective_memory_mb)} MiB"}}
             environment = self.environments.status(spec.provider) if spec.optional_dependency in PROVIDER_REQUIREMENTS and PROVIDER_REQUIREMENTS[spec.optional_dependency] else None
             if environment and environment.get("status") == "ready" and not self.environments.verify(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency]):
@@ -566,10 +681,10 @@ class SpecialistRuntime:
                     environment = self.environments.ensure(spec.provider, PROVIDER_REQUIREMENTS[spec.optional_dependency])
                     provider = self._worker_provider(spec.name, provider, environment["python"], requires_verified_artifact=model_spec.artifact_kind != "native")
                     self.providers[spec.name] = provider
-                    details = provider.doctor(hardware)
+                    details = self._provider_doctor(provider, hardware, probe_endpoints=probe_endpoints)
                 except EnvironmentError as exc:
                     fixes.append({"capability": spec.name, "status": "failed", "message": str(exc)})
-            if fix and details.get("status") != "ready":
+            if fix and details.get("status") not in {"ready", "unprobed"}:
                 fixes.append({"capability": spec.name, "status": "manual", "message": "Provider reported an issue; install its optional backend and rerun doctor."})
             verification = None
             if installation and installation.get("artifact_path"):
@@ -593,12 +708,21 @@ class SpecialistRuntime:
                         else:
                             fixes.append({"capability": spec.name, "status": "manual", "message": "No verified artifact is registered; reinstall with --source and --sha256."})
             error_state = self.cache.error_state(spec.name)
+            requirements = self._requirement_state(provider, details, probe_endpoints=probe_endpoints)
             state = "ready" if installation else ("error" if error_state else "not installed")
             if verification and verification.get("status") == "corrupt":
                 state = "corrupt"
-            if details.get("status") != "ready":
+            if details.get("status") not in {"ready", "unprobed"}:
                 state = "unavailable"
-            capabilities.append({"capability": spec.name, "provider": getattr(provider, "name", spec.provider), "model": self._model_for(spec, installation, hardware), "installation": installation, "error": error_state, "environment": environment, "verification": verification, "registry": {"source_url": spec.source_url, "models": [model.id for model in spec.models]}, **details, "status": state})
+            reason = (details.get("error") or {}).get("message") if state == "unavailable" else None
+            if state == "ready" and requirements and requirements["unmet"]:
+                # Installed and routable, but a declared non-optional
+                # prerequisite is missing. The capability stays exposed through
+                # the CLI, HTTP and the harness tool table and fails at
+                # execution, so it is neither "not installed" nor "error".
+                state = "degraded"
+                reason = "missing required prerequisite: " + "; ".join(describe_group(item) for item in requirements["unmet"])
+            capabilities.append({"capability": spec.name, "provider": getattr(provider, "name", spec.provider), "model": self._model_for(spec, installation, hardware), "installation": installation, "error": error_state, "environment": environment, "verification": verification, "registry": {"source_url": spec.source_url, "models": [model.id for model in spec.models]}, **details, "status": state, "requirements": requirements, "reason": reason})
         from . import __version__
         from .music import music_classification
         music_groups = {"Stable": [], "Experimental": [], "Heavy Generative": []}

@@ -18,6 +18,7 @@ from .providers.ipc import WorkerError, run_worker
 from .models import ModelArtifactError
 from .environments import EnvironmentError
 from .provider_manifest import ProviderCatalog, ProviderManifest, ProviderManifestError, builtin_manifests
+from .requirements import describe_group
 from .node import ComputeNode, NodeError
 from .providers.fish_audio.client import FishAudioError
 
@@ -55,6 +56,30 @@ def _human_result(value):
     return 0
 
 
+def _print_capability_reason(item):
+    """Print why a capability is not ready, not just the status word.
+
+    A declared-but-unprobed endpoint is printed for every capability, including
+    a ready one: ``ready`` then means installed and routable locally, and the
+    operator has to be told which prerequisite the self-check did not check.
+    """
+    requirements = item.get("requirements") or {}
+    if item.get("status") != "ready":
+        reason = item.get("reason")
+        if not reason:
+            reason = (item.get("error") or {}).get("message") if isinstance(item.get("error"), dict) else None
+        if reason:
+            print(f"  reason: {reason}")
+        # The provider message and the declared prerequisites answer different
+        # questions, so an unmet requirement is named even when the provider
+        # already reported something.
+        unmet = requirements.get("unmet") or []
+        if unmet and (not reason or not reason.startswith("missing required prerequisite")):
+            print("  missing required prerequisite: " + "; ".join(describe_group(group) for group in unmet))
+    for group in requirements.get("unprobed") or []:
+        print(f"  not probed: {describe_group(group)}")
+
+
 def _human_doctor(value):
     system = value.get("system", {})
     print(f"Specialist OS {value.get('version', __version__)}")
@@ -72,6 +97,7 @@ def _human_doctor(value):
             continue
         marker = item.get("status", "unknown")
         print(f"{item['capability']:<22} {marker:<16} provider={item['provider']}")
+        _print_capability_reason(item)
         if item.get("provider") == "fish_audio":
             print(f"  model={item.get('model')} server={item.get('endpoint') or item.get('server_endpoint') or 'not configured'} state={item.get('state', 'unknown')} license={item.get('license_mode', 'research_only')}")
             if item.get("recommended_execution"):
@@ -82,6 +108,7 @@ def _human_doctor(value):
         for name in names:
             item = by_name[name]
             print(f"{name:<28} {item.get('status', 'unknown'):<16} provider={item['provider']}")
+            _print_capability_reason(item)
     return 0
 
 
@@ -114,6 +141,7 @@ def build_parser():
     doctor = sub.add_parser("doctor", help="Inspect system, dependencies and provider state")
     doctor.add_argument("--fix", action="store_true", help="Install safe local fallback markers")
     doctor.add_argument("--strict", action="store_true", help="Exit non-zero unless every capability is ready")
+    doctor.add_argument("--probe-endpoints", action="store_true", help="Contact declared provider endpoints (off by default; an offline host can stall the report)")
     doctor.add_argument("--json", action="store_true", dest="as_json")
     install = sub.add_parser("install", help="Install a capability, bundle or all")
     install.add_argument("target")
@@ -287,7 +315,7 @@ def main(argv=None):
         _json_dump({"results": results, "wall_ms": round((time.perf_counter() - started) * 1000, 2)})
         return int(any(item.get("error") for item in results))
     if args.command == "doctor":
-        value = runtime.doctor(fix=args.fix)
+        value = runtime.doctor(fix=args.fix, probe_endpoints=args.probe_endpoints)
         failed = any(item.get("status") != "ready" for item in value.get("capabilities", []))
         if args.as_json:
             _json_dump(value)

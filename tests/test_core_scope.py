@@ -7,6 +7,7 @@ import unittest
 
 from specialist.core import CORE_CAPABILITIES, CORE_FAMILIES, CORE_FAMILY_BY_CAPABILITY, core_install_targets
 from specialist.environments import PROVIDER_REQUIREMENTS
+from specialist.music import MUSIC_CAPABILITIES
 from specialist.packs import PACKS, get_pack
 from specialist.registry import BUNDLES, CAPABILITIES, get_spec, registry_snapshot
 
@@ -25,6 +26,15 @@ class CoreScopeTests(unittest.TestCase):
         self.assertTrue(CORE_CAPABILITIES.issubset(CAPABILITIES))
         with self.assertRaises(TypeError):
             CORE_FAMILIES["spatial"] = ("spatial.geometry",)
+
+    def test_registry_splits_into_frozen_core_and_the_music_pack_only(self):
+        non_core = {name for name in CAPABILITIES if name not in CORE_CAPABILITIES}
+        self.assertEqual(non_core, set(MUSIC_CAPABILITIES))
+        self.assertEqual(len(MUSIC_CAPABILITIES), 10)
+        self.assertEqual(len(CAPABILITIES), len(CORE_CAPABILITIES) + len(MUSIC_CAPABILITIES))
+        self.assertEqual({name for name in CORE_CAPABILITIES if name.startswith("music.")}, set())
+        for item in registry_snapshot():
+            self.assertEqual(item["core"], item["capability"] not in MUSIC_CAPABILITIES)
 
     def test_core_install_targets_exclude_heavy_and_experimental_providers(self):
         self.assertEqual(set(get_pack("core").capabilities), CORE_CAPABILITIES)

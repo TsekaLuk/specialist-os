@@ -93,6 +93,65 @@ variant exits non-zero when any capability is unavailable, unconfigured or has
 a corrupt/error model state. A tampered artifact is reported as `corrupt` and
 will not be silently replaced.
 
+`doctor` also reports `degraded`: the capability is installed and routable, but
+a declared non-optional prerequisite is missing, so the call is accepted and
+fails at execution. The unmet requirement (or the group of interchangeable
+sources that satisfies it, such as a credential readable from an environment
+variable or a credential file) is named in both `--json` and the human output.
+A missing prerequisite marked optional does not degrade a capability. A
+`degraded` capability is not `ready`, so `--strict` still exits non-zero.
+
+The self-check and the readiness route treat endpoints differently, on purpose.
+
+`specialist doctor` never contacts a declared endpoint. A registered but
+offline remote node or speech server is reported as declared-but-unprobed
+instead of stalling the report for seconds per capability, and the first real
+call surfaces reachability. Pass `specialist doctor --probe-endpoints` to
+contact them explicitly; on an unreachable host that flag is the slow path by
+design (one provider self-check per capability, 3s each). The Python API
+follows the same default: `runtime.readiness()` and `runtime.doctor()` probe
+nothing unless the caller asks.
+
+A probe applies the provider's own health predicate, not bare reachability: a
+node that answers 200 while reporting a non-`ok` status, or a Fish Audio server
+whose `status` is not ok/ready/healthy, is `unavailable` with an
+`endpoint_probe.status` of `unhealthy` (distinct from `unreachable`).
+
+`/ready` and `/v1/ready` do probe. Testing reachability is the reason a
+load-balancer readiness route exists, so a dead Fish Audio server or an offline
+registered node makes those capabilities `unavailable` and, when that leaves
+the service unable to serve, returns 503. The cost is bounded: each distinct
+endpoint is contacted at most once per request with a 1s budget
+(`READINESS_ENDPOINT_TIMEOUT`), shared across every capability that points at
+it. Eight capabilities on one blackholed node cost one probe. Probes run
+sequentially, so the worst case is (distinct endpoints x 1s) plus local
+checks - not (capabilities x timeout). A deployment with four distinct
+endpoints, all blackholed, answers `/ready` in about 4s: size the orchestrator
+probe timeout above (distinct endpoints x 1s) or reduce the endpoint count.
+The dedupe is asserted, not estimated: four capabilities routed to one node
+produce exactly one probe at the 1s budget, checked on call count and per-call
+timeout. Against a blackholed node, `readiness(probe_endpoints=True)` issues one
+HTTP call and returns in ~1.1s, while the default path issues none (~0.08s).
+`doctor --probe-endpoints` has no shared budget by design: it runs one provider
+self-check per capability at that provider's own timeout.
+
+`/studio` reports the same readiness snapshot without probing: it is a
+dashboard view, not a traffic gate. Its status can therefore be more optimistic
+than `/ready` on a host whose remote node is down, so the snapshot marks itself
+with `health.endpoints_probed: false`; read `/ready` for the traffic decision.
+
+Because `doctor` stays unprobed, `ready` in the self-check on a capability with
+a declared endpoint means installed, configured and locally routable, not
+reachable. Both the human report and `--json` name every declared endpoint that
+was not probed (`not probed:` lines, and `requirements.unprobed` with
+`ok: null`, distinct from `ok: false` for a missing prerequisite). A CLI health
+gate that must include reachability has to run
+`specialist doctor --strict --probe-endpoints --json` and accept its timeouts.
+
+A provider manifest that cannot be read is skipped by itself: its declared
+prerequisites are not checked, every other provider is still evaluated, and
+both `doctor` and `/ready` carry a warning naming the skipped file.
+
 Before promoting a release, run the process-boundary E2E suite from a clean
 checkout. It uses fallback providers and temporary state, so it does not
 download model weights:

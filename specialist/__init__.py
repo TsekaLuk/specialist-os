@@ -279,4 +279,4 @@ class Specialist:
 
 
 __all__ = ["Specialist", "SpeechFacade", "HumanFacade", "AudioFacade", "RetrievalFacade", "IdentityFacade", "GeometryFacade", "MediaFacade", "SpecialistRuntime", "SpecialistGraph", "SpecialistCascade", "ComputeNode", "NodeScheduler", "ProviderAdapter", "ProviderResult"]
-__version__ = "1.1.0"
+__version__ = "1.1.1"

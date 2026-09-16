@@ -20,6 +20,10 @@ class RemoteNodeProvider:
     disk_requirement_mb = 0
     license = "remote node terms"
     remote = True
+    # ``doctor`` issues a real HTTP request, so the runtime skips it unless the
+    # operator explicitly opts into endpoint probes. A registered but offline
+    # node must not stall the whole self-check.
+    doctor_probes_endpoint = True
 
     def __init__(self, node_id: str, capability: str, endpoint: str, *, token: str | None = None, latency_ms: int = 0, memory_mb: int = 0):
         if not endpoint.startswith(("http://", "https://")):
@@ -42,6 +46,21 @@ class RemoteNodeProvider:
     def install(self, cache, spec):
         cache.mark_installed(spec.name, self.name, self.model, source=self.endpoint, license_name=spec.license, commercial=spec.commercial, source_url=self.endpoint)
         return {"status": "ready", "remote": True, "node_id": self.node_id, "endpoint": self.endpoint}
+
+    def doctor_local(self, hardware):
+        """Report the registered node without contacting it."""
+        return {"status": "unprobed", "remote": True, "node_id": self.node_id, "endpoint": self.endpoint,
+                "endpoint_probe": {"status": "unprobed", "endpoint": f"{self.endpoint}/health", "reason": "self-check does not contact remote nodes; use --probe-endpoints"}}
+
+    def doctor_endpoint(self):
+        """Describe the health URL and the predicate ``doctor`` applies to it.
+
+        Reachability alone is not health: a node that answers 200 while
+        reporting a non-``ok`` status is not ready here, so the predicate
+        travels with the URL and a bounded caller reaches the same verdict.
+        """
+        return {"url": f"{self.endpoint}/health", "headers": self._headers(),
+                "expect": {"status": 200, "json_field": "status", "accept": ["ok"]}}
 
     def doctor(self, hardware):
         request = urllib.request.Request(f"{self.endpoint}/health", headers=self._headers(), method="GET")

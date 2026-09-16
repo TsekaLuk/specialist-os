@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## 1.1.1
+
+- Declared provider prerequisites as data that can be read without importing
+  provider code. Interchangeable sources share a group and the group is satisfied
+  when any member is, so a credential readable from either an environment
+  variable or a file no longer reports the unused source as missing.
+- Added the `degraded` capability status: installed and routable, but a
+  non-optional prerequisite is unmet, so the call is accepted and fails at
+  execution. `doctor` now names the unmet requirement instead of printing a bare
+  status word. Existing status values are unchanged.
+- Self-check no longer contacts declared endpoints. A registered but offline
+  remote node or speech server previously stalled `specialist doctor` for seconds
+  per capability; it is now reported as declared-but-unprobed. Pass
+  `specialist doctor --probe-endpoints` to contact them explicitly.
+- BEHAVIOR CHANGE: `/ready` and `/v1/ready` probe declared endpoints and return
+  503 when one is unreachable or reports itself unhealthy. Deployments whose
+  orchestrator reads `/ready` will start draining a node whose remote capability
+  backend or Fish Audio server is down. Probes are deduplicated per distinct
+  endpoint with a 1s budget each. `/studio` stays unprobed and says so.
+- Endpoint health predicates travel with the URL, so a node answering 200 with an
+  unhealthy body is reported unhealthy rather than ready.
+- Requirements are probed in the provider's own environment, fixing a false
+  missing-prerequisite report for console scripts installed in isolated provider
+  environments.
+- A malformed third-party provider manifest now drops only its own requirements
+  and is named in the report warnings, instead of silently clearing every
+  provider's requirements.
+- Fixed the package E2E capability assertion, which compared the combined Core
+  plus Music list against the Core-only baseline. Core and the Music pack are now
+  asserted as separate counts that partition the list, keeping the ADR-003 scope
+  freeze enforced by CI.
+
 ## 1.1.0
 
 - Expanded Specialist OS to 56 local-first capabilities spanning human pose,

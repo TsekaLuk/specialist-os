@@ -15,10 +15,14 @@ def snapshot(runtime, *, recent_limit: int = 20) -> dict[str, Any]:
             events = [json.loads(line) for line in lines if line.strip()]
         except (OSError, ValueError):
             events = []
+    # A dashboard view, not a traffic gate: it never contacts a declared
+    # endpoint, so its status can be more optimistic than ``/ready``. The
+    # snapshot says so rather than letting the two reports disagree silently.
     readiness = runtime.readiness()
     return {
         "status": readiness.get("status"),
-        "health": {"backend": readiness.get("backend"), "isolate": readiness.get("isolate"), "ready_capabilities": readiness.get("ready_capabilities"), "capabilities": readiness.get("capabilities")},
+        "health": {"backend": readiness.get("backend"), "isolate": readiness.get("isolate"), "ready_capabilities": readiness.get("ready_capabilities"), "capabilities": readiness.get("capabilities"),
+                   "endpoints_probed": False, "endpoint_note": "declared endpoints are not contacted for this snapshot; /ready probes them"},
         "capabilities": runtime.capabilities(),
         "models": runtime.models(),
         "nodes": [node.to_dict() for node in runtime.nodes.list()],

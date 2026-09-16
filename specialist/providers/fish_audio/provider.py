@@ -50,6 +50,8 @@ def _audio_metadata(path: Path, raw_metadata: dict, mime: str) -> dict:
 
 class FishAudioProvider:
     name = "fish_audio"
+    # The lifecycle health check contacts the isolated server over HTTP.
+    doctor_probes_endpoint = True
     preferred_model = "s2-pro"
     supported_platforms = ("linux-x64", "windows-x64", "macos-arm64")
     supported_devices = ("cuda", "cpu", "mps")
@@ -107,8 +109,31 @@ class FishAudioProvider:
         return {"status": "ready", "downloaded": False, "backend": "fish-audio-server", "server": self._get_lifecycle().client.endpoint, "license_mode": "research_only" if not spec.commercial else "commercial"}
 
     def doctor(self, hardware):
+        return self._doctor(hardware, self._get_lifecycle().health())
+
+    def doctor_endpoint(self):
+        """Describe the health URL and the predicate the client applies to it.
+
+        ``FishAudioClient.health`` accepts only HTTP 200 with a JSON body whose
+        ``status`` is ok, ready or healthy. The same contract is carried as data
+        so a bounded probe cannot pass a server that is up but not serving.
+        """
+        client = self._get_lifecycle().client
+        headers = {"Authorization": f"Bearer {client.token}"} if getattr(client, "token", None) else {}
+        return {"url": f"{client.endpoint}/v1/health", "headers": headers,
+                "expect": {"status": 200, "json_field": "status", "accept": ["ok", "ready", "healthy"]}}
+
+    def doctor_local(self, hardware):
+        """Report everything the self-check knows without contacting the server."""
         lifecycle = self._get_lifecycle()
-        value = lifecycle.health()
+        return self._doctor(hardware, {
+            "status": "unprobed",
+            "state": lifecycle.state,
+            "endpoint": lifecycle.client.endpoint,
+            "endpoint_probe": {"status": "unprobed", "endpoint": lifecycle.client.endpoint, "reason": "self-check does not contact the Fish Audio server; use --probe-endpoints"},
+        })
+
+    def _doctor(self, hardware, value):
         is_macos = str(hardware.get("os", "")).lower().startswith("darwin")
         suitable = bool(hardware.get("cuda") and (hardware.get("memory_gb") or 0) >= 24)
         value.update({"backend": "isolated-http-server", "provider": self.name, "model": self.model, "hardware": hardware, "support_level": "experimental" if is_macos else "supported", "hardware_suitable": suitable, "recommended_gpu_memory_gb": 24, "license_mode": "research_only", "max_concurrency": self.max_concurrency})

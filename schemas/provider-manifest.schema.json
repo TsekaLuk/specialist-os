@@ -15,7 +15,23 @@
     "license": {"type": "object"},
     "platform": {"type": "object"},
     "network_required": {"type": "boolean"},
-    "trust_level": {"enum": ["official", "verified", "community", "experimental"]}
+    "trust_level": {"enum": ["official", "verified", "community", "experimental"]},
+    "requirements": {
+      "type": "array",
+      "description": "Provider prerequisites as data. Requirements sharing a group are interchangeable sources of the same prerequisite and the group is satisfied when any member is. Endpoints are never contacted during a self-check.",
+      "items": {
+        "type": "object",
+        "required": ["kind", "name"],
+        "properties": {
+          "kind": {"enum": ["binary", "env", "file", "endpoint"]},
+          "name": {"type": "string", "minLength": 1},
+          "purpose": {"type": "string"},
+          "optional": {"type": "boolean", "default": false},
+          "group": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
   },
   "additionalProperties": true
   ,"anyOf": [{"required": ["capability"]}, {"required": ["capabilities"]}]

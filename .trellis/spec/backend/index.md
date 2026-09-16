@@ -19,6 +19,7 @@ This directory contains guidelines for backend development. Fill in each file wi
 | [Error Handling](./error-handling.md) | Error types, handling strategies | To fill |
 | [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns and CLI gallery contracts | Maintained |
 | [Music Contracts](./music-contracts.md) | ADR-004 payloads, artifacts and native provider boundaries | Maintained |
+| [Provider Self-Check Contracts](./provider-selfcheck-contracts.md) | Prerequisite declaration, probe policy, status levels and scope freeze | Maintained |
 | [Logging Guidelines](./logging-guidelines.md) | Structured logging, log levels | To fill |
 
 ---

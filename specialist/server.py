@@ -97,7 +97,12 @@ class RuntimeRequestHandler(BaseHTTPRequestHandler):
             except (KeyError, ValueError) as exc:
                 return self._send(404, {"error": {"code": "unknown_capability", "message": str(exc)}})
         if route in {"/ready", "/v1/ready"}:
-            readiness = self.runtime.readiness()
+            # A load-balancer readiness probe exists to test reachability, so
+            # this route opts into endpoint probes even though the CLI
+            # self-check and the Python default stay unprobed. Each distinct
+            # endpoint is contacted at most once per request with a short
+            # budget, bounding the response at (distinct endpoints x timeout).
+            readiness = self.runtime.readiness(probe_endpoints=True)
             return self._send(200 if readiness.get("accepting_requests", readiness.get("status") == "ready") else 503, readiness)
         if route in {"/metrics", "/v1/metrics"}:
             metrics = self.runtime.metrics()

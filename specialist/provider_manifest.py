@@ -11,6 +11,8 @@ import json
 from pathlib import Path
 from typing import Any, Iterable
 
+from .requirements import ProviderRequirement, RequirementError, parse_requirements
+
 
 class ProviderManifestError(ValueError):
     """Raised when a provider manifest is missing or malformed."""
@@ -28,6 +30,7 @@ class ProviderManifest:
     platform: dict[str, Any] = field(default_factory=dict)
     network_required: bool = False
     trust_level: str = "community"
+    requirements: tuple[ProviderRequirement, ...] = ()
     source: str | None = None
 
     @classmethod
@@ -54,7 +57,11 @@ class ProviderManifest:
         network_required = value.get("network_required", False)
         if not isinstance(network_required, bool):
             raise ProviderManifestError("network_required must be boolean")
-        return cls(provider.strip(), version.strip(), tuple(item.strip() for item in capabilities), runtime=mappings["runtime"], models=mappings["models"], metrics=mappings["metrics"], license=mappings["license"], platform=mappings["platform"], network_required=network_required, trust_level=trust_level, source=source)
+        try:
+            requirements = parse_requirements(value.get("requirements"))
+        except RequirementError as exc:
+            raise ProviderManifestError(f"invalid provider requirements: {exc}") from exc
+        return cls(provider.strip(), version.strip(), tuple(item.strip() for item in capabilities), runtime=mappings["runtime"], models=mappings["models"], metrics=mappings["metrics"], license=mappings["license"], platform=mappings["platform"], network_required=network_required, trust_level=trust_level, requirements=requirements, source=source)
 
     @classmethod
     def load(cls, path: str | Path) -> "ProviderManifest":
@@ -88,6 +95,7 @@ class ProviderManifest:
             "platform": dict(self.platform),
             "network_required": self.network_required,
             "trust_level": self.trust_level,
+            "requirements": [item.to_dict() for item in self.requirements],
         }
         if self.source:
             value["source"] = self.source
@@ -146,15 +154,70 @@ class ProviderCatalog:
         return self.install(ProviderManifest.load(path))
 
     def list(self) -> list[ProviderManifest]:
+        return self.scan()[0]
+
+    def scan(self) -> tuple[list[ProviderManifest], list[dict[str, str]]]:
+        """Load every catalog manifest, isolating a bad one to itself.
+
+        A single malformed third-party manifest must not hide the prerequisites
+        of every other provider, so each file is loaded independently and the
+        failures are reported to the caller instead of being swallowed.
+        """
         if not self.root.is_dir() or self.root.is_symlink():
-            return []
-        return discover_manifests([self.root])
+            return [], []
+        manifests: list[ProviderManifest] = []
+        errors: list[dict[str, str]] = []
+        seen: set[str] = set()
+        candidates = sorted([*self.root.glob("*/manifest.json"), *self.root.glob("*/manifest.yaml"), *self.root.glob("*/manifest.yml")])
+        for candidate in candidates:
+            try:
+                manifest = ProviderManifest.load(candidate)
+            except Exception as exc:
+                errors.append({"path": str(candidate), "message": str(exc)})
+                continue
+            if manifest.provider not in seen:
+                seen.add(manifest.provider)
+                manifests.append(manifest)
+        return manifests, errors
 
     def get(self, provider: str) -> ProviderManifest | None:
         path = self._manifest_path(provider)
         if not path.is_file() or path.is_symlink():
             return None
         return ProviderManifest.load(path)
+
+
+BUILTIN_REQUIREMENTS: dict[str, tuple[ProviderRequirement, ...]] = {
+    "ffmpeg": (
+        ProviderRequirement("binary", "ffmpeg", "decode, transcode and resample media"),
+    ),
+    "whisper.cpp": (
+        # One prerequisite with two interchangeable sources: the binary on PATH
+        # or an explicit override; reporting the unused source would be a false
+        # alarm on a host where transcription works.
+        ProviderRequirement("binary", "whisper-cli", "run whisper.cpp transcription", group="whisper-binary"),
+        ProviderRequirement("env", "SPECIALIST_WHISPER_BINARY", "run whisper.cpp transcription", group="whisper-binary"),
+        ProviderRequirement("binary", "ffmpeg", "decode source audio before transcription"),
+    ),
+    "mineru": (
+        ProviderRequirement("binary", "mineru", "run the MinerU document pipeline", group="mineru-command"),
+        ProviderRequirement("env", "SPECIALIST_MINERU_COMMAND", "run the MinerU document pipeline", group="mineru-command"),
+        ProviderRequirement("env", "SPECIALIST_MINERU_MODEL_DIR", "locate the MinerU pipeline models", group="mineru-models"),
+        ProviderRequirement("file", "~/mineru.json", "locate the MinerU pipeline models", group="mineru-models"),
+    ),
+    "pyannote": (
+        ProviderRequirement("env", "HF_TOKEN", "read gated diarization weights", group="huggingface-token"),
+        ProviderRequirement("env", "HUGGINGFACE_HUB_TOKEN", "read gated diarization weights", group="huggingface-token"),
+        ProviderRequirement("env", "HUGGING_FACE_HUB_TOKEN", "read gated diarization weights", group="huggingface-token"),
+        ProviderRequirement("file", "~/.cache/huggingface/token", "read gated diarization weights", group="huggingface-token"),
+    ),
+    "fish_audio": (
+        # Endpoints are declared so operators can see them, and never contacted
+        # during a self-check.
+        ProviderRequirement("endpoint", "SPECIALIST_FISH_AUDIO_URL", "reach the isolated Fish Audio server"),
+        ProviderRequirement("env", "SPECIALIST_FISH_AUDIO_TOKEN", "authenticate against a shared Fish Audio server", optional=True),
+    ),
+}
 
 
 def builtin_manifests() -> list[ProviderManifest]:
@@ -189,6 +252,7 @@ def builtin_manifests() -> list[ProviderManifest]:
             platform={"macos_arm64": True, "linux_x64": True, "windows_x64": True},
             network_required=False,
             trust_level="official",
+            requirements=BUILTIN_REQUIREMENTS.get(name, ()),
             source="builtin",
         )
         for name, capabilities, version, runtime, devices, license_name in definitions
@@ -205,6 +269,7 @@ def builtin_manifests() -> list[ProviderManifest]:
         platform={"linux_x64": "supported", "windows_wsl": "supported", "macos_arm64": "experimental"},
         network_required=False,
         trust_level="official",
+        requirements=fish.requirements,
         source="builtin",
     )
     pyannote = next(item for item in manifests if item.provider == "pyannote")
@@ -219,6 +284,7 @@ def builtin_manifests() -> list[ProviderManifest]:
         platform=pyannote.platform,
         network_required=pyannote.network_required,
         trust_level=pyannote.trust_level,
+        requirements=pyannote.requirements,
         source=pyannote.source,
     )
     return manifests

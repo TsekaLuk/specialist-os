@@ -12,3 +12,8 @@ evidence and frozen Core scope. Do not bypass native capture restrictions.
 - Demo/slides reconstruction and clean installation have documented, verified paths.
 - Unified workspace and native playback/recording retain explicit open status
   until actually verified; do not archive this entire task after partial fixes.
+- Self-check declares prerequisites as data, treats interchangeable sources as one
+  requirement, and never contacts a declared endpoint on the default path.
+- Self-check separates a capability that is installed and routable but missing a
+  non-optional prerequisite from one that is absent or failed to load, and names
+  the unmet requirement in human output.

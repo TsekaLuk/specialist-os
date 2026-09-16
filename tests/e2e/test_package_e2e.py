@@ -73,8 +73,19 @@ class PackageE2ETests(unittest.TestCase):
             )
             self.assertEqual(capabilities.returncode, 0, capabilities.stdout + capabilities.stderr)
             installed_capabilities = json.loads(capabilities.stdout)
-            self.assertEqual(len(installed_capabilities), 56)
             capability_names = {item["capability"] for item in installed_capabilities}
+            # The installed CLI reports the frozen scope itself: registry_snapshot carries
+            # "core", derived from CORE_CAPABILITIES (ADR-003). That flag is authoritative,
+            # not the "music." prefix, so a new capability is counted by the scope it was
+            # registered in. The counts stay literal on purpose: adding to either scope must
+            # fail this gate until the scope decision is made deliberately.
+            core_capabilities = sorted(item["capability"] for item in installed_capabilities if item["core"])
+            pack_capabilities = sorted(item["capability"] for item in installed_capabilities if not item["core"])
+            self.assertEqual(len(core_capabilities), 56, core_capabilities)
+            self.assertEqual([name for name in core_capabilities if name.startswith("music.")], [])
+            self.assertEqual(len(pack_capabilities), 10, pack_capabilities)
+            self.assertEqual([name for name in pack_capabilities if not name.startswith("music.")], [])
+            self.assertEqual(len(installed_capabilities), len(core_capabilities) + len(pack_capabilities))
             self.assertTrue(
                 {
                     "human.pose",
